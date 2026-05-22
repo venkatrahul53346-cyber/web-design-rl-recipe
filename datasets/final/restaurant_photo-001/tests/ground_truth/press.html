@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Press &amp; Media — Salt &amp; Field</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Page-specific: press */
+    .press-head {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: 80px;
+      align-items: end;
+      padding: 112px 0 64px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .press-head .lede { max-width: 38ch; }
+    @media (max-width: 820px) {
+      .press-head { grid-template-columns: 1fr; gap: 32px; padding: 72px 0 48px; }
+    }
+
+    .logo-wall {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--rule);
+      border-left: 1px solid var(--rule);
+    }
+    .logo-wall .logo-cell {
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 44px 28px;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+    }
+    .logo-cell .logo-name {
+      font-family: var(--serif);
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+    .logo-cell .logo-name .amp { font-style: italic; color: var(--accent); }
+    .logo-cell .logo-name.allcaps {
+      font-family: var(--sans);
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+    }
+    .logo-cell .logo-name.italic-only {
+      font-style: italic;
+      font-size: 1.7rem;
+    }
+    .logo-cell .logo-issue {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    @media (max-width: 820px) {
+      .logo-wall { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .mentions {
+      border-top: 1px solid var(--rule);
+    }
+    .mention {
+      display: grid;
+      grid-template-columns: 140px 1fr 200px 60px;
+      gap: 40px;
+      padding: 32px 0;
+      border-bottom: 1px solid var(--rule);
+      align-items: baseline;
+    }
+    .mention .m-date {
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .mention .m-pub {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--ink-soft);
+    }
+    .mention .m-title {
+      font-family: var(--serif);
+      font-size: 1.45rem;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+    .mention .m-byline {
+      font-size: 0.82rem;
+      color: var(--ink-mute);
+    }
+    .mention .m-arrow {
+      text-align: right;
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+    .mention a:hover { text-decoration: none; }
+    @media (max-width: 820px) {
+      .mention { grid-template-columns: 1fr; gap: 8px; padding: 24px 0; }
+      .mention .m-arrow { display: none; }
+    }
+
+    .pullquote {
+      padding: 96px 0;
+    }
+    .pullquote blockquote {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.18;
+      letter-spacing: -0.005em;
+      max-width: 22ch;
+      color: var(--ink);
+    }
+    .pullquote .qmark {
+      font-family: var(--serif);
+      font-size: 5rem;
+      line-height: 0.6;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .pullquote cite {
+      display: block;
+      margin-top: 32px;
+      font-style: normal;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .pullquote cite em {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 0.95rem;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--ink-soft);
+      margin-left: 8px;
+    }
+
+    .kit-grid {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 64px;
+    }
+    @media (max-width: 820px) {
+      .kit-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+    .kit-list { list-style: none; border-top: 1px solid var(--rule); }
+    .kit-list li {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--rule);
+      align-items: baseline;
+    }
+    .kit-list .kit-name {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+    }
+    .kit-list .kit-meta {
+      display: block;
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-top: 4px;
+    }
+    .kit-list .kit-dl {
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink);
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 3px;
+    }
+    .kit-list .kit-dl:hover { color: var(--accent); text-decoration: none; }
+
+    .contact-card {
+      background: var(--bg-warm);
+      border: 1px solid var(--rule);
+      padding: 40px;
+    }
+    .contact-card h3 {
+      font-family: var(--serif);
+      font-size: 1.8rem;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .contact-card .role {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--ink-soft);
+      margin-bottom: 24px;
+    }
+    .contact-card dl {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      row-gap: 14px;
+      column-gap: 16px;
+      padding-top: 24px;
+      border-top: 1px solid var(--rule);
+      font-size: 0.92rem;
+    }
+    .contact-card dt {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      align-self: center;
+    }
+    .contact-card dd { font-family: var(--sans); }
+
+    .awards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .award {
+      padding: 48px 32px;
+      border-right: 1px solid var(--rule);
+      text-align: center;
+    }
+    .award:last-child { border-right: 0; }
+    .award .a-year {
+      font-family: var(--serif);
+      font-size: 2.6rem;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .award .a-name {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+    }
+    .award .a-detail {
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    @media (max-width: 820px) {
+      .awards { grid-template-columns: 1fr; }
+      .award { border-right: 0; border-bottom: 1px solid var(--rule); }
+      .award:last-child { border-bottom: 0; }
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 40px;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .section-header h2 { margin: 0; }
+    .section-header .eyebrow { margin: 0; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav" aria-label="Primary">
+    <div class="nav-left">
+      <a href="menu.html" class="nav-link">Menu</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="location.html" class="nav-link">Location</a>
+      <a href="press.html" class="nav-link current">Press</a>
+    </div>
+    <a href="index.html" class="nav-brand">Salt <span class="amp">&amp;</span> Field</a>
+    <div class="nav-right">
+      <span class="nav-meta">Thu&ndash;Sun &middot; 5:30 &amp; 8:00</span>
+      <a href="reservations.html" class="nav-cta">Reserve</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="wrap">
+    <div class="press-head">
+      <div>
+        <p class="eyebrow eyebrow-accent" style="margin-bottom: 18px;">Press &amp; Media</p>
+        <h1 class="display-l">A small dining room <span class="italic serif">that has had</span> a generous reception.</h1>
+      </div>
+      <div>
+        <p class="lede">Selected coverage, photography, and contact information for editors, food writers, and broadcast producers. We&rsquo;re glad to host visits on Thursday and Friday services with at least two weeks&rsquo; notice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-header">
+        <p class="eyebrow">As featured in</p>
+        <p class="dek">A partial list, 2021&ndash;present.</p>
+      </div>
+      <div class="logo-wall">
+        <div class="logo-cell">
+          <div class="logo-name">The New York <span class="italic">Times</span></div>
+          <div class="logo-issue">Food &middot; March 2024</div>
+        </div>
+        <div class="logo-cell">
+          <div class="logo-name allcaps">Bon App&eacute;tit</div>
+          <div class="logo-issue">Hot 10 &middot; 2023</div>
+        </div>
+        <div class="logo-cell">
+          <div class="logo-name italic-only">Saveur</div>
+          <div class="logo-issue">Issue 214</div>
+        </div>
+        <div class="logo-cell">
+          <div class="logo-name">Eater <span class="italic">SF</span></div>
+          <div class="logo-issue">Best New &middot; 2022</div>
+        </div>
+        <div class="logo-cell">
+          <div class="logo-name allcaps">Cond&eacute; Nast Traveler</div>
+          <div class="logo-issue">Hot List 2024</div>
+        </div>
+        <div class="logo-cell">
+          <div class="logo-name italic-only">Cherry Bombe</div>
+          <div class="logo-issue">Spring 2023</div>
+        </div>
+        <div class="logo-cell">
+          <div class="logo-name">San Francisco <span class="italic">Chronicle</span></div>
+          <div class="logo-issue">Top 100 &middot; 2024</div>
+        </div>
+        <div class="logo-cell">
+          <div class="logo-name allcaps">Food &amp; Wine</div>
+          <div class="logo-issue">Best New Chef &middot; 2023</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight section-warm">
+    <div class="wrap">
+      <div class="awards">
+        <div class="award">
+          <div class="a-year">2024</div>
+          <div class="a-name"><em>One Michelin Star</em></div>
+          <div class="a-detail">California Guide</div>
+        </div>
+        <div class="award">
+          <div class="a-year">2023</div>
+          <div class="a-name"><em>Best New Chef</em></div>
+          <div class="a-detail">Food &amp; Wine &middot; Amelia Sato</div>
+        </div>
+        <div class="award">
+          <div class="a-year">2022</div>
+          <div class="a-name"><em>Outstanding Restaurant Nominee</em></div>
+          <div class="a-detail">James Beard Foundation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-deep pullquote">
+    <div class="wrap-narrow">
+      <span class="qmark">&ldquo;</span>
+      <blockquote>
+        The most quietly radical restaurant in Northern California &mdash; a place where the walk from row to plate is measured in minutes, not miles.
+        <cite>Tejal Rao <em>&mdash; The New York Times, March 2024</em></cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-header">
+        <h2 class="display-m">Recent coverage</h2>
+        <p class="eyebrow">2022 &mdash; 2024</p>
+      </div>
+      <div class="mentions">
+
+        <div class="mention">
+          <div class="m-date">Mar 12, 2024</div>
+          <div>
+            <div class="m-pub">The New York Times</div>
+            <div class="m-title"><a href="#">In Anderson Valley, a Farm Learns to Cook for Itself</a></div>
+            <div class="m-byline">By Tejal Rao &middot; 2,400 words</div>
+          </div>
+          <div class="m-date">Feature</div>
+          <div class="m-arrow"><a href="#">&rarr;</a></div>
+        </div>
+
+        <div class="mention">
+          <div class="m-date">Jan 30, 2024</div>
+          <div>
+            <div class="m-pub">Cond&eacute; Nast Traveler</div>
+            <div class="m-title"><a href="#">The Hot List 2024: 73 Restaurants Worth a Detour</a></div>
+            <div class="m-byline">Edited by Lale Arikoglu</div>
+          </div>
+          <div class="m-date">List</div>
+          <div class="m-arrow"><a href="#">&rarr;</a></div>
+        </div>
+
+        <div class="mention">
+          <div class="m-date">Nov 04, 2023</div>
+          <div>
+            <div class="m-pub">Bon App&eacute;tit</div>
+            <div class="m-title"><a href="#">Hot 10: America&rsquo;s Best New Restaurants, 2023</a></div>
+            <div class="m-byline">By Hilary Cadigan, photographs by Aubrie Pick</div>
+          </div>
+          <div class="m-date">List</div>
+          <div class="m-arrow"><a href="#">&rarr;</a></div>
+        </div>
+
+        <div class="mention">
+          <div class="m-date">Jul 18, 2023</div>
+          <div>
+            <div class="m-pub">Food &amp; Wine</div>
+            <div class="m-title"><a href="#">Best New Chef 2023: Amelia Sato Cooks the Hillside</a></div>
+            <div class="m-byline">By Khushbu Shah &middot; cover story</div>
+          </div>
+          <div class="m-date">Profile</div>
+          <div class="m-arrow"><a href="#">&rarr;</a></div>
+        </div>
+
+        <div class="mention">
+          <div class="m-date">May 02, 2023</div>
+          <div>
+            <div class="m-pub">Saveur</div>
+            <div class="m-title"><a href="#">A Forty-Seat Argument for Slowing Everything Down</a></div>
+            <div class="m-byline">By Kayla Stewart &middot; print, Issue 214</div>
+          </div>
+          <div class="m-date">Essay</div>
+          <div class="m-arrow"><a href="#">&rarr;</a></div>
+        </div>
+
+        <div class="mention">
+          <div class="m-date">Feb 14, 2023</div>
+          <div>
+            <div class="m-pub">San Francisco Chronicle</div>
+            <div class="m-title"><a href="#">Top 100 Restaurants: Mendocino&rsquo;s Quiet Standout</a></div>
+            <div class="m-byline">By Soleil Ho</div>
+          </div>
+          <div class="m-date">Review</div>
+          <div class="m-arrow"><a href="#">&rarr;</a></div>
+        </div>
+
+        <div class="mention">
+          <div class="m-date">Oct 06, 2022</div>
+          <div>
+            <div class="m-pub">Eater SF</div>
+            <div class="m-title"><a href="#">Best New Restaurants in the Bay Area, 2022</a></div>
+            <div class="m-byline">By Lauren Saria</div>
+          </div>
+          <div class="m-date">List</div>
+          <div class="m-arrow"><a href="#">&rarr;</a></div>
+        </div>
+
+        <div class="mention">
+          <div class="m-date">Spring 2023</div>
+          <div>
+            <div class="m-pub">Cherry Bombe</div>
+            <div class="m-title"><a href="#">Women Who Feed Us: Amelia Sato in Conversation</a></div>
+            <div class="m-byline">Interview by Kerry Diamond &middot; print</div>
+          </div>
+          <div class="m-date">Interview</div>
+          <div class="m-arrow"><a href="#">&rarr;</a></div>
+        </div>
+
+        <div class="mention">
+          <div class="m-date">Aug 22, 2022</div>
+          <div>
+            <div class="m-pub">KQED Forum</div>
+            <div class="m-title"><a href="#">What Regenerative Farming Tastes Like (Audio, 51 min)</a></div>
+            <div class="m-byline">Hosted by Mina Kim</div>
+          </div>
+          <div class="m-date">Radio</div>
+          <div class="m-arrow"><a href="#">&rarr;</a></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section-loose section-warm">
+    <div class="wrap">
+      <div class="kit-grid">
+        <div>
+          <p class="eyebrow eyebrow-accent" style="margin-bottom: 18px;">Press Kit</p>
+          <h2 class="display-m" style="margin-bottom: 20px;">Materials for editors <span class="italic">&amp; producers</span>.</h2>
+          <p class="dek" style="margin-bottom: 28px;">High-resolution photography, biographies, fact sheets, and approved logos. Please credit photographers as listed in each file&rsquo;s metadata.</p>
+          <p style="font-size: 0.95rem; color: var(--ink-soft);">For interviews, custom shoots, or to arrange a working-day visit to the farm, please write directly &mdash; we typically respond within two business days.</p>
+        </div>
+        <div>
+          <ul class="kit-list">
+            <li>
+              <div>
+                <span class="kit-name">Restaurant fact sheet</span>
+                <span class="kit-meta">PDF &middot; 4 pages &middot; 480 KB</span>
+              </div>
+              <a class="kit-dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="kit-name">Chef Amelia Sato &mdash; biography</span>
+                <span class="kit-meta">PDF &middot; short &amp; long versions &middot; 220 KB</span>
+              </div>
+              <a class="kit-dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="kit-name">Farm &amp; growing-practices brief</span>
+                <span class="kit-meta">PDF &middot; 6 pages &middot; 1.2 MB</span>
+              </div>
+              <a class="kit-dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="kit-name">Photography &mdash; dining room &amp; dishes</span>
+                <span class="kit-meta">ZIP &middot; 24 hi-res images &middot; 184 MB</span>
+              </div>
+              <a class="kit-dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="kit-name">Photography &mdash; the land &amp; growers</span>
+                <span class="kit-meta">ZIP &middot; 18 hi-res images &middot; 142 MB</span>
+              </div>
+              <a class="kit-dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="kit-name">Wordmark &amp; logo lockups</span>
+                <span class="kit-meta">SVG, EPS, PNG &middot; light &amp; dark &middot; 3.4 MB</span>
+              </div>
+              <a class="kit-dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="kit-name">Sample tasting-menu (Autumn 2024)</span>
+                <span class="kit-meta">PDF &middot; 2 pages &middot; 180 KB</span>
+              </div>
+              <a class="kit-dl" href="#">Download</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="asym-grid">
+        <div>
+          <p class="eyebrow" style="margin-bottom: 18px;">Press Contact</p>
+          <h2 class="display-m" style="margin-bottom: 20px;">Write to <span class="italic">Wren</span>.</h2>
+          <p class="dek">Our director of communications handles all editorial requests, photography licensing, and on-site visits. For private events or general inquiries, please use the addresses in the footer.</p>
+          <p style="margin-top: 28px; font-size: 0.95rem; color: var(--ink-soft);">We do not host food bloggers or unsolicited tastings during regular service. Working-press visits are arranged Thursday and Friday only, with two weeks&rsquo; notice.</p>
+        </div>
+        <div class="contact-card">
+          <h3>Wren Halberstam</h3>
+          <p class="role">Director of communications</p>
+          <dl>
+            <dt>Email</dt>
+            <dd><a href="mailto:press@saltandfield.com">press@saltandfield.com</a></dd>
+            <dt>Direct</dt>
+            <dd><a href="tel:+17078954412">(707) 895-4412</a></dd>
+            <dt>Mail</dt>
+            <dd>Salt &amp; Field<br>Attn: Press<br>2840 Greenwood Ridge Road<br>Philo, California 95466</dd>
+            <dt>Hours</dt>
+            <dd>Tue&ndash;Fri, 10:00&ndash;16:00 PT</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">Salt <span class="amp">&amp;</span> Field</div>
+        <p class="footer-tag">A forty-seat restaurant on a regenerative farm in the Anderson Valley. Tasting menus only, Thursday through Sunday.</p>
+        <p style="font-size: 0.88rem; line-height: 1.6;">2840 Greenwood Ridge Road<br>Philo, California 95466<br><a href="tel:+17078954400">(707) 895-4400</a></p>
+      </div>
+      <div class="footer-col">
+        <h4>Visit</h4>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="menu.html">Tasting menu</a></li>
+          <li><a href="location.html">Directions</a></li>
+          <li><a href="location.html#hours">Hours</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>The Farm</h4>
+        <ul>
+          <li><a href="about.html">Our story</a></li>
+          <li><a href="about.html#chef">Chef &amp; team</a></li>
+          <li><a href="about.html#farm">Growing practices</a></li>
+          <li><a href="press.html">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Stay close</h4>
+        <ul>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Private events</a></li>
+          <li><a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2024 Salt &amp; Field. All rights reserved.</span>
+      <span class="footer-meta">Grown, cooked, and served in Mendocino County.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

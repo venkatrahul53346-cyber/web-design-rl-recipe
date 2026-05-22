@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compare plans — Riverbed</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .compare-hero { padding: 88px 0 40px; }
+  .compare-hero h1 { font-size: clamp(36px, 5vw, 56px); max-width: 760px; }
+  .compare-hero .lead { margin-top: 20px; }
+  .compare-tier-summary { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: var(--radius-lg); margin-top: 40px; background: var(--bg); }
+  .compare-tier-summary > div { padding: 22px 20px; border-right: 1px solid var(--line); }
+  .compare-tier-summary > div:last-child { border-right: 0; }
+  .compare-tier-summary .label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mute); margin-bottom: 14px; }
+  .compare-tier-summary .tier-name { font-size: 16px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 10px; }
+  .compare-tier-summary .tier-name.accent { color: var(--text); }
+  .compare-tier-summary .tier-tag { font-size: 10px; color: var(--accent); border: 1px solid var(--accent-line); padding: 2px 7px; border-radius: 999px; font-weight: 500; }
+  .compare-tier-summary .micro-price { font-size: 22px; font-weight: 600; letter-spacing: -0.025em; margin-top: 8px; }
+  .compare-tier-summary .micro-price .unit { font-size: 12px; color: var(--text-mute); font-weight: 500; margin-left: 4px; }
+  .compare-tier-summary .micro-desc { font-size: 13px; color: var(--text-dim); margin-top: 8px; line-height: 1.5; }
+  .compare-wrap { margin-top: 8px; overflow-x: auto; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+  .compare-table col.feature { width: 34%; }
+  .compare-table col.tier { width: 22%; }
+  .compare-table thead th.featured-col { color: var(--accent); position: relative; }
+  .compare-table thead th.featured-col::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--accent-line); }
+  .compare-table td.featured-cell { background: rgba(239, 68, 68, 0.025); }
+  .compare-table .feat-name { color: var(--text); font-weight: 500; }
+  .compare-table .feat-hint { color: var(--text-mute); font-size: 12px; margin-top: 2px; display: block; font-weight: 400; }
+  .check-icon { width: 14px; height: 14px; display: inline-block; vertical-align: -2px; }
+  .check-icon.accent path { stroke: var(--accent); stroke-width: 1.75; }
+  .check-icon.dim path { stroke: var(--text-dim); stroke-width: 1.5; }
+  .dash { color: var(--text-mute); display: inline-block; width: 14px; text-align: center; }
+  .cell-detail { color: var(--text); font-weight: 500; }
+  .cell-detail.muted { color: var(--text-dim); }
+  .cta-row td { padding-top: 24px !important; padding-bottom: 32px !important; border-bottom: 0 !important; background: var(--bg); }
+  .cta-row .btn { width: 100%; }
+  .footnotes { padding: 56px 0 80px; }
+  .footnotes ol { padding-left: 18px; color: var(--text-dim); font-size: 13px; line-height: 1.7; max-width: 720px; }
+  .footnotes ol li { margin-bottom: 6px; }
+  @media (max-width: 820px) {
+    .compare-tier-summary { grid-template-columns: 1fr; }
+    .compare-tier-summary > div { border-right: 0; border-bottom: 1px solid var(--line); }
+    .compare-table { min-width: 720px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="index.html" class="brand" aria-label="Riverbed home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 5 C 5 5, 5 13, 9 13 C 13 13, 13 5, 16 5" stroke="#EF4444" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="2" cy="5" r="1.4" fill="#F5F5F7"/>
+          <circle cx="16" cy="5" r="1.4" fill="#F5F5F7"/>
+        </svg>
+      </span>
+      Riverbed
+    </a>
+    <nav class="nav-primary" aria-label="Primary">
+      <a href="index.html">Pricing</a>
+      <a href="compare.html" class="active">Compare plans</a>
+      <a href="customers.html">Customers</a>
+      <a href="enterprise.html">Enterprise</a>
+      <a href="faq.html">FAQ</a>
+      <a href="https://github.com" rel="noopener">Docs</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="contact.html" class="btn btn-ghost">Sign in</a>
+      <a href="index.html#start" class="btn btn-primary">Start free</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="compare-hero">
+    <div class="container">
+      <span class="eyebrow"><span class="dot"></span> Plan comparison</span>
+      <h1 style="margin-top:18px;">Every feature, side by side.</h1>
+      <p class="lead">The full matrix — retention, sampling, query limits, RBAC, SSO, and everything else that matters when you're putting tracing on the critical path. No asterisks, no &ldquo;contact sales for limits.&rdquo;</p>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="compare-tier-summary">
+        <div>
+          <div class="label">Choosing a plan</div>
+          <p class="micro-desc" style="margin-top:0;">Start on Free to wire up the agent. Move to Pro when you need more than 7 days of retention or want to invite the rest of the team. Enterprise when procurement gets involved.</p>
+        </div>
+        <div>
+          <div class="label">Free</div>
+          <div class="tier-name">Free</div>
+          <div class="micro-price">$0<span class="unit">forever</span></div>
+          <div class="micro-desc">Up to 5M spans / month. Single project. Community Slack.</div>
+        </div>
+        <div>
+          <div class="label">Pro &middot; Recommended</div>
+          <div class="tier-name accent">Pro <span class="tier-tag">Popular</span></div>
+          <div class="micro-price">$0.40<span class="unit">/ million spans</span></div>
+          <div class="micro-desc">Usage-based. 30-day retention, unlimited seats, query API.</div>
+        </div>
+        <div>
+          <div class="label">Enterprise</div>
+          <div class="tier-name">Enterprise</div>
+          <div class="micro-price">Custom</div>
+          <div class="micro-desc">Self-hosted query plane, SSO, custom retention, signed BAA.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-md">
+    <div class="container">
+      <div class="compare-wrap">
+        <table class="compare-table" aria-label="Feature comparison across plans">
+          <colgroup>
+            <col class="feature">
+            <col class="tier">
+            <col class="tier">
+            <col class="tier">
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">Feature</th>
+              <th scope="col">Free</th>
+              <th scope="col" class="featured-col">Pro</th>
+              <th scope="col">Enterprise</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-group"><td colspan="4">Ingest &amp; retention</td></tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Monthly span volume</span><span class="feat-hint">Spans across all services, post head-sampling.</span></th>
+              <td><span class="cell-detail">5M included</span></td>
+              <td class="featured-cell"><span class="cell-detail">Unlimited, $0.40/M</span></td>
+              <td><span class="cell-detail">Volume commit</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Trace retention</span><span class="feat-hint">Hot, queryable storage.</span></th>
+              <td><span class="cell-detail muted">7 days</span></td>
+              <td class="featured-cell"><span class="cell-detail">30 days</span></td>
+              <td><span class="cell-detail">Up to 13 months</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Tail-based sampling</span><span class="feat-hint">Keep slow / errored traces, drop the rest.</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><svg class="check-icon accent" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Cold archive to S3 / GCS</span><span class="feat-hint">Parquet exports, queryable from your warehouse.</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><span class="cell-detail">Daily</span></td>
+              <td><span class="cell-detail">Continuous</span></td>
+            </tr>
+
+            <tr class="row-group"><td colspan="4">Instrumentation</td></tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Open-source agent</span><span class="feat-hint">Apache 2.0, eBPF + OTel SDK.</span></th>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td class="featured-cell"><svg class="check-icon accent" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Zero-instrumentation HTTP/gRPC</span><span class="feat-hint">Automatic context propagation across services.</span></th>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td class="featured-cell"><svg class="check-icon accent" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Database query capture</span><span class="feat-hint">Postgres, MySQL, Mongo, Redis, ClickHouse.</span></th>
+              <td><span class="cell-detail muted">Postgres &amp; MySQL</span></td>
+              <td class="featured-cell"><span class="cell-detail">All supported</span></td>
+              <td><span class="cell-detail">All + custom drivers</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Custom span attributes</span></th>
+              <td><span class="cell-detail muted">32 / span</span></td>
+              <td class="featured-cell"><span class="cell-detail">128 / span</span></td>
+              <td><span class="cell-detail">Unlimited</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">OpenTelemetry compatibility</span><span class="feat-hint">OTLP/HTTP and OTLP/gRPC ingest.</span></th>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td class="featured-cell"><svg class="check-icon accent" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+
+            <tr class="row-group"><td colspan="4">Query &amp; analysis</td></tr>
+            <tr>
+              <th scope="row"><span class="feat-name">TraceQL query language</span><span class="feat-hint">SQL-like filters across spans and resources.</span></th>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td class="featured-cell"><svg class="check-icon accent" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Saved queries &amp; views</span></th>
+              <td><span class="cell-detail muted">10 saved</span></td>
+              <td class="featured-cell"><span class="cell-detail">Unlimited</span></td>
+              <td><span class="cell-detail">Unlimited + version history</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Service map</span></th>
+              <td><span class="cell-detail muted">15-min window</span></td>
+              <td class="featured-cell"><span class="cell-detail">24-hour window</span></td>
+              <td><span class="cell-detail">7-day window</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Latency comparisons</span><span class="feat-hint">A/B traces, deploy-vs-deploy diff.</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><svg class="check-icon accent" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Query API rate limit</span></th>
+              <td><span class="cell-detail muted">60 req / min</span></td>
+              <td class="featured-cell"><span class="cell-detail">1,000 req / min</span></td>
+              <td><span class="cell-detail">Negotiable</span></td>
+            </tr>
+
+            <tr class="row-group"><td colspan="4">Alerting &amp; workflows</td></tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Latency &amp; error SLOs</span></th>
+              <td><span class="cell-detail muted">3 SLOs</span></td>
+              <td class="featured-cell"><span class="cell-detail">50 SLOs</span></td>
+              <td><span class="cell-detail">Unlimited</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">PagerDuty, Opsgenie, Slack</span></th>
+              <td><span class="cell-detail muted">Slack only</span></td>
+              <td class="featured-cell"><svg class="check-icon accent" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Webhook destinations</span></th>
+              <td><span class="cell-detail muted">1</span></td>
+              <td class="featured-cell"><span class="cell-detail">25</span></td>
+              <td><span class="cell-detail">Unlimited + signed payloads</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Anomaly detection</span><span class="feat-hint">Auto-baseline p95 latency per route.</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><svg class="check-icon accent" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+
+            <tr class="row-group"><td colspan="4">Team &amp; access</td></tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Seats</span></th>
+              <td><span class="cell-detail muted">3</span></td>
+              <td class="featured-cell"><span class="cell-detail">Unlimited</span></td>
+              <td><span class="cell-detail">Unlimited + JIT provisioning</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Projects / environments</span></th>
+              <td><span class="cell-detail muted">1 project</span></td>
+              <td class="featured-cell"><span class="cell-detail">25 projects</span></td>
+              <td><span class="cell-detail">Unlimited</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Role-based access control</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><span class="cell-detail">5 preset roles</span></td>
+              <td><span class="cell-detail">Custom roles + scopes</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">SSO (SAML, OIDC)</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><span class="cell-detail">Google, GitHub, Okta</span></td>
+              <td><span class="cell-detail">Any SAML 2.0 IdP</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">SCIM provisioning</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><span class="dash">&mdash;</span></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Audit log</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><span class="cell-detail">30 days</span></td>
+              <td><span class="cell-detail">7 years, exportable</span></td>
+            </tr>
+
+            <tr class="row-group"><td colspan="4">Security &amp; compliance</td></tr>
+            <tr>
+              <th scope="row"><span class="feat-name">SOC 2 Type II report</span></th>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td class="featured-cell"><svg class="check-icon accent" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">HIPAA &amp; signed BAA</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><span class="dash">&mdash;</span></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">PII scrubbing at agent</span><span class="feat-hint">Regex + named-entity redaction before egress.</span></th>
+              <td><span class="cell-detail muted">Defaults only</span></td>
+              <td class="featured-cell"><span class="cell-detail">Custom rules</span></td>
+              <td><span class="cell-detail">Custom + on-prem key</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Data residency</span></th>
+              <td><span class="cell-detail muted">US-East</span></td>
+              <td class="featured-cell"><span class="cell-detail">US, EU, AP</span></td>
+              <td><span class="cell-detail">Self-host or dedicated VPC</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Customer-managed keys (CMK)</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><span class="dash">&mdash;</span></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+
+            <tr class="row-group"><td colspan="4">Support &amp; SLA</td></tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Uptime SLA</span></th>
+              <td><span class="cell-detail muted">Best effort</span></td>
+              <td class="featured-cell"><span class="cell-detail">99.9%</span></td>
+              <td><span class="cell-detail">99.99% with credits</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Support channel</span></th>
+              <td><span class="cell-detail muted">Community Slack</span></td>
+              <td class="featured-cell"><span class="cell-detail">Email, 1 business day</span></td>
+              <td><span class="cell-detail">Shared Slack + on-call</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Onboarding engineer</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><span class="dash">&mdash;</span></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="feat-name">Quarterly architecture review</span></th>
+              <td><span class="dash">&mdash;</span></td>
+              <td class="featured-cell"><span class="dash">&mdash;</span></td>
+              <td><svg class="check-icon dim" viewBox="0 0 14 14" fill="none"><path d="M3 7.2 6 10l5-6"/></svg></td>
+            </tr>
+
+            <tr class="cta-row">
+              <td></td>
+              <td><a href="index.html#start" class="btn btn-secondary">Start Free</a></td>
+              <td class="featured-cell"><a href="index.html#start" class="btn btn-primary">Start Pro trial <span class="arrow">&rarr;</span></a></td>
+              <td><a href="contact.html" class="btn btn-secondary">Talk to sales</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <section class="footnotes">
+    <div class="container">
+      <span class="kicker">Footnotes</span>
+      <ol style="margin-top:18px;">
+        <li>Span volume is billed on accepted spans after head sampling. Spans dropped by tail sampling on Pro and Enterprise do not count toward volume.</li>
+        <li>Retention is measured in calendar days from span receipt. Cold archive in S3 / GCS is not subject to the hot retention window and remains queryable through the API.</li>
+        <li>The query API rate limit is averaged over a 60-second window with burst capacity equal to 2&times; the steady-state limit.</li>
+        <li>SOC 2 Type II is available under NDA for accounts on Pro and above. Request via <a href="contact.html">contact</a>.</li>
+        <li>The Riverbed agent is open source under Apache 2.0 at github.com/riverbed-labs/agent &mdash; usable against any OTLP-compatible backend, not just Riverbed.</li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 5 C 5 5, 5 13, 9 13 C 13 13, 13 5, 16 5" stroke="#EF4444" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="2" cy="5" r="1.4" fill="#F5F5F7"/>
+            <circle cx="16" cy="5" r="1.4" fill="#F5F5F7"/>
+          </svg>
+        </span>
+        Riverbed
+      </a>
+      <p>Distributed tracing that follows the request &mdash; from edge to database, without manual instrumentation.</p>
+      <div style="margin-top:20px;"><span class="status-pill">All systems normal</span></div>
+    </div>
+    <div>
+      <h5>Product</h5>
+      <ul>
+        <li><a href="index.html">Pricing</a></li>
+        <li><a href="compare.html">Compare plans</a></li>
+        <li><a href="enterprise.html">Enterprise</a></li>
+        <li><a href="#">Changelog</a></li>
+        <li><a href="#">Integrations</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Developers</h5>
+      <ul>
+        <li><a href="#">Documentation</a></li>
+        <li><a href="#">Agent on GitHub</a></li>
+        <li><a href="#">OpenTelemetry guide</a></li>
+        <li><a href="#">API reference</a></li>
+        <li><a href="#">Status</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Company</h5>
+      <ul>
+        <li><a href="customers.html">Customers</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="#">Security</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Resources</h5>
+      <ul>
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="#">Tracing 101</a></li>
+        <li><a href="#">SLA</a></li>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2025 Riverbed Labs, Inc. Made in Brooklyn &amp; Lisbon.</span>
+    <span class="mono">v2.14.3 &middot; build 8f3a21c</span>
+  </div>
+</footer>
+
+</body>
+</html>

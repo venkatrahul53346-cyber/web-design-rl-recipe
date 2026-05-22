@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guides — Glyph cookbook</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .guides-head { padding: 56px 0 28px 0; border-bottom: 1px solid var(--rule); }
+  .guides-head .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); margin-bottom: 14px; }
+  .guides-head h1 { margin-bottom: 10px; max-width: 28ch; }
+  .guides-head p.lead { max-width: 60ch; margin-bottom: 0; }
+  .guides-meta { display: flex; gap: 28px; margin-top: 22px; font-size: 11.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em; }
+  .guides-meta span strong { color: var(--ink); font-weight: 600; }
+
+  .guides-section { padding: 44px 0 28px 0; }
+  .guides-section.wide { padding: 80px 0 28px 0; }
+  .section-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); margin-bottom: 28px; display: flex; justify-content: space-between; align-items: baseline; }
+  .section-eyebrow .count { color: var(--ink-3); font-weight: 400; }
+
+  .recipe-grid { display: grid; grid-template-columns: repeat(12, 1fr); border-top: 1px solid var(--rule); }
+  .recipe { grid-column: span 6; border-bottom: 1px solid var(--rule); padding: 28px 24px 32px 0; position: relative; }
+  .recipe:nth-child(odd) { border-right: 1px solid var(--rule); padding-right: 32px; }
+  .recipe:nth-child(even) { padding-left: 32px; padding-right: 8px; }
+  .recipe .num { font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em; }
+  .recipe h3 { margin-top: 6px; margin-bottom: 8px; font-size: 16px; }
+  .recipe h3 a { border: 0; color: var(--ink); }
+  .recipe h3 a:hover { color: var(--accent); }
+  .recipe .desc { color: var(--ink-2); margin-bottom: 14px; }
+  .recipe .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .recipe .tag { font-size: 11px; color: var(--ink-3); border: 1px solid var(--rule); padding: 1px 6px; text-transform: lowercase; }
+  .recipe .steps { list-style: none; padding: 0; margin: 0 0 14px 0; font-size: 12.5px; color: var(--ink-2); }
+  .recipe .steps li { display: flex; gap: 10px; padding: 4px 0; border-bottom: 1px dashed var(--rule); margin: 0; }
+  .recipe .steps li:last-child { border-bottom: 0; }
+  .recipe .steps .si { color: var(--ink-3); flex-shrink: 0; width: 28px; }
+  .recipe .read { font-size: 12px; color: var(--accent); border-bottom: 1px solid var(--accent); }
+  .recipe .read:hover { color: var(--ink); border-bottom-color: var(--ink); }
+  .recipe .meta-foot { display: flex; justify-content: space-between; margin-top: 16px; font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .featured { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--rule); background: var(--bg); margin-bottom: 24px; }
+  .featured .copy { padding: 28px 32px 32px 32px; border-right: 1px solid var(--rule); }
+  .featured .copy .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 14px; }
+  .featured h2 { font-size: 22px; margin: 0 0 12px 0; padding: 0; border: 0; }
+  .featured .copy p { font-size: 13.5px; color: var(--ink-2); }
+  .featured .copy .read { font-size: 12px; color: var(--accent); border-bottom: 1px solid var(--accent); display: inline-block; margin-top: 6px; }
+  .featured pre { margin: 0; border: 0; padding: 20px 24px; background: var(--bg-tint); height: 100%; }
+
+  .topic-rows { border-top: 1px solid var(--rule); }
+  .topic-row { display: grid; grid-template-columns: 200px 1fr 120px; gap: 32px; padding: 16px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+  .topic-row .topic { color: var(--ink-3); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .topic-row .title a { border: 0; color: var(--ink); }
+  .topic-row .title a:hover { color: var(--accent); }
+  .topic-row .title .d { color: var(--ink-3); margin-left: 10px; font-size: 12.5px; }
+  .topic-row .time { font-size: 11.5px; color: var(--ink-3); text-align: right; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .callout-help { border-left: 2px solid var(--accent); padding: 16px 20px; background: var(--bg-tint); margin-top: 44px; }
+  .callout-help h4 { margin: 0 0 6px 0; color: var(--ink); font-size: 13.5px; }
+  .callout-help p { margin: 0; font-size: 12.5px; }
+  .callout-help a { color: var(--accent); border-bottom: 1px solid var(--accent); }
+
+  @media (max-width: 820px) {
+    .recipe-grid .recipe { grid-column: span 12; border-right: 0 !important; padding: 24px 0 !important; }
+    .featured { grid-template-columns: 1fr; }
+    .featured .copy { border-right: 0; border-bottom: 1px solid var(--rule); }
+    .topic-row { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="row">
+      <a href="index.html" class="brand plain" aria-label="Glyph home">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="name">glyph</span>
+        <span class="ver">v0.14.2</span>
+      </a>
+      <nav class="primary-nav" aria-label="Primary">
+        <a href="getting-started.html">Getting started</a>
+        <a href="guides.html" class="active">Guides</a>
+        <a href="api-reference.html">Reference</a>
+        <a href="examples.html">Examples</a>
+        <a href="changelog.html">Changelog</a>
+      </nav>
+      <div class="header-utils">
+        <span class="search-stub" role="search">
+          <span>search docs</span>
+          <span class="kbd">⌘K</span>
+        </span>
+        <a class="gh-link" href="https://github.com/glyph-dev/glyph">github ↗</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="guides-head">
+    <div class="container-narrow">
+      <div class="eyebrow">Guides · Cookbook</div>
+      <h1>Recipes for the long road between schema and shipped.</h1>
+      <p class="lead">Practical, opinionated walkthroughs for the things that go wrong in real API work — drift between consumer and producer, breaking changes that slip past code review, mocks that lie, and CI that doesn't catch any of it. Each recipe is a focused workflow you can adopt in an afternoon.</p>
+      <div class="guides-meta">
+        <span><strong>14</strong> recipes</span>
+        <span><strong>6</strong> categories</span>
+        <span>Last updated · Nov 4, 2024</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="guides-section wide">
+    <div class="container-narrow">
+      <div class="section-eyebrow"><span>Featured recipe</span><span class="count">most-read this month</span></div>
+      <div class="featured">
+        <div class="copy">
+          <div class="label">★ Editor's pick</div>
+          <h2>Catching breaking changes in pull requests, automatically.</h2>
+          <p>Wire <code>glyph diff</code> into your PR checks so the bot comments with a structured changelog: which endpoints changed shape, which response codes were removed, and which fields became required. Producer teams stop guessing what consumers will break.</p>
+          <p>Includes a GitHub Action, a fail-on-major policy file, and a worked example of an <code>additionalProperties: false</code> tightening caught at review time.</p>
+          <a href="#" class="read">read the recipe →</a>
+        </div>
+        <pre><span class="prompt">$</span> glyph diff <span class="str">main</span> <span class="str">HEAD</span> --policy semver
+
+<span class="cmt"># 3 changes detected against main</span>
+  <span class="kw">major</span>  POST /orders        response.shipping_address now required
+  <span class="kw">minor</span>  GET  /orders/{id}   added field: tracking_url (nullable)
+  <span class="kw">patch</span>  GET  /healthz       description updated
+
+<span class="warn">✖ policy violation:</span> 1 major change on protected branch.
+  → blocking PR <span class="num">#4821</span>. require label <span class="str">"api:breaking"</span> to override.
+</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="guides-section">
+    <div class="container-narrow">
+      <div class="section-eyebrow"><span>All recipes</span><span class="count">06 of 14 shown</span></div>
+
+      <div class="recipe-grid">
+
+        <article class="recipe">
+          <div class="num">R · 01</div>
+          <h3><a href="#">Generating a typed TypeScript client without hand-edits</a></h3>
+          <p class="desc">Produce a client you can actually re-generate without throwing away your custom auth and retry logic.</p>
+          <div class="tags"><span class="tag">typescript</span><span class="tag">codegen</span><span class="tag">clients</span></div>
+          <ul class="steps">
+            <li><span class="si">01</span><span>Pin the spec source in <code>glyph.toml</code></span></li>
+            <li><span class="si">02</span><span>Choose a transport adapter (fetch / axios / undici)</span></li>
+            <li><span class="si">03</span><span>Wire middleware via the <code>extend()</code> seam, not patches</span></li>
+            <li><span class="si">04</span><span>Lock generated output behind <code>glyph verify</code> in CI</span></li>
+          </ul>
+          <div class="meta-foot"><span>~ 8 min read</span><a href="#" class="read">open recipe →</a></div>
+        </article>
+
+        <article class="recipe">
+          <div class="num">R · 02</div>
+          <h3><a href="#">Running a faithful mock server from your OpenAPI spec</a></h3>
+          <p class="desc">Stand up a mock that respects required fields, enums, and oneOf branches — not just "any object that vaguely fits".</p>
+          <div class="tags"><span class="tag">mocks</span><span class="tag">local-dev</span><span class="tag">examples</span></div>
+          <ul class="steps">
+            <li><span class="si">01</span><span>Run <code>glyph mock serve --port 4010</code></span></li>
+            <li><span class="si">02</span><span>Author canonical examples in the spec itself</span></li>
+            <li><span class="si">03</span><span>Use <code>Prefer: example=NotFound</code> to steer responses</span></li>
+            <li><span class="si">04</span><span>Add deterministic seeds for snapshot tests</span></li>
+          </ul>
+          <div class="meta-foot"><span>~ 6 min read</span><a href="#" class="read">open recipe →</a></div>
+        </article>
+
+        <article class="recipe">
+          <div class="num">R · 03</div>
+          <h3><a href="#">Contract tests for a Go producer using <code>glyph verify</code></a></h3>
+          <p class="desc">Run your real handlers against generated contract tests so the spec and the server can never silently disagree.</p>
+          <div class="tags"><span class="tag">go</span><span class="tag">contract-tests</span><span class="tag">producer</span></div>
+          <ul class="steps">
+            <li><span class="si">01</span><span>Emit a test harness with <code>glyph gen tests --lang go</code></span></li>
+            <li><span class="si">02</span><span>Boot your server in an <code>httptest</code> instance</span></li>
+            <li><span class="si">03</span><span>Run the harness; investigate each schema miss</span></li>
+            <li><span class="si">04</span><span>Promote passing endpoints into the <code>stable</code> tier</span></li>
+          </ul>
+          <div class="meta-foot"><span>~ 11 min read</span><a href="#" class="read">open recipe →</a></div>
+        </article>
+
+        <article class="recipe">
+          <div class="num">R · 04</div>
+          <h3><a href="#">Splitting one giant spec into versioned, composable bundles</a></h3>
+          <p class="desc">Move from a 12,000-line <code>openapi.yaml</code> to per-domain files that still resolve into a single coherent contract.</p>
+          <div class="tags"><span class="tag">spec-hygiene</span><span class="tag">refs</span><span class="tag">monorepo</span></div>
+          <ul class="steps">
+            <li><span class="si">01</span><span>Identify domain boundaries (billing, identity, catalog…)</span></li>
+            <li><span class="si">02</span><span>Extract paths and schemas into <code>$ref</code>-able files</span></li>
+            <li><span class="si">03</span><span>Bundle with <code>glyph bundle --resolve external</code></span></li>
+            <li><span class="si">04</span><span>Gate merges on <code>glyph lint --rule no-cycles</code></span></li>
+          </ul>
+          <div class="meta-foot"><span>~ 9 min read</span><a href="#" class="read">open recipe →</a></div>
+        </article>
+
+        <article class="recipe">
+          <div class="num">R · 05</div>
+          <h3><a href="#">Publishing typed SDKs to npm and PyPI from one source</a></h3>
+          <p class="desc">A release flow that ships a TypeScript SDK and a Python SDK from the same spec, versioned together, with reproducible builds.</p>
+          <div class="tags"><span class="tag">release</span><span class="tag">npm</span><span class="tag">pypi</span></div>
+          <ul class="steps">
+            <li><span class="si">01</span><span>Define a release matrix in <code>glyph.publish.toml</code></span></li>
+            <li><span class="si">02</span><span>Generate, test, and tag in a single CI job</span></li>
+            <li><span class="si">03</span><span>Sign artifacts and publish provenance</span></li>
+            <li><span class="si">04</span><span>Wire a downstream consumer-update PR bot</span></li>
+          </ul>
+          <div class="meta-foot"><span>~ 13 min read</span><a href="#" class="read">open recipe →</a></div>
+        </article>
+
+        <article class="recipe">
+          <div class="num">R · 06</div>
+          <h3><a href="#">Migrating a v1 endpoint to v2 without orphaning consumers</a></h3>
+          <p class="desc">Run both versions side-by-side, mark v1 deprecated in the spec, and watch the migration finish in real traffic.</p>
+          <div class="tags"><span class="tag">versioning</span><span class="tag">deprecation</span><span class="tag">migrations</span></div>
+          <ul class="steps">
+            <li><span class="si">01</span><span>Tag the old operation <code>deprecated: true</code></span></li>
+            <li><span class="si">02</span><span>Emit <code>Sunset</code> and <code>Deprecation</code> headers automatically</span></li>
+            <li><span class="si">03</span><span>Track callers per version with <code>glyph telemetry</code></span></li>
+            <li><span class="si">04</span><span>Remove v1 only when the SDK reports zero hits</span></li>
+          </ul>
+          <div class="meta-foot"><span>~ 10 min read</span><a href="#" class="read">open recipe →</a></div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="guides-section wide">
+    <div class="container-narrow">
+      <div class="section-eyebrow"><span>Shorter how-tos</span><span class="count">single-task</span></div>
+      <div class="topic-rows">
+        <div class="topic-row">
+          <div class="topic">CI / Pipelines</div>
+          <div class="title"><a href="#">Failing a GitHub Action on a major contract break</a><span class="d">— 12 lines of YAML, one policy file.</span></div>
+          <div class="time">~ 3 min</div>
+        </div>
+        <div class="topic-row">
+          <div class="topic">Auth</div>
+          <div class="title"><a href="#">Modeling bearer + signed-request schemes in one spec</a><span class="d">— Without leaking secrets into examples.</span></div>
+          <div class="time">~ 4 min</div>
+        </div>
+        <div class="topic-row">
+          <div class="topic">Schemas</div>
+          <div class="title"><a href="#">Choosing between <code>oneOf</code>, <code>anyOf</code>, and discriminators</a><span class="d">— A decision tree, with code that generates cleanly.</span></div>
+          <div class="time">~ 5 min</div>
+        </div>
+        <div class="topic-row">
+          <div class="topic">Errors</div>
+          <div class="title"><a href="#">Adopting RFC 7807 problem details across an org</a><span class="d">— Shared error schema, per-service codes, typed clients.</span></div>
+          <div class="time">~ 6 min</div>
+        </div>
+        <div class="topic-row">
+          <div class="topic">Tooling</div>
+          <div class="title"><a href="#">Pre-commit hooks that catch spec mistakes locally</a><span class="d">— Lint, format, and diff before you push.</span></div>
+          <div class="time">~ 2 min</div>
+        </div>
+        <div class="topic-row">
+          <div class="topic">Performance</div>
+          <div class="title"><a href="#">Speeding up generation in a 200-endpoint monorepo</a><span class="d">— Incremental cache keys, parallel emitters, IDE warm path.</span></div>
+          <div class="time">~ 7 min</div>
+        </div>
+        <div class="topic-row">
+          <div class="topic">Integrations</div>
+          <div class="title"><a href="#">Bridging Glyph with Buf for hybrid REST + gRPC stacks</a><span class="d">— Share types where it makes sense, isolate where it doesn't.</span></div>
+          <div class="time">~ 8 min</div>
+        </div>
+        <div class="topic-row">
+          <div class="topic">Telemetry</div>
+          <div class="title"><a href="#">Tracking SDK adoption with anonymous version pings</a><span class="d">— Opt-in, aggregate, and useful for sunset decisions.</span></div>
+          <div class="time">~ 4 min</div>
+        </div>
+      </div>
+
+      <div class="callout-help">
+        <h4>Missing the recipe you need?</h4>
+        <p>Open an <a href="https://github.com/glyph-dev/glyph/discussions">RFC discussion</a> with the workflow you're trying to build. Several of the recipes on this page started as a single GitHub issue from a platform team.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row">
+      <div class="tagline-block">
+        <a href="index.html" class="brand plain"><span class="mark" aria-hidden="true"></span><span class="name">glyph</span></a>
+        <p>API contracts that stay honest. One command from OpenAPI to typed clients, mocks, and contract tests.</p>
+      </div>
+      <div>
+        <h5>Docs</h5>
+        <ul>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="guides.html">Guides</a></li>
+          <li><a href="api-reference.html">CLI reference</a></li>
+          <li><a href="examples.html">Examples</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Project</h5>
+        <ul>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph">Source (GitHub)</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/issues">Issue tracker</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/discussions">Discussions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">RFCs</a></li>
+          <li><a href="#">Contributing</a></li>
+          <li><a href="#">Code of conduct</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">License — Apache 2.0</a></li>
+          <li><a href="#">Security policy</a></li>
+          <li><a href="#">Trademark</a></li>
+          <li><a href="#">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="colophon">
+      <div><span class="status-dot" aria-hidden="true"></span>all systems nominal · build 2024.11.4-a31cf2</div>
+      <div>© 2021–2024 Glyph contributors · Set in JetBrains Mono</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

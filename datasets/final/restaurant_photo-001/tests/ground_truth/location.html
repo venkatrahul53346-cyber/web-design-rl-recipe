@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Location & Hours — Salt & Field</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .loc-hero {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 64px;
+    align-items: end;
+  }
+  @media (max-width: 820px) { .loc-hero { grid-template-columns: 1fr; gap: 32px; } }
+
+  .address-block .display-m { margin-bottom: 18px; }
+  .address-block p { font-size: 1.02rem; line-height: 1.7; color: var(--ink-soft); }
+  .address-block .pin-line { color: var(--accent); font-family: var(--serif); font-style: italic; font-size: 1.1rem; margin-bottom: 8px; }
+
+  /* Crosshatch map */
+  .map-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 11;
+    border: 1px solid var(--rule);
+    background-color: var(--bg-warm);
+    background-image:
+      repeating-linear-gradient(45deg, var(--rule-soft) 0, var(--rule-soft) 1px, transparent 1px, transparent 14px),
+      repeating-linear-gradient(-45deg, var(--rule-soft) 0, var(--rule-soft) 1px, transparent 1px, transparent 14px);
+    overflow: hidden;
+  }
+  .map-road {
+    position: absolute;
+    background: var(--bg);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .map-road.r1 { top: 38%; left: -5%; width: 70%; height: 18px; transform: rotate(-6deg); }
+  .map-road.r2 { top: 62%; left: 30%; width: 80%; height: 14px; transform: rotate(8deg); }
+  .map-road.r3 { top: 10%; left: 55%; width: 4px; height: 110%; transform: rotate(12deg); background: var(--rule); border: 0; }
+  .map-river {
+    position: absolute;
+    top: 70%; left: -10%;
+    width: 130%; height: 26px;
+    background: var(--bg-deep);
+    transform: rotate(-3deg);
+    opacity: 0.85;
+  }
+  .map-pin {
+    position: absolute;
+    top: 44%; left: 52%;
+    transform: translate(-50%, -100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .map-pin .pin-dot {
+    width: 18px; height: 18px;
+    background: var(--accent);
+    border: 3px solid var(--bg-warm);
+    box-sizing: content-box;
+  }
+  .map-pin .pin-stem {
+    width: 1px; height: 28px;
+    background: var(--accent);
+  }
+  .map-pin .pin-label {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink);
+    background: var(--bg-warm);
+    padding: 4px 10px;
+    border: 1px solid var(--rule);
+    white-space: nowrap;
+    margin-top: -2px;
+  }
+  .map-marker {
+    position: absolute;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--ink-mute);
+  }
+  .map-marker.m1 { top: 14%; left: 8%; }
+  .map-marker.m2 { top: 78%; right: 8%; }
+  .map-marker.m3 { top: 28%; right: 14%; }
+  .map-compass {
+    position: absolute;
+    top: 18px; right: 18px;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    border: 1px solid var(--rule);
+    padding: 8px 10px;
+    background: rgba(251,247,240,0.85);
+  }
+  .map-scale {
+    position: absolute;
+    bottom: 16px; left: 16px;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .map-scale .bar { width: 56px; height: 2px; background: var(--ink); }
+
+  /* Hours table */
+  .hours-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .hours-table tr { border-bottom: 1px solid var(--rule); }
+  .hours-table tr:first-child { border-top: 1px solid var(--rule); }
+  .hours-table td {
+    padding: 22px 0;
+    vertical-align: baseline;
+  }
+  .hours-table .day {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    width: 38%;
+  }
+  .hours-table .seating {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+  .hours-table .seating em {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-mute);
+    display: block;
+    font-size: 0.88rem;
+    margin-top: 4px;
+  }
+  .hours-table .closed {
+    color: var(--ink-mute);
+    font-style: italic;
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    text-align: right;
+  }
+
+  /* Directions columns */
+  .dir-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px;
+  }
+  @media (max-width: 820px) { .dir-grid { grid-template-columns: 1fr; gap: 32px; } }
+  .dir-col h3 {
+    font-family: var(--serif);
+    font-size: 1.45rem;
+    margin-bottom: 14px;
+  }
+  .dir-col .miles {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--accent);
+    margin-bottom: 18px;
+    font-size: 1.05rem;
+  }
+  .dir-col p {
+    font-size: 0.96rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+
+  /* Practical list */
+  .practical {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 56px;
+  }
+  @media (max-width: 820px) { .practical { grid-template-columns: 1fr; gap: 32px; } }
+  .practical-list { list-style: none; }
+  .practical-list li {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 32px;
+    align-items: baseline;
+  }
+  .practical-list li:first-child { border-top: 1px solid var(--rule); }
+  .practical-list .label {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .practical-list .body {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+  .practical-list .body strong { color: var(--ink); font-weight: 500; }
+  @media (max-width: 640px) {
+    .practical-list li { grid-template-columns: 1fr; gap: 6px; }
+  }
+
+  .nearby-fig figcaption {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 0.95rem;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav" aria-label="Primary">
+    <div class="nav-left">
+      <a href="menu.html" class="nav-link">Menu</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="location.html" class="nav-link current">Location</a>
+      <a href="press.html" class="nav-link">Press</a>
+    </div>
+    <a href="index.html" class="nav-brand">Salt <span class="amp">&amp;</span> Field</a>
+    <div class="nav-right">
+      <span class="nav-meta">Thu&ndash;Sun &middot; 5:30 &amp; 8:00</span>
+      <a href="reservations.html" class="nav-cta">Reserve</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow eyebrow-accent">Finding us</p>
+      <h1 class="display-l">A bend in the road,<br>then a long gravel drive.</h1>
+      <p class="dek">We are two and a half hours north of the Golden Gate, twelve minutes past the last cell signal, and worth every mile of the trip out.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="loc-hero">
+        <div class="address-block">
+          <p class="eyebrow" style="margin-bottom: 18px;">The address</p>
+          <h2 class="display-m serif">2840 Greenwood<br>Ridge Road</h2>
+          <p class="pin-line">Philo, California &mdash; 95466</p>
+          <p>The driveway is unmarked from the road. Look for a low rock wall and a single sycamore at mile marker 14.6. Continue past the farm gate; guest parking is on the left under the bay laurels.</p>
+          <p style="margin-top: 20px;"><a href="tel:+17078954400" class="btn-link">Call (707) 895-4400</a></p>
+        </div>
+
+        <figure class="map-frame" aria-label="Map showing Salt and Field location off Greenwood Ridge Road">
+          <div class="map-compass">N &uarr;</div>
+          <span class="map-marker m1">Navarro River</span>
+          <span class="map-marker m3">Hwy 128</span>
+          <span class="map-marker m2">Philo &mdash; 4 mi</span>
+          <div class="map-road r3"></div>
+          <div class="map-road r1"></div>
+          <div class="map-road r2"></div>
+          <div class="map-river"></div>
+          <div class="map-pin" aria-hidden="true">
+            <span class="pin-label">Salt <em style="font-style:italic;color:var(--accent);">&amp;</em> Field</span>
+            <span class="pin-stem"></span>
+            <span class="pin-dot"></span>
+          </div>
+          <div class="map-scale"><span class="bar"></span> 1 mile</div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="section section-warm" id="hours">
+    <div class="wrap">
+      <div class="asym-grid">
+        <div>
+          <p class="eyebrow eyebrow-accent">Hours</p>
+          <h2 class="display-l" style="margin-top: 14px;">Four nights<br><em class="italic">a week.</em></h2>
+          <p class="dek" style="margin-top: 24px;">Two seatings each evening &mdash; the early room at 5:30, the late room at 8:00. We close Monday through Wednesday so the kitchen can harvest, prep, and rest.</p>
+          <p style="margin-top: 28px; font-size: 0.95rem; color: var(--ink-mute);">The dining room is closed during the second week of January and the last week of August. Holiday hours posted on the journal.</p>
+        </div>
+        <div>
+          <table class="hours-table">
+            <tbody>
+              <tr>
+                <td class="day">Monday</td>
+                <td class="closed">closed</td>
+              </tr>
+              <tr>
+                <td class="day">Tuesday</td>
+                <td class="closed">closed</td>
+              </tr>
+              <tr>
+                <td class="day">Wednesday</td>
+                <td class="closed">closed</td>
+              </tr>
+              <tr>
+                <td class="day">Thursday</td>
+                <td class="seating">5:30 &nbsp;&middot;&nbsp; 8:00<em>seven-course menu</em></td>
+              </tr>
+              <tr>
+                <td class="day">Friday</td>
+                <td class="seating">5:30 &nbsp;&middot;&nbsp; 8:00<em>seven-course menu</em></td>
+              </tr>
+              <tr>
+                <td class="day">Saturday</td>
+                <td class="seating">5:30 &nbsp;&middot;&nbsp; 8:00<em>nine-course tasting</em></td>
+              </tr>
+              <tr>
+                <td class="day">Sunday</td>
+                <td class="seating">1:00 &nbsp;&middot;&nbsp; 5:30<em>Sunday supper &mdash; family-style</em></td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top: 24px;"><a href="reservations.html" class="btn">Reserve a table</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow eyebrow-accent" style="text-align: center;">Getting here</p>
+      <h2 class="display-m serif" style="text-align: center; margin: 14px 0 56px; max-width: 720px; margin-left: auto; margin-right: auto;">The drive is part of the meal. Plan it like one.</h2>
+
+      <div class="dir-grid">
+        <div class="dir-col">
+          <h3>From San Francisco</h3>
+          <p class="miles">132 miles &middot; 2 hr 35 min</p>
+          <p>North on Highway 101 to Cloverdale, then west on Highway 128 through the redwoods. The road narrows past Boonville &mdash; drive it in daylight if you can. Coming home, fog often closes in along the Navarro by 10pm.</p>
+        </div>
+        <div class="dir-col">
+          <h3>From Mendocino Coast</h3>
+          <p class="miles">28 miles &middot; 45 min</p>
+          <p>Inland on Highway 128 from the village of Albion. You will follow the river upstream for most of the drive. The orchards begin at Navarro; we are seven miles further on, past Greenwood Ridge Vineyards.</p>
+        </div>
+        <div class="dir-col">
+          <h3>From Healdsburg</h3>
+          <p class="miles">68 miles &middot; 1 hr 25 min</p>
+          <p>The scenic route &mdash; north on 101, then a hard left at Cloverdale onto 128. A good driver can make it in an hour and ten, but the road is full of switchbacks. Most guests pause for a glass at Pennyroyal in Boonville.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="section section-deep">
+    <div class="wrap">
+      <div class="practical">
+        <div>
+          <p class="eyebrow eyebrow-accent">Before you arrive</p>
+          <h2 class="display-m serif" style="margin-top: 14px;">A few practical notes <em class="italic" style="color: var(--accent);">&mdash;</em></h2>
+          <p class="dek" style="margin-top: 20px;">Reading these will save you a phone call from the gate.</p>
+        </div>
+        <ul class="practical-list">
+          <li>
+            <span class="label">Parking</span>
+            <span class="body"><strong>Complimentary, gravel lot at the bay laurels.</strong> Twenty-two spaces. The lot is unlit; we provide a lantern walk to the dining room. Please do not park along Greenwood Ridge Road &mdash; CalFire keeps the shoulders clear.</span>
+          </li>
+          <li>
+            <span class="label">Cell service</span>
+            <span class="body"><strong>None on property.</strong> Verizon flickers at the front gate; AT&amp;T returns about a mile down the ridge. The restaurant has a landline at (707) 895-4400 if you need to be reached.</span>
+          </li>
+          <li>
+            <span class="label">Arrival window</span>
+            <span class="body"><strong>Doors open thirty minutes before your seating.</strong> Come early &mdash; there is a garden walk, a glass of something cold, and a fire in the courtyard most evenings.</span>
+          </li>
+          <li>
+            <span class="label">Public transit</span>
+            <span class="body"><strong>There is none, honestly.</strong> The nearest Greyhound stop is Ukiah, fifty miles east. We can arrange a car service from Healdsburg or the Sonoma County airport with two days' notice &mdash; ask when you book.</span>
+          </li>
+          <li>
+            <span class="label">Accessibility</span>
+            <span class="body"><strong>The dining room and restrooms are step-free.</strong> The path from the lot is packed gravel for about sixty feet; we are glad to bring a chair or arm to anyone who would prefer one. Let us know in advance.</span>
+          </li>
+          <li>
+            <span class="label">What to wear</span>
+            <span class="body"><strong>Comfortable, with a layer.</strong> The valley drops fifteen degrees after sundown and a portion of service moves through the garden. No dress code &mdash; people show up in everything from jeans to silk.</span>
+          </li>
+          <li>
+            <span class="label">Staying nearby</span>
+            <span class="body"><strong>We keep a short list of inns we trust.</strong> The Boonville Hotel (eight miles), Brambles Bed &amp; Breakfast (three miles), and the cottages at Goldeneye Winery. Email <a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a> and we will send the current list.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <hr class="rule">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 32px 0; flex-wrap: wrap; gap: 16px;">
+        <p class="serif italic" style="font-size: 1.3rem; color: var(--ink-soft);">Lost on the ridge? Call the kitchen.</p>
+        <a href="tel:+17078954400" class="btn-link">(707) 895-4400</a>
+      </div>
+      <hr class="rule">
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">Salt <span class="amp">&amp;</span> Field</div>
+        <p class="footer-tag">A forty-seat restaurant on a regenerative farm in the Anderson Valley. Tasting menus only, Thursday through Sunday.</p>
+        <p style="font-size: 0.88rem; line-height: 1.6;">2840 Greenwood Ridge Road<br>Philo, California 95466<br><a href="tel:+17078954400">(707) 895-4400</a></p>
+      </div>
+      <div class="footer-col">
+        <h4>Visit</h4>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="menu.html">Tasting menu</a></li>
+          <li><a href="location.html">Directions</a></li>
+          <li><a href="location.html#hours">Hours</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>The Farm</h4>
+        <ul>
+          <li><a href="about.html">Our story</a></li>
+          <li><a href="about.html#chef">Chef &amp; team</a></li>
+          <li><a href="about.html#farm">Growing practices</a></li>
+          <li><a href="press.html">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Stay close</h4>
+        <ul>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Private events</a></li>
+          <li><a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2024 Salt &amp; Field. All rights reserved.</span>
+      <span class="footer-meta">Grown, cooked, and served in Mendocino County.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Bag — Wren &amp; Bell</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .cart-wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--gutter); }
+  .cart-head { padding: 56px 0 40px; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; }
+  .cart-head h1 { font-size: clamp(36px, 4.5vw, 56px); margin-bottom: 8px; }
+  .cart-head .eyebrow { display:block; margin-bottom: 14px; }
+  .cart-head__note { color: var(--ink-mute); font-size: 13px; max-width: 380px; line-height: 1.6; }
+  .cart-head__note em { font-style: italic; }
+
+  .cart-layout { display: grid; grid-template-columns: 1.55fr 1fr; gap: 80px; padding: 56px 0 96px; align-items: start; }
+  @media (max-width: 960px) { .cart-layout { grid-template-columns: 1fr; gap: 48px; padding: 40px 0 64px; } }
+
+  .cart-table__head { display: grid; grid-template-columns: 110px 1fr 130px 110px 90px; gap: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500; }
+  .cart-table__head span:nth-child(3), .cart-table__head span:nth-child(4) { text-align: center; }
+  .cart-table__head span:nth-child(5) { text-align: right; }
+
+  .line { display: grid; grid-template-columns: 110px 1fr 130px 110px 90px; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--rule-soft); align-items: start; }
+  .line__img { aspect-ratio: 4/5; background: var(--bg-deep); border: 1px solid var(--rule-soft); overflow: hidden; }
+  .line__img img { width: 100%; height: 100%; object-fit: cover; }
+  .line__info h3 { font-size: 16px; font-weight: 500; margin-bottom: 6px; letter-spacing: -0.005em; }
+  .line__meta { font-size: 13px; color: var(--ink-mute); line-height: 1.7; }
+  .line__meta span + span::before { content: '·'; margin: 0 8px; color: var(--rule); }
+  .line__edit { margin-top: 14px; display: flex; gap: 18px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .line__edit a { border-bottom: 1px solid var(--rule); padding-bottom: 2px; color: var(--ink-soft); }
+  .line__edit a:hover { color: var(--ink); border-color: var(--ink); }
+
+  .qty { display: inline-flex; align-items: center; border: 1px solid var(--rule); margin: 0 auto; }
+  .qty button { background: none; border: 0; width: 32px; height: 34px; font-size: 14px; cursor: pointer; color: var(--ink); }
+  .qty button:hover { color: var(--accent-deep); }
+  .qty span { width: 32px; text-align: center; font-variant-numeric: tabular-nums; font-size: 13px; }
+  .line__qty { display: flex; justify-content: center; }
+  .line__price { text-align: center; font-variant-numeric: tabular-nums; font-size: 14px; padding-top: 8px; }
+  .line__total { text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 500; padding-top: 8px; }
+
+  @media (max-width: 720px) {
+    .cart-table__head { display: none; }
+    .line { grid-template-columns: 90px 1fr; gap: 18px; padding: 22px 0; }
+    .line__qty, .line__price, .line__total { grid-column: 2; text-align: left; padding-top: 0; }
+    .line__qty { justify-content: flex-start; margin-top: 12px; }
+    .qty { margin: 0; }
+  }
+
+  .summary { background: var(--bg-alt); border: 1px solid var(--rule); padding: 36px 32px; position: sticky; top: 120px; }
+  .summary h2 { font-size: 22px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .summary .eyebrow { margin-bottom: 24px; display: block; }
+  .summary__row { display: flex; justify-content: space-between; padding: 12px 0; font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .summary__row.muted { color: var(--ink-mute); font-size: 13px; }
+  .summary__row.total { padding: 18px 0 6px; border-top: 1px solid var(--rule); margin-top: 12px; font-size: 16px; color: var(--ink); font-weight: 500; }
+  .summary__total-num { font-variant-numeric: tabular-nums; }
+  .summary__vat { font-size: 12px; color: var(--ink-mute); margin-bottom: 24px; font-style: italic; font-weight: 300; }
+  .summary .btn { margin-top: 8px; }
+  .summary__pay { margin-top: 18px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); text-align: center; }
+  .summary__pay-row { margin-top: 12px; display: flex; justify-content: center; gap: 14px; font-size: 12px; color: var(--ink-soft); letter-spacing: 0.04em; }
+  .summary__pay-row span { padding: 6px 10px; border: 1px solid var(--rule); font-weight: 500; }
+
+  .gift { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--rule-soft); }
+  .gift label { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; color: var(--ink-soft); cursor: pointer; line-height: 1.5; }
+  .gift input[type=checkbox] { appearance: none; width: 16px; height: 16px; border: 1px solid var(--ink); background: transparent; cursor: pointer; flex-shrink: 0; margin-top: 2px; position: relative; }
+  .gift input[type=checkbox]:checked { background: var(--ink); }
+  .gift input[type=checkbox]:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px; border: solid var(--bg); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+
+  .promise { background: var(--bg-deep); padding: 72px 0; margin-top: 0; }
+  .promise-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+  @media (max-width: 800px) { .promise-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; } }
+  .promise-item h4 { margin-bottom: 10px; color: var(--ink); }
+  .promise-item p { font-size: 13px; line-height: 1.65; color: var(--ink-soft); }
+
+  .also { padding: 96px 0 80px; border-top: 1px solid var(--rule); }
+  .also__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 36px; gap: 24px; }
+  .also__head h2 { font-size: 28px; font-weight: 300; letter-spacing: -0.02em; }
+  .also__head a { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid var(--ink); padding-bottom: 3px; }
+  .also-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  @media (max-width: 900px) { .also-grid { grid-template-columns: repeat(2, 1fr); } }
+  .mini-card .mini-img { aspect-ratio: 4/5; background: var(--bg-deep); border: 1px solid var(--rule-soft); overflow: hidden; }
+  .mini-card .mini-img img { width: 100%; height: 100%; object-fit: cover; }
+  .mini-meta { display: flex; justify-content: space-between; padding: 12px 2px 0; font-size: 13px; }
+  .mini-name { font-weight: 500; }
+  .mini-price { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .mini-sub { font-size: 12px; color: var(--ink-mute); padding: 2px 2px 0; }
+
+  .empty-link { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); }
+  .empty-link:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header__announce">Free shipping in the EU &amp; UK. <em>Spring drop — limited to 240 pieces per style.</em></div>
+  <div class="site-header__inner">
+    <nav class="site-nav" aria-label="primary">
+      <a href="collection.html">Shop</a>
+      <a href="journal.html">Journal</a>
+      <a href="about.html">The Workshop</a>
+    </nav>
+    <a class="site-logo" href="index.html">Wren &amp; Bell <span>·</span></a>
+    <div class="site-utils">
+      <a href="#">Search</a>
+      <a href="#">Account</a>
+      <a href="cart.html" class="active">Bag<span class="cart-count">(3)</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="cart-wrap">
+    <section class="cart-head">
+      <div>
+        <span class="eyebrow">Your Bag — 3 pieces</span>
+        <h1>A small, considered selection.</h1>
+      </div>
+      <p class="cart-head__note"><em>Each piece is finished by hand in Naples. Orders placed before noon CET ship the same day; cashmere is packed in unbleached linen.</em></p>
+    </section>
+
+    <section class="cart-layout">
+      <div>
+        <div class="cart-table__head">
+          <span>Piece</span>
+          <span></span>
+          <span>Quantity</span>
+          <span>Price</span>
+          <span>Total</span>
+        </div>
+
+        <article class="line">
+          <div class="line__img"><img src="rick.jpg" alt="The Vico Crewneck in Oat"></div>
+          <div class="line__info">
+            <h3>The Vico Crewneck</h3>
+            <div class="line__meta">
+              <span>2-ply Mongolian cashmere</span><span>Oat</span><span>Size M</span>
+            </div>
+            <div class="line__edit">
+              <a href="#">Edit</a>
+              <a href="#">Save for later</a>
+              <a href="#">Remove</a>
+            </div>
+          </div>
+          <div class="line__qty">
+            <div class="qty"><button aria-label="decrease">−</button><span>1</span><button aria-label="increase">+</button></div>
+          </div>
+          <div class="line__price">€385.00</div>
+          <div class="line__total">€385.00</div>
+        </article>
+
+        <article class="line">
+          <div class="line__img"><img src="rick.jpg" alt="The Gelso Cardigan in Slate"></div>
+          <div class="line__info">
+            <h3>The Gelso Cardigan</h3>
+            <div class="line__meta">
+              <span>Extrafine merino</span><span>Slate</span><span>Size S</span>
+            </div>
+            <div class="line__edit">
+              <a href="#">Edit</a>
+              <a href="#">Save for later</a>
+              <a href="#">Remove</a>
+            </div>
+          </div>
+          <div class="line__qty">
+            <div class="qty"><button aria-label="decrease">−</button><span>1</span><button aria-label="increase">+</button></div>
+          </div>
+          <div class="line__price">€245.00</div>
+          <div class="line__total">€245.00</div>
+        </article>
+
+        <article class="line">
+          <div class="line__img"><img src="rick.jpg" alt="The Bell Watchcap in Rose"></div>
+          <div class="line__info">
+            <h3>The Bell Watchcap</h3>
+            <div class="line__meta">
+              <span>Cashmere ribbed</span><span>Dusty Rose</span><span>One size</span>
+            </div>
+            <div class="line__edit">
+              <a href="#">Edit</a>
+              <a href="#">Save for later</a>
+              <a href="#">Remove</a>
+            </div>
+          </div>
+          <div class="line__qty">
+            <div class="qty"><button aria-label="decrease">−</button><span>2</span><button aria-label="increase">+</button></div>
+          </div>
+          <div class="line__price">€95.00</div>
+          <div class="line__total">€190.00</div>
+        </article>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-top:28px;">
+          <a href="collection.html" class="empty-link">← Continue browsing</a>
+          <span class="serif-note" style="font-size:13px;">Items reserved for 30 minutes.</span>
+        </div>
+      </div>
+
+      <aside class="summary">
+        <span class="eyebrow">Order summary</span>
+        <h2>Subtotal</h2>
+        <div class="summary__row"><span>3 pieces</span><span class="summary__total-num">€820.00</span></div>
+        <div class="summary__row"><span>Shipping</span><span>Complimentary</span></div>
+        <div class="summary__row muted"><span>Estimated delivery</span><span>3–5 working days</span></div>
+        <div class="summary__row total"><span>Total</span><span class="summary__total-num">€820.00</span></div>
+        <div class="summary__vat">Including €135.04 VAT. Duties to non-EU addresses calculated at checkout.</div>
+
+        <a href="#" class="btn btn--block">Proceed to checkout</a>
+
+        <div class="summary__pay">We accept</div>
+        <div class="summary__pay-row">
+          <span>Visa</span><span>Mastercard</span><span>Amex</span><span>Klarna</span>
+        </div>
+
+        <div class="gift">
+          <label>
+            <input type="checkbox">
+            <span>Wrap this order in our linen pouch with a hand-written note (no charge).</span>
+          </label>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <section class="promise">
+    <div class="wrap">
+      <div class="promise-grid">
+        <div class="promise-item">
+          <h4>Knit in Naples</h4>
+          <p>Made on Shima Seiki and Stoll machines in our Vico Lungo Gelso workshop. Finished and linked by hand.</p>
+        </div>
+        <div class="promise-item">
+          <h4>Mended for life</h4>
+          <p>Send any Wren &amp; Bell piece back for darning, re-linking or moth repair. We cover return postage in the EU.</p>
+        </div>
+        <div class="promise-item">
+          <h4>Thirty-day returns</h4>
+          <p>Try a piece for a month. If it isn't right, send it back unworn for a full refund — no questions, no restocking fee.</p>
+        </div>
+        <div class="promise-item">
+          <h4>No surprises</h4>
+          <p>Prices reflect the true cost of yarn, labour and a fair margin. We do not run sales or seasonal discounting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="also">
+    <div class="wrap">
+      <div class="also__head">
+        <h2>You may also like</h2>
+        <a href="collection.html">See the full spring drop</a>
+      </div>
+      <div class="also-grid">
+        <a class="mini-card" href="product.html">
+          <div class="mini-img"><img src="rick.jpg" alt=""></div>
+          <div class="mini-meta"><span class="mini-name">The Posillipo Polo</span><span class="mini-price">€295</span></div>
+          <div class="mini-sub">Merino · four colours</div>
+        </a>
+        <a class="mini-card" href="product.html">
+          <div class="mini-img"><img src="rick.jpg" alt=""></div>
+          <div class="mini-meta"><span class="mini-name">The Chiaia Vest</span><span class="mini-price">€220</span></div>
+          <div class="mini-sub">Cashmere · three colours</div>
+        </a>
+        <a class="mini-card" href="product.html">
+          <div class="mini-img"><img src="rick.jpg" alt=""></div>
+          <div class="mini-meta"><span class="mini-name">The Forcella Scarf</span><span class="mini-price">€145</span></div>
+          <div class="mini-sub">Cashmere · ribbed</div>
+        </a>
+        <a class="mini-card" href="product.html">
+          <div class="mini-img"><img src="rick.jpg" alt=""></div>
+          <div class="mini-meta"><span class="mini-name">The Wren Turtleneck</span><span class="mini-price">€365</span></div>
+          <div class="mini-sub">Cashmere · two colours</div>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>Wren &amp; Bell</h3>
+        <p>Knitwear made in Naples on machines from the eighties. Four pieces a year, in cashmere and merino — nothing more.</p>
+        <form class="newsletter" onsubmit="event.preventDefault()">
+          <input type="email" placeholder="Your email" aria-label="Email address" />
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+      <div class="footer-col">
+        <h4>SHOP</h4>
+        <ul>
+          <li><a href="collection.html">All knitwear</a></li>
+          <li><a href="collection.html">Cashmere</a></li>
+          <li><a href="collection.html">Merino</a></li>
+          <li><a href="collection.html">Spring '25</a></li>
+          <li><a href="collection.html">Archive</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>HOUSE</h4>
+        <ul>
+          <li><a href="about.html">The Workshop</a></li>
+          <li><a href="journal.html">Journal</a></li>
+          <li><a href="about.html#materials">Materials</a></li>
+          <li><a href="about.html#care">Care &amp; Repair</a></li>
+          <li><a href="about.html#stockists">Stockists</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>SUPPORT</h4>
+        <ul>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Wholesale</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-base">
+      <div>© Wren &amp; Bell s.r.l. — Vico Lungo Gelso 41, Napoli</div>
+      <ul>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Instagram</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

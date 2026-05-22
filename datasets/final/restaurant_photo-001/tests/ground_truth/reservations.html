@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservations &mdash; Salt &amp; Field</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .reserve-layout {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: 96px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .reserve-layout { grid-template-columns: 1fr; gap: 56px; }
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px 32px;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; gap: 28px; }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .field label {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      font-weight: 500;
+    }
+    .field input,
+    .field select,
+    .field textarea {
+      font-family: var(--sans);
+      font-size: 1rem;
+      color: var(--ink);
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--rule);
+      border-radius: 0;
+      padding: 10px 0 12px;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: var(--ink-mute);
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.05rem;
+    }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-bottom-color: var(--accent);
+    }
+    .field select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+      background-position: calc(100% - 14px) 18px, calc(100% - 8px) 18px;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 28px;
+    }
+    .field textarea {
+      resize: vertical;
+      min-height: 96px;
+      line-height: 1.5;
+    }
+    .field .hint {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 0.92rem;
+      color: var(--ink-mute);
+      margin-top: 2px;
+    }
+
+    .check-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 12px;
+      margin-top: 4px;
+    }
+    .check-row label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      padding: 8px 14px;
+      border: 1px solid var(--rule);
+      cursor: pointer;
+      text-transform: none;
+    }
+    .check-row label:hover { border-color: var(--ink); }
+    .check-row input { accent-color: var(--accent); }
+    .check-row input:checked + span { color: var(--accent); }
+    .check-row label:has(input:checked) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .seating-choice {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--rule);
+      margin-top: 4px;
+    }
+    .seating-choice label {
+      padding: 16px 20px;
+      cursor: pointer;
+      border-right: 1px solid var(--rule);
+      display: block;
+      transition: background 0.15s;
+    }
+    .seating-choice label:last-child { border-right: 0; }
+    .seating-choice label:has(input:checked) {
+      background: var(--ink);
+      color: var(--bg-warm);
+    }
+    .seating-choice input { position: absolute; opacity: 0; pointer-events: none; }
+    .seating-choice .time {
+      font-family: var(--serif);
+      font-size: 1.6rem;
+      line-height: 1;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .seating-choice .label {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
+    .form-submit {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+    .form-submit .fineprint {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
+    /* Aside panel */
+    .reserve-aside {
+      border-left: 1px solid var(--rule);
+      padding-left: 56px;
+    }
+    @media (max-width: 900px) {
+      .reserve-aside { border-left: 0; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 48px; }
+    }
+    .aside-block { margin-bottom: 44px; }
+    .aside-block:last-child { margin-bottom: 0; }
+    .aside-block h3 {
+      font-family: var(--serif);
+      font-size: 1.45rem;
+      font-weight: 400;
+      margin-bottom: 14px;
+      line-height: 1.15;
+    }
+    .aside-block p {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: var(--ink-soft);
+    }
+    .aside-block .italic-note {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--ink-soft);
+    }
+
+    .hours-mini {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .hours-mini td {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--rule-soft);
+      font-size: 0.9rem;
+    }
+    .hours-mini tr:last-child td { border-bottom: 0; }
+    .hours-mini td:first-child {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--ink);
+    }
+    .hours-mini td:last-child {
+      text-align: right;
+      color: var(--ink-soft);
+      letter-spacing: 0.02em;
+    }
+    .hours-mini tr.closed td:last-child { color: var(--ink-mute); }
+
+    .price-line {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .price-line .num {
+      font-family: var(--serif);
+      font-size: 2.2rem;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .price-line .label {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+
+    /* Sub-section after form */
+    .private-band {
+      background: var(--bg-deep);
+      padding: 72px 0;
+      border-top: 1px solid var(--rule);
+    }
+    .private-grid {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 64px;
+      align-items: end;
+    }
+    @media (max-width: 820px) {
+      .private-grid { grid-template-columns: 1fr; gap: 28px; }
+    }
+    .private-grid h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+    .private-grid h2 em { color: var(--accent); }
+
+    /* Top intro band */
+    .reserve-intro {
+      padding: 88px 0 40px;
+    }
+    .reserve-intro .eyebrow { margin-bottom: 22px; }
+    .reserve-intro h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.8rem, 6.5vw, 5.2rem);
+      line-height: 0.98;
+      letter-spacing: -0.015em;
+      max-width: 12ch;
+      margin-bottom: 28px;
+    }
+    .reserve-intro h1 em { color: var(--accent); font-style: italic; }
+    .reserve-intro .dek { max-width: 560px; }
+
+    .intro-meta {
+      display: flex;
+      gap: 56px;
+      margin-top: 44px;
+      padding-top: 28px;
+      border-top: 1px solid var(--rule);
+      flex-wrap: wrap;
+    }
+    .intro-meta div .eyebrow { display: block; margin-bottom: 8px; }
+    .intro-meta div p {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      line-height: 1.3;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav" aria-label="Primary">
+    <div class="nav-left">
+      <a href="menu.html" class="nav-link">Menu</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="location.html" class="nav-link">Location</a>
+      <a href="press.html" class="nav-link">Press</a>
+    </div>
+    <a href="index.html" class="nav-brand">Salt <span class="amp">&amp;</span> Field</a>
+    <div class="nav-right">
+      <span class="nav-meta">Thu&ndash;Sun &middot; 5:30 &amp; 8:00</span>
+      <a href="reservations.html" class="nav-cta current">Reserve</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="reserve-intro">
+    <div class="wrap">
+      <span class="eyebrow eyebrow-accent">Reservations</span>
+      <h1>Hold a seat <em>at the field.</em></h1>
+      <p class="dek">Two seatings, four nights a week, forty guests an evening. The kitchen begins prep the morning of your visit &mdash; please cancel by noon two days prior if your plans change.</p>
+
+      <div class="intro-meta">
+        <div>
+          <span class="eyebrow">Booking window</span>
+          <p>Sixty days out, opens Tuesdays at 10am Pacific.</p>
+        </div>
+        <div>
+          <span class="eyebrow">Hold &amp; cancel</span>
+          <p>$95 per guest hold, fully refundable until 48 hours prior.</p>
+        </div>
+        <div>
+          <span class="eyebrow">Length</span>
+          <p>Plan on two and a half hours at the table.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="section">
+    <div class="wrap">
+      <div class="reserve-layout">
+
+        <form class="reserve-form" action="#" method="post" novalidate>
+
+          <div style="margin-bottom: 40px;">
+            <span class="eyebrow eyebrow-accent">Step one</span>
+            <h2 class="display-m" style="margin-top: 10px;">Choose a date</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="date">Date</label>
+              <input type="date" id="date" name="date" min="2024-01-01" value="2024-06-08">
+              <span class="hint">We seat Thursday through Sunday.</span>
+            </div>
+
+            <div class="field">
+              <label for="party">Party size</label>
+              <select id="party" name="party">
+                <option>2 guests</option>
+                <option>3 guests</option>
+                <option>4 guests</option>
+                <option>5 guests</option>
+                <option>6 guests</option>
+                <option>7 or more &mdash; inquire</option>
+              </select>
+              <span class="hint">Tables of seven or more are handled as buyouts.</span>
+            </div>
+
+            <div class="field full">
+              <label>Seating</label>
+              <div class="seating-choice">
+                <label>
+                  <input type="radio" name="seating" value="early" checked>
+                  <span class="time">5:30</span>
+                  <span class="label">Early &mdash; sunset on the ridge</span>
+                </label>
+                <label>
+                  <input type="radio" name="seating" value="late">
+                  <span class="time">8:00</span>
+                  <span class="label">Late &mdash; lantern light</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <hr class="rule-soft" style="margin: 56px 0;">
+
+          <div style="margin-bottom: 40px;">
+            <span class="eyebrow eyebrow-accent">Step two</span>
+            <h2 class="display-m" style="margin-top: 10px;">Tell us about your table</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="firstName">First name</label>
+              <input type="text" id="firstName" name="firstName" placeholder="Ada">
+            </div>
+            <div class="field">
+              <label for="lastName">Last name</label>
+              <input type="text" id="lastName" name="lastName" placeholder="Brennan">
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="you@elsewhere.com">
+            </div>
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone" name="phone" placeholder="(415) 555 0117">
+            </div>
+
+            <div class="field full">
+              <label>Dietary considerations</label>
+              <div class="check-row">
+                <label><input type="checkbox" name="diet" value="vegetarian"><span>Vegetarian</span></label>
+                <label><input type="checkbox" name="diet" value="vegan"><span>Vegan</span></label>
+                <label><input type="checkbox" name="diet" value="pescatarian"><span>Pescatarian</span></label>
+                <label><input type="checkbox" name="diet" value="gluten"><span>Gluten free</span></label>
+                <label><input type="checkbox" name="diet" value="dairy"><span>Dairy free</span></label>
+                <label><input type="checkbox" name="diet" value="shellfish"><span>No shellfish</span></label>
+                <label><input type="checkbox" name="diet" value="pork"><span>No pork</span></label>
+                <label><input type="checkbox" name="diet" value="alcohol"><span>No alcohol</span></label>
+              </div>
+              <span class="hint">We adapt the menu rather than substitute &mdash; please flag anything we should know.</span>
+            </div>
+
+            <div class="field full">
+              <label for="allergies">Allergies &amp; intolerances</label>
+              <textarea id="allergies" name="allergies" placeholder="Tree nuts, sesame, anything that should never reach the table."></textarea>
+            </div>
+
+            <div class="field full">
+              <label for="notes">A note for the kitchen</label>
+              <textarea id="notes" name="notes" rows="3" placeholder="Anniversary, first visit, driving from Portland, a guest in a wheelchair &mdash; tell us anything that will help us host you well."></textarea>
+            </div>
+
+            <div class="field full">
+              <label>Pairings</label>
+              <div class="check-row">
+                <label><input type="checkbox" name="pairing" value="wine"><span>Wine pairing &mdash; $95</span></label>
+                <label><input type="checkbox" name="pairing" value="reserve"><span>Reserve pairing &mdash; $185</span></label>
+                <label><input type="checkbox" name="pairing" value="na"><span>Non-alcoholic pairing &mdash; $55</span></label>
+              </div>
+              <span class="hint">Decide at the table if you&rsquo;d prefer.</span>
+            </div>
+          </div>
+
+          <div class="form-submit">
+            <button type="submit" class="btn">Request reservation</button>
+            <p class="fineprint">A $95 per-guest hold is captured on confirmation. Refundable until 48 hours before service.</p>
+          </div>
+
+        </form>
+
+        <aside class="reserve-aside">
+
+          <div class="aside-block">
+            <span class="eyebrow">The menu</span>
+            <div class="price-line" style="margin-top: 14px;">
+              <span class="num">$185</span>
+              <span class="label">per guest, tasting</span>
+            </div>
+            <p>Nine to eleven courses drawn from what was pulled out of the field that morning, the cellar, and the smoker behind the kitchen. Service runs two and a half hours.</p>
+          </div>
+
+          <hr class="rule-soft">
+
+          <div class="aside-block" style="margin-top: 36px;">
+            <span class="eyebrow">Service</span>
+            <table class="hours-mini" style="margin-top: 14px;">
+              <tr><td>Thursday</td><td>5:30 &middot; 8:00</td></tr>
+              <tr><td>Friday</td><td>5:30 &middot; 8:00</td></tr>
+              <tr><td>Saturday</td><td>5:30 &middot; 8:00</td></tr>
+              <tr><td>Sunday</td><td>5:30 only</td></tr>
+              <tr class="closed"><td>Mon&ndash;Wed</td><td>Closed &mdash; on the farm</td></tr>
+            </table>
+          </div>
+
+          <hr class="rule-soft">
+
+          <div class="aside-block" style="margin-top: 36px;">
+            <h3>Getting here</h3>
+            <p>We&rsquo;re an unhurried two and a half hours north of the Golden Gate, fifteen minutes off Highway 128 on Greenwood Ridge Road. The last mile is gravel; drive it slowly.</p>
+            <p style="margin-top: 12px;"><a href="location.html" class="btn-link" style="font-size: 0.78rem;">Directions &amp; lodging</a></p>
+          </div>
+
+          <hr class="rule-soft">
+
+          <div class="aside-block" style="margin-top: 36px;">
+            <h3>Waitlist</h3>
+            <p class="italic-note">Fully booked on the night you wanted? We release no-shows and cancellations on the morning of service. Join the list and we&rsquo;ll write back if a seat opens.</p>
+            <p style="margin-top: 14px;"><a href="mailto:reservations@saltandfield.com?subject=Waitlist" class="btn-link" style="font-size: 0.78rem;">Email the host stand</a></p>
+          </div>
+
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="private-band">
+    <div class="wrap">
+      <div class="private-grid">
+        <div>
+          <span class="eyebrow eyebrow-accent">Larger gatherings</span>
+          <h2 style="margin-top: 18px;">Buyouts <em>&amp;</em> private dinners.</h2>
+        </div>
+        <div>
+          <p class="lede" style="margin-bottom: 20px;">For parties of seven through the full forty, we&rsquo;ll plan a bespoke menu with our farm director and sommelier. Rehearsal dinners, harvest birthdays, an entire wedding weekend at the long table.</p>
+          <p><a href="mailto:events@saltandfield.com" class="btn-link">Inquire about a buyout</a> &nbsp; &middot; &nbsp; <span class="italic" style="font-family: var(--serif); color: var(--ink-soft);">events@saltandfield.com</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">Salt <span class="amp">&amp;</span> Field</div>
+        <p class="footer-tag">A forty-seat restaurant on a regenerative farm in the Anderson Valley. Tasting menus only, Thursday through Sunday.</p>
+        <p style="font-size: 0.88rem; line-height: 1.6;">2840 Greenwood Ridge Road<br>Philo, California 95466<br><a href="tel:+17078954400">(707) 895-4400</a></p>
+      </div>
+      <div class="footer-col">
+        <h4>Visit</h4>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="menu.html">Tasting menu</a></li>
+          <li><a href="location.html">Directions</a></li>
+          <li><a href="location.html#hours">Hours</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>The Farm</h4>
+        <ul>
+          <li><a href="about.html">Our story</a></li>
+          <li><a href="about.html#chef">Chef &amp; team</a></li>
+          <li><a href="about.html#farm">Growing practices</a></li>
+          <li><a href="press.html">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Stay close</h4>
+        <ul>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Private events</a></li>
+          <li><a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2024 Salt &amp; Field. All rights reserved.</span>
+      <span class="footer-meta">Grown, cooked, and served in Mendocino County.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

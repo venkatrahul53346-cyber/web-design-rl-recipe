@@ -1,0 +1,59 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "dashboard_dense-0000",
+    "archetype": "A4",
+    "vertical": "devtools",
+    "style": {
+      "density": "dense",
+      "color_regime": "dark-native",
+      "typography": "geometric-sans",
+      "border_language": "hairline-1px",
+      "motif": "data-viz-decor"
+    },
+    "palette_seed": "#EF4444",
+    "font_pair": [
+      "Inter",
+      "Inter",
+      null
+    ],
+    "difficulty": "hard",
+    "sitemap": [
+      "overview",
+      "login",
+      "team",
+      "settings",
+      "billing",
+      "detail-view"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Riverbed",
+      "tagline": "Observability that follows the request",
+      "value_prop": "Riverbed traces every request across services without manual instrumentation. Open-source agent, hosted query plane, $0 to start.",
+      "product_category": "distributed tracing / observability",
+      "target_audience": "platform and SRE teams"
+    },
+    "notes": "Design reference: linear.app, vercel.com/dashboard, planetscale.com. Background near-black (#0A0A0B), panel surface slightly lighter (#15151A), text on dark (#E5E5E7 primary, #8A8A92 muted). Persistent left sidebar (~220px) with nav groups + collapsible sections. Persistent top bar with breadcrumbs + search + user menu. Hairline 1px borders (#26262C) separate everything; no shadows.\n\nOverview page: KPI cards in a 4-column grid (number large, label small, sparkline beneath), then a wide chart (line or bar, faint grid lines), then a recent-activity feed and a data table below. Detail-view: header with breadcrumbs, filter row, dense data table with sortable columns and zebra-stripe-free hairline rows. Settings: left rail of categories, right pane with the active form. Billing: current plan card, invoice table with status pills, payment-method tile. Team: members table with role/status columns and an invite form.\n\nNumerals must use tabular figures (font-feature-settings 'tnum'). Charts can be SVG or simulated with divs + 1px borders; do not use library-specific markup. Riverbed's name appears as the logo lockup top-left of the sidebar.\n\nAvoid: rounded cards larger than 8px radius, oversized hero treatments (this is an app shell, not a landing page), gradient decorations on data charts."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "billing",
+    "detail-view",
+    "login",
+    "overview",
+    "settings",
+    "team"
+  ],
+  "files": [
+    "billing.html",
+    "detail-view.html",
+    "login.html",
+    "overview.html",
+    "settings.html",
+    "styles.css",
+    "team.html"
+  ],
+  "has_external_css": true,
+  "assets": []
+}

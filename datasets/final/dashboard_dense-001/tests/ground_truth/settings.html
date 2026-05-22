@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings · Ingestion — Riverbed</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* page-local helpers: only what styles.css doesn't already give us */
+  .settings-shell { display: grid; grid-template-columns: 200px 1fr; gap: 0; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); overflow: hidden; }
+  .settings-rail { border-right: 1px solid var(--border); padding: 8px 0; background: var(--bg); min-height: 640px; }
+  .settings-rail .rail-group { padding: 12px 10px 6px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); }
+  .settings-rail a { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px 6px 18px; color: var(--text-muted); font-size: 13px; position: relative; border-left: 2px solid transparent; }
+  .settings-rail a:hover { color: var(--text); background: var(--surface); }
+  .settings-rail a.active { color: var(--text); background: var(--surface); border-left-color: var(--accent); }
+  .settings-rail a .rail-meta { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+  .settings-rail a.active .rail-meta { color: var(--accent); }
+
+  .settings-pane { padding: 0; }
+  .pane-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 18px 20px 14px; border-bottom: 1px solid var(--border); gap: 16px; }
+  .pane-head h2 { font-size: 18px; letter-spacing: -0.015em; }
+  .pane-head p { font-size: 12px; margin-top: 4px; max-width: 560px; }
+  .pane-head .save-bar { display: flex; align-items: center; gap: 8px; }
+
+  .form-section { border-bottom: 1px solid var(--border); padding: 16px 20px 20px; }
+  .form-section:last-child { border-bottom: 0; }
+  .form-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+  .form-section-title .hint { font-family: var(--mono); font-size: 10px; color: var(--text-dim); text-transform: none; letter-spacing: 0; }
+
+  .form-row { display: grid; grid-template-columns: 220px 1fr; gap: 24px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .form-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .form-row:first-child { padding-top: 0; }
+  .form-label { font-size: 13px; color: var(--text); }
+  .form-label .desc { display: block; font-size: 11px; color: var(--text-muted); margin-top: 3px; line-height: 1.5; }
+  .form-label .req { color: var(--accent); margin-left: 2px; }
+
+  .form-control input[type=text], .form-control input[type=email], .form-control input[type=number], .form-control select, .form-control textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px 9px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    outline: 0;
+  }
+  .form-control input.mono, .form-control textarea.mono { font-family: var(--mono); font-size: 12px; }
+  .form-control input:focus, .form-control select:focus, .form-control textarea:focus { border-color: var(--border-strong); background: var(--surface); }
+  .form-control textarea { resize: vertical; min-height: 84px; line-height: 1.55; }
+  .form-control .help { font-size: 11px; color: var(--text-dim); margin-top: 6px; font-family: var(--mono); }
+  .form-control .inline-pair { display: flex; gap: 8px; align-items: center; }
+  .form-control .inline-pair input { flex: 1; }
+
+  /* segmented */
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg); }
+  .seg button { background: transparent; border: 0; color: var(--text-muted); padding: 5px 11px; font-size: 12px; font-family: var(--sans); cursor: pointer; border-right: 1px solid var(--border); }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: var(--surface-hover); color: var(--text); }
+  .seg button.on.accent { color: var(--accent); }
+
+  /* toggle */
+  .toggle { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+  .toggle .track { width: 28px; height: 16px; border-radius: 999px; background: var(--surface-hover); border: 1px solid var(--border); position: relative; transition: background 0.12s; }
+  .toggle .track::after { content: ''; position: absolute; left: 2px; top: 1px; width: 11px; height: 11px; border-radius: 50%; background: var(--text-dim); transition: all 0.12s; }
+  .toggle.on .track { background: var(--accent-bg); border-color: var(--accent-dim); }
+  .toggle.on .track::after { left: 14px; background: var(--accent); }
+  .toggle .lbl { font-size: 12px; color: var(--text-muted); }
+
+  /* slider visual */
+  .slider-wrap { display: grid; grid-template-columns: 1fr 64px; gap: 14px; align-items: center; }
+  .slider { position: relative; height: 6px; background: var(--surface-hover); border-radius: 3px; border: 1px solid var(--border); }
+  .slider .fill { position: absolute; left: 0; top: -1px; bottom: -1px; width: 18%; background: var(--accent); border-radius: 3px; }
+  .slider .knob { position: absolute; left: 18%; top: 50%; width: 12px; height: 12px; transform: translate(-50%, -50%); background: var(--text); border-radius: 50%; border: 2px solid var(--accent); }
+  .slider-val { font-family: var(--mono); font-size: 12px; color: var(--text); text-align: right; }
+
+  /* code block */
+  .code-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--mono); font-size: 12px; color: var(--text); padding: 10px 12px; line-height: 1.6; overflow-x: auto; }
+  .code-block .k { color: #C084FC; }
+  .code-block .s { color: #FCA5A5; }
+  .code-block .n { color: var(--text-muted); }
+  .code-block .c { color: var(--text-dim); }
+
+  /* endpoint list */
+  .endpoint-row { display: grid; grid-template-columns: 80px 1fr 90px 110px 24px; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .endpoint-row:last-child { border-bottom: 0; }
+  .endpoint-row .ep-region { font-family: var(--mono); color: var(--text); }
+  .endpoint-row .ep-url { font-family: var(--mono); color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .endpoint-row .ep-lat { font-family: var(--mono); color: var(--text-muted); text-align: right; }
+  .endpoint-row .ep-x { color: var(--text-dim); text-align: right; cursor: pointer; }
+  .endpoint-row .ep-x:hover { color: var(--accent); }
+
+  /* pill */
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: var(--bg); }
+  .pill .pd { width: 5px; height: 5px; border-radius: 50%; background: var(--success); }
+  .pill.warn .pd { background: var(--warn); }
+  .pill.err .pd { background: var(--accent); }
+  .pill.info .pd { background: var(--info); }
+
+  /* buttons inline */
+  .btn-i { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 12px; font-family: var(--sans); cursor: pointer; }
+  .btn-i:hover { background: var(--surface-hover); }
+  .btn-i.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .btn-i.primary:hover { background: #DC3939; }
+  .btn-i.ghost { background: transparent; }
+  .btn-i.danger { color: var(--accent); border-color: var(--accent-dim); background: transparent; }
+  .btn-i.danger:hover { background: var(--accent-bg); }
+
+  .changed-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 20px; background: var(--accent-bg); border-bottom: 1px solid var(--accent-dim); font-size: 12px; color: var(--text); }
+  .changed-bar .changes { display: flex; align-items: center; gap: 10px; }
+  .changed-bar .changes .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .changed-bar .actions { display: flex; gap: 8px; }
+
+  .kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kv-grid .kv-row { display: grid; grid-template-columns: 1fr 1fr 24px; gap: 6px; }
+  .kv-grid .kv-row input { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 8px; font-family: var(--mono); font-size: 11px; color: var(--text); outline: 0; }
+  .kv-grid .kv-row .rm { color: var(--text-dim); background: transparent; border: 0; cursor: pointer; }
+  .kv-grid .kv-row .rm:hover { color: var(--accent); }
+
+  .danger-zone { border: 1px solid var(--accent-dim); border-radius: var(--radius-lg); padding: 14px 16px; background: rgba(239,68,68,0.03); display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; }
+  .danger-zone h4 { font-size: 13px; color: var(--text); }
+  .danger-zone p { font-size: 11px; margin-top: 3px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Riverbed</span>
+      <span class="brand-env">prod</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Workspace</div>
+      <a class="nav-item" href="overview.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>
+        Overview
+      </a>
+      <a class="nav-item" href="detail-view.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+        Traces
+        <span class="count">14.2k</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 13l4-4 3 3 5-6"/></svg>
+        Metrics
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v9H2zM2 7h12"/></svg>
+        Logs
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2 2"/></svg>
+        Alerts
+        <span class="count">3</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2v12M2 8h12"/></svg>
+        Dashboards
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">
+        Services
+        <span class="sidebar-heading-action" title="Filter">+</span>
+      </div>
+      <a class="nav-item" href="#"><span class="dot"></span> api-gateway</a>
+      <a class="nav-item" href="#"><span class="dot"></span> checkout-svc</a>
+      <a class="nav-item" href="#"><span class="dot" style="background:var(--warn)"></span> inventory-svc</a>
+      <a class="nav-item" href="#"><span class="dot"></span> notifications</a>
+      <a class="nav-item" href="#"><span class="dot" style="background:var(--accent)"></span> payments-svc</a>
+      <a class="nav-item" href="#"><span class="dot"></span> search-svc</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Account</div>
+      <a class="nav-item" href="team.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="6" r="2.5"/><path d="M2 14c0-2.2 1.8-4 4-4s4 1.8 4 4M11 7a2 2 0 100-4M14 14c0-1.8-1.2-3.3-3-3.8"/></svg>
+        Team
+      </a>
+      <a class="nav-item" href="billing.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="12" height="9" rx="1"/><path d="M2 7h12"/></svg>
+        Billing
+      </a>
+      <a class="nav-item active" href="settings.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M3 13l1.5-1.5M11.5 4.5L13 3"/></svg>
+        Settings
+      </a>
+    </div>
+
+    <div class="sidebar-foot">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>All systems normal</span>
+      <a href="#" class="spacer" style="text-align:right;font-family:var(--mono);font-size:11px;">v2.18.0</a>
+    </div>
+  </aside>
+
+  <div class="main">
+
+    <div class="topbar">
+      <div class="breadcrumbs">
+        <a class="crumb" href="#">acme-prod</a>
+        <span class="sep">/</span>
+        <a class="crumb" href="settings.html">Settings</a>
+        <span class="sep">/</span>
+        <span class="crumb current">Ingestion</span>
+      </div>
+      <div class="topbar-search">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-dim)"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+        <input type="text" placeholder="Jump to setting, key, or service…">
+        <span class="kbd">⌘K</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Help"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6"/><path d="M6.5 6.2c.2-.9 1-1.5 1.9-1.5 1.1 0 1.9.8 1.9 1.8 0 1.6-1.9 1.4-1.9 2.8M8 11.5v.2"/></svg></button>
+        <button class="icon-btn" title="Notifications"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3.5 11h9l-1-2V6.5a3.5 3.5 0 10-7 0V9l-1 2zM6 13a2 2 0 004 0"/></svg></button>
+        <div class="user-chip">
+          <span class="avatar">MR</span>
+          <span class="uname">m.reyes</span>
+        </div>
+      </div>
+    </div>
+
+    <main class="page">
+
+      <div class="page-header">
+        <div>
+          <h1>Settings</h1>
+          <p>Workspace <span style="font-family:var(--mono);color:var(--text);">acme-prod</span> · last edited 14 minutes ago by alex.k@acme.io</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn-i ghost">View audit log</button>
+          <button class="btn-i">Export config</button>
+        </div>
+      </div>
+
+      <div class="settings-shell">
+
+        <nav class="settings-rail">
+          <div class="rail-group">Workspace</div>
+          <a href="#">General <span class="rail-meta">⌘1</span></a>
+          <a href="#">Members <span class="rail-meta">12</span></a>
+          <a href="#">API keys <span class="rail-meta">4</span></a>
+          <a href="#">SSO &amp; SAML</a>
+
+          <div class="rail-group">Telemetry</div>
+          <a href="#" class="active">Ingestion <span class="rail-meta">●</span></a>
+          <a href="#">Sampling</a>
+          <a href="#">Retention</a>
+          <a href="#">Service map</a>
+
+          <div class="rail-group">Alerts</div>
+          <a href="#">Notification channels</a>
+          <a href="#">Routing rules</a>
+          <a href="#">Quiet hours</a>
+
+          <div class="rail-group">Integrations</div>
+          <a href="#">Slack <span class="rail-meta">✓</span></a>
+          <a href="#">PagerDuty <span class="rail-meta">✓</span></a>
+          <a href="#">GitHub</a>
+          <a href="#">Webhooks <span class="rail-meta">7</span></a>
+
+          <div class="rail-group">Compliance</div>
+          <a href="#">Data residency</a>
+          <a href="#">PII scrubbing</a>
+          <a href="#">Audit log</a>
+        </nav>
+
+        <section class="settings-pane">
+
+          <div class="pane-head">
+            <div>
+              <h2>Ingestion</h2>
+              <p>Configure how the Riverbed agent ships spans to the hosted query plane. Changes propagate to running agents on their next heartbeat (≤ 30s).</p>
+            </div>
+            <div class="save-bar">
+              <span class="pill"><span class="pd"></span> Healthy</span>
+              <button class="btn-i ghost">Discard</button>
+              <button class="btn-i primary">Save changes</button>
+            </div>
+          </div>
+
+          <div class="changed-bar">
+            <div class="changes">
+              <span class="dot"></span>
+              <span><strong style="color:var(--text)">3 unsaved changes</strong> &nbsp;·&nbsp; <span style="font-family:var(--mono);color:var(--text-muted)">sampling.head_rate</span>, <span style="font-family:var(--mono);color:var(--text-muted)">tls.min_version</span>, <span style="font-family:var(--mono);color:var(--text-muted)">batch.max_size</span></span>
+            </div>
+            <div class="actions">
+              <button class="btn-i ghost">Review diff</button>
+              <button class="btn-i primary">Apply</button>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Endpoints <span class="hint">protocol: OTLP/HTTP · gRPC fallback enabled</span></div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Primary ingest URL<span class="req">*</span>
+                <span class="desc">Agents POST batched spans here. Use a region close to your services to minimize ingest p50.</span>
+              </div>
+              <div class="form-control">
+                <div class="inline-pair">
+                  <input type="text" class="mono" value="https://ingest.us-east-2.riverbed.dev/v1/traces">
+                  <button class="btn-i">Copy</button>
+                  <button class="btn-i ghost">Test</button>
+                </div>
+                <div class="help">last successful push 2.4s ago · p50 14ms · p99 38ms</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Failover endpoints
+                <span class="desc">Tried in order if the primary returns 5xx for ≥ 3 consecutive batches.</span>
+              </div>
+              <div class="form-control">
+                <div class="endpoint-row">
+                  <span class="ep-region">us-west-2</span>
+                  <span class="ep-url">https://ingest.us-west-2.riverbed.dev/v1/traces</span>
+                  <span class="pill"><span class="pd"></span> reachable</span>
+                  <span class="ep-lat">62ms</span>
+                  <span class="ep-x">×</span>
+                </div>
+                <div class="endpoint-row">
+                  <span class="ep-region">eu-west-1</span>
+                  <span class="ep-url">https://ingest.eu-west-1.riverbed.dev/v1/traces</span>
+                  <span class="pill"><span class="pd"></span> reachable</span>
+                  <span class="ep-lat">94ms</span>
+                  <span class="ep-x">×</span>
+                </div>
+                <div class="endpoint-row">
+                  <span class="ep-region">ap-south-1</span>
+                  <span class="ep-url">https://ingest.ap-south-1.riverbed.dev/v1/traces</span>
+                  <span class="pill warn"><span class="pd"></span> degraded</span>
+                  <span class="ep-lat">218ms</span>
+                  <span class="ep-x">×</span>
+                </div>
+                <div style="margin-top:10px;">
+                  <button class="btn-i ghost">+ Add region</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Sampling <span class="hint">applied at agent · before egress</span></div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Strategy
+                <span class="desc">Head-based is cheap and deterministic. Tail-based requires a 30s collector buffer but keeps every error and slow trace.</span>
+              </div>
+              <div class="form-control">
+                <div class="seg">
+                  <button>Always on</button>
+                  <button class="on">Head-based</button>
+                  <button>Tail-based</button>
+                  <button>Adaptive</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Base sample rate
+                <span class="desc">Percentage of root spans retained. Errors and spans &gt; 2s are always kept regardless.</span>
+            </div>
+              <div class="form-control">
+                <div class="slider-wrap">
+                  <div class="slider"><div class="fill"></div><div class="knob"></div></div>
+                  <div class="slider-val">18%</div>
+                </div>
+                <div class="help">est. retained: 2.56M / 14.2M spans · est. cost: $112/day</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Per-service overrides
+                <span class="desc">Force sample rates for noisy or critical services. Wins over the base rate.</span>
+              </div>
+              <div class="form-control">
+                <div class="kv-grid">
+                  <div class="kv-row">
+                    <input value="payments-svc">
+                    <input value="1.00">
+                    <button class="rm">×</button>
+                  </div>
+                  <div class="kv-row">
+                    <input value="checkout-svc">
+                    <input value="1.00">
+                    <button class="rm">×</button>
+                  </div>
+                  <div class="kv-row">
+                    <input value="health-probe">
+                    <input value="0.001">
+                    <button class="rm">×</button>
+                  </div>
+                  <div class="kv-row">
+                    <input value="search-svc">
+                    <input value="0.25">
+                    <button class="rm">×</button>
+                  </div>
+                </div>
+                <div style="margin-top:10px;"><button class="btn-i ghost">+ Add override</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Batching &amp; transport</div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Max batch size
+                <span class="desc">Spans per request. Higher reduces overhead; lower reduces tail latency under pressure.</span>
+              </div>
+              <div class="form-control">
+                <input type="text" class="mono" value="512" style="width:140px">
+                <div class="help">recommended: 256–1024</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Flush interval
+              </div>
+              <div class="form-control">
+                <div class="inline-pair" style="max-width:280px">
+                  <input type="text" class="mono" value="2000">
+                  <select>
+                    <option>milliseconds</option>
+                    <option>seconds</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Compression
+                <span class="desc">Applied to the OTLP body before egress.</span>
+              </div>
+              <div class="form-control">
+                <div class="seg">
+                  <button>none</button>
+                  <button class="on">gzip</button>
+                  <button>zstd</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">
+                TLS minimum version
+              </div>
+              <div class="form-control">
+                <select style="max-width:240px">
+                  <option>TLS 1.2</option>
+                  <option selected>TLS 1.3</option>
+                </select>
+                <div class="help">FIPS-140-3 cipher suites enforced for this workspace</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Drop on backpressure
+                <span class="desc">When the agent's local queue is full, drop oldest spans rather than blocking the application thread.</span>
+              </div>
+              <div class="form-control">
+                <div class="toggle on"><span class="track"></span><span class="lbl">Enabled — drops counted to <span style="font-family:var(--mono);color:var(--text)">riverbed.agent.dropped_spans</span></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Agent configuration snippet <span class="hint">paste into riverbed.yaml</span></div>
+
+            <div class="form-row" style="grid-template-columns: 1fr;">
+              <div class="form-control">
+                <pre class="code-block"><span class="c"># Generated from current settings — read-only preview</span>
+<span class="k">workspace</span>: <span class="s">"acme-prod"</span>
+<span class="k">endpoint</span>: <span class="s">"https://ingest.us-east-2.riverbed.dev/v1/traces"</span>
+<span class="k">failover</span>:
+  - <span class="s">"https://ingest.us-west-2.riverbed.dev/v1/traces"</span>
+  - <span class="s">"https://ingest.eu-west-1.riverbed.dev/v1/traces"</span>
+<span class="k">sampling</span>:
+  <span class="k">strategy</span>: <span class="s">head</span>
+  <span class="k">rate</span>: <span class="n">0.18</span>
+  <span class="k">overrides</span>:
+    <span class="k">payments-svc</span>: <span class="n">1.00</span>
+    <span class="k">checkout-svc</span>: <span class="n">1.00</span>
+    <span class="k">health-probe</span>: <span class="n">0.001</span>
+<span class="k">batch</span>:
+  <span class="k">max_size</span>: <span class="n">512</span>
+  <span class="k">flush_ms</span>: <span class="n">2000</span>
+  <span class="k">compression</span>: <span class="s">gzip</span>
+<span class="k">tls</span>:
+  <span class="k">min_version</span>: <span class="s">"1.3"</span></pre>
+                <div class="help" style="display:flex;justify-content:space-between;align-items:center;">
+                  <span>sha256: <span style="color:var(--text)">a91f…c4f3</span> · 412 bytes</span>
+                  <span><button class="btn-i ghost">Copy</button> <button class="btn-i ghost">Download YAML</button></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">PII scrubbing rules</div>
+
+            <div class="form-row">
+              <div class="form-label">
+                Redact tag patterns
+                <span class="desc">Span attributes matching these patterns are replaced with <span style="font-family:var(--mono);color:var(--text)">[REDACTED]</span> at the agent before egress. Regex, one per line.</span>
+              </div>
+              <div class="form-control">
+                <textarea class="mono">^http\.request\.header\.authorization$
+^db\.statement$
+.*\.email$
+.*\.ssn$
+^user\.payment\.card_number$</textarea>
+                <div class="help">5 patterns · matched 41,208 attributes in the last 24h</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Danger zone</div>
+            <div class="danger-zone">
+              <div>
+                <h4>Rotate ingestion key</h4>
+                <p>Invalidates the current key immediately. All agents must redeploy with the new value within 60 seconds or they will drop spans.</p>
+              </div>
+              <button class="btn-i danger">Rotate key</button>
+            </div>
+            <div class="danger-zone">
+              <div>
+                <h4>Pause ingestion for this workspace</h4>
+                <p>Drops all incoming spans at the edge until resumed. Existing data is retained per your retention policy.</p>
+              </div>
+              <button class="btn-i danger">Pause ingestion</button>
+            </div>
+          </div>
+
+        </section>
+      </div>
+
+    </main>
+
+    <footer class="site-footer">
+      <div class="foot-meta">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>edge-us-east-2</span>
+        <span class="hidden-sep">·</span>
+        <span>ingest p50 14ms</span>
+        <span class="hidden-sep">·</span>
+        <span>build c4f3a91</span>
+      </div>
+      <div class="foot-links">
+        <a href="https://docs.riverbed.dev">Docs</a>
+        <a href="https://github.com/riverbed-io/agent">Agent</a>
+        <a href="https://status.riverbed.dev">Status</a>
+        <a href="#">Changelog</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="foot-meta">© 2025 Riverbed Labs, Inc.</div>
+    </footer>
+
+  </div>
+</div>
+</body>
+</html>

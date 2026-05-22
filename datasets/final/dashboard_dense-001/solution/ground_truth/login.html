@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — Riverbed</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Login is an unauthenticated page — strip the app shell but keep the instrument-panel feel */
+  body.auth { display: flex; flex-direction: column; min-height: 100vh; }
+  .auth-topbar {
+    height: var(--topbar-h);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+  }
+  .auth-topbar .brand-link { display: flex; align-items: center; gap: 8px; }
+  .auth-topbar .meta { font-family: var(--mono); font-size: 11px; color: var(--text-dim); display: flex; gap: 14px; }
+  .auth-topbar .meta .ok { color: var(--success); }
+
+  .auth-main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    min-height: 0;
+  }
+
+  /* Left: live ingest panel — proves the product is real */
+  .auth-aside {
+    border-right: 1px solid var(--border);
+    padding: 32px 40px;
+    display: flex; flex-direction: column;
+    gap: 28px;
+    background:
+      linear-gradient(transparent 95%, rgba(38,38,44,0.6) 95%) 0 0 / 100% 24px,
+      linear-gradient(90deg, transparent 95%, rgba(38,38,44,0.6) 95%) 0 0 / 24px 100%,
+      var(--bg);
+  }
+  .aside-eyebrow {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+  .aside-head h2 {
+    font-size: 22px; letter-spacing: -0.02em; max-width: 32ch;
+    margin-top: 6px;
+  }
+  .aside-head p {
+    margin-top: 10px; font-size: 13px; max-width: 48ch; color: var(--text-muted);
+  }
+
+  .ingest-panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+    max-width: 640px;
+  }
+  .ingest-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; border-bottom: 1px solid var(--border);
+    font-size: 11px; color: var(--text-muted);
+  }
+  .ingest-head .left { display: flex; align-items: center; gap: 8px; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(239,68,68,0.15); }
+  .ingest-head .meta-r { font-family: var(--mono); color: var(--text-dim); font-size: 11px; }
+
+  .trace-feed { font-family: var(--mono); font-size: 12px; }
+  .trace-row {
+    display: grid;
+    grid-template-columns: 64px 56px 1fr 60px 70px;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .trace-row:last-child { border-bottom: 0; }
+  .trace-row .ts { color: var(--text-dim); }
+  .trace-row .method {
+    font-size: 10px; padding: 1px 5px; border-radius: 3px;
+    border: 1px solid var(--border); text-align: center;
+    letter-spacing: 0.04em;
+  }
+  .m-GET { color: #3B82F6; border-color: rgba(59,130,246,0.35); }
+  .m-POST { color: #22C55E; border-color: rgba(34,197,94,0.35); }
+  .m-DELETE { color: var(--accent); border-color: rgba(239,68,68,0.4); }
+  .m-PUT { color: var(--warn); border-color: rgba(245,158,11,0.35); }
+  .trace-row .path { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .trace-row .dur { color: var(--text-muted); text-align: right; }
+  .trace-row .status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; padding: 1px 6px; border-radius: 999px;
+    border: 1px solid var(--border); color: var(--text-muted);
+  }
+  .status-pill .pdot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); }
+  .status-pill.err { color: var(--accent); border-color: rgba(239,68,68,0.4); }
+  .status-pill.err .pdot { background: var(--accent); }
+  .status-pill.warn { color: var(--warn); border-color: rgba(245,158,11,0.4); }
+  .status-pill.warn .pdot { background: var(--warn); }
+
+  .aside-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    max-width: 640px;
+  }
+  .aside-stats .cell {
+    padding: 12px 14px;
+    border-right: 1px solid var(--border);
+  }
+  .aside-stats .cell:last-child { border-right: 0; }
+  .aside-stats .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); }
+  .aside-stats .value { font-family: var(--mono); font-size: 18px; letter-spacing: -0.01em; margin-top: 6px; color: var(--text); }
+  .aside-stats .sub { font-family: var(--mono); font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .aside-stats .sub.up { color: var(--success); }
+
+  .aside-foot {
+    margin-top: auto;
+    font-size: 12px; color: var(--text-dim);
+    display: flex; gap: 18px; flex-wrap: wrap;
+  }
+  .aside-foot a { color: var(--text-muted); }
+  .aside-foot a:hover { color: var(--text); }
+
+  /* Right: form panel */
+  .auth-form-wrap {
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 32px;
+  }
+  .auth-card { width: 100%; max-width: 340px; }
+  .auth-card h1 { font-size: 20px; letter-spacing: -0.015em; }
+  .auth-card .sub { font-size: 13px; color: var(--text-muted); margin-top: 6px; margin-bottom: 22px; }
+
+  .sso-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sso-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 32px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: var(--radius);
+    font-size: 12px; font-family: var(--sans);
+    cursor: pointer;
+  }
+  .sso-btn:hover { background: var(--surface-hover); }
+  .sso-btn svg { width: 14px; height: 14px; }
+
+  .divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 18px 0;
+    color: var(--text-dim); font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  .field { display: block; margin-bottom: 12px; }
+  .field label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 11px; color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+  .field label a { color: var(--text-muted); font-size: 11px; }
+  .field label a:hover { color: var(--text); }
+  .field input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 7px 10px;
+    height: 32px;
+    outline: none;
+  }
+  .field input::placeholder { color: var(--text-dim); }
+  .field input:focus { border-color: var(--accent-dim); box-shadow: 0 0 0 3px rgba(239,68,68,0.08); }
+
+  .btn-primary {
+    width: 100%;
+    height: 32px;
+    border: 0;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { background: #DC2626; }
+  .btn-primary .arrow { font-family: var(--mono); opacity: 0.9; }
+
+  .form-foot {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .form-foot a { color: var(--text); border-bottom: 1px dotted var(--text-dim); }
+  .form-foot a:hover { border-bottom-color: var(--text); }
+
+  .legal {
+    margin-top: 28px;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.6;
+  }
+  .legal a { text-decoration: underline; text-decoration-color: var(--border); }
+
+  /* footer override since we're not in the app shell */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    font-size: 11px; color: var(--text-dim);
+  }
+  .foot-meta { display: flex; align-items: center; gap: 8px; }
+  .foot-meta .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px rgba(34,197,94,0.15); }
+  .foot-meta .hidden-sep { color: var(--text-dim); }
+  .foot-links { display: flex; gap: 16px; }
+  .foot-links a { color: var(--text-muted); }
+  .foot-links a:hover { color: var(--text); }
+
+  @media (max-width: 880px) {
+    .auth-main { grid-template-columns: 1fr; }
+    .auth-aside { display: none; }
+  }
+</style>
+</head>
+<body class="auth">
+  <header class="auth-topbar">
+    <a class="brand-link" href="/">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Riverbed</span>
+    </a>
+    <div class="meta">
+      <span><span class="ok">●</span> ingest p50 14ms</span>
+      <span>edge-us-east-2</span>
+      <span>v2.18.0</span>
+    </div>
+  </header>
+
+  <main class="auth-main">
+    <section class="auth-aside" aria-label="Live ingest preview">
+      <div class="aside-head">
+        <div class="aside-eyebrow">Sign in to your workspace</div>
+        <h2>Observability that follows the request, not the dashboard.</h2>
+        <p>Below is a 60-second window from the public demo workspace. Same query plane you'll land in.</p>
+      </div>
+
+      <div class="ingest-panel">
+        <div class="ingest-head">
+          <div class="left">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span>Live traces · demo.riverbed.dev</span>
+          </div>
+          <div class="meta-r">last 60s · 2,184 spans</div>
+        </div>
+        <div class="trace-feed">
+          <div class="trace-row">
+            <span class="ts">14:02:11</span>
+            <span class="method m-GET">GET</span>
+            <span class="path">/v2/checkout/session/cs_3aR2…</span>
+            <span class="dur">42ms</span>
+            <span class="status-pill"><span class="pdot"></span>200</span>
+          </div>
+          <div class="trace-row">
+            <span class="ts">14:02:11</span>
+            <span class="method m-POST">POST</span>
+            <span class="path">/v2/payments/charge</span>
+            <span class="dur">218ms</span>
+            <span class="status-pill warn"><span class="pdot"></span>202</span>
+          </div>
+          <div class="trace-row">
+            <span class="ts">14:02:10</span>
+            <span class="method m-GET">GET</span>
+            <span class="path">/v2/inventory/sku/AX-991-BLK</span>
+            <span class="dur">11ms</span>
+            <span class="status-pill"><span class="pdot"></span>200</span>
+          </div>
+          <div class="trace-row">
+            <span class="ts">14:02:10</span>
+            <span class="method m-DELETE">DEL</span>
+            <span class="path">/v2/cart/items/itm_84a1</span>
+            <span class="dur">1.4s</span>
+            <span class="status-pill err"><span class="pdot"></span>504</span>
+          </div>
+          <div class="trace-row">
+            <span class="ts">14:02:09</span>
+            <span class="method m-GET">GET</span>
+            <span class="path">/v2/search?q=mechanical+keyboard</span>
+            <span class="dur">63ms</span>
+            <span class="status-pill"><span class="pdot"></span>200</span>
+          </div>
+          <div class="trace-row">
+            <span class="ts">14:02:09</span>
+            <span class="method m-PUT">PUT</span>
+            <span class="path">/v2/users/u_7c2/preferences</span>
+            <span class="dur">29ms</span>
+            <span class="status-pill"><span class="pdot"></span>204</span>
+          </div>
+          <div class="trace-row">
+            <span class="ts">14:02:08</span>
+            <span class="method m-POST">POST</span>
+            <span class="path">/internal/notify.email.dispatch</span>
+            <span class="dur">87ms</span>
+            <span class="status-pill"><span class="pdot"></span>200</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="aside-stats">
+        <div class="cell">
+          <div class="label">Spans / sec</div>
+          <div class="value">36,418</div>
+          <div class="sub up">▲ 4.2% vs 1h</div>
+        </div>
+        <div class="cell">
+          <div class="label">p95 latency</div>
+          <div class="value">182ms</div>
+          <div class="sub">SLO 250ms</div>
+        </div>
+        <div class="cell">
+          <div class="label">Error rate</div>
+          <div class="value">0.41%</div>
+          <div class="sub">budget 1.00%</div>
+        </div>
+      </div>
+
+      <div class="aside-foot">
+        <a href="https://docs.riverbed.dev">Read the docs →</a>
+        <a href="https://github.com/riverbed-io/agent">Agent on GitHub</a>
+        <a href="https://status.riverbed.dev">Status</a>
+      </div>
+    </section>
+
+    <section class="auth-form-wrap">
+      <div class="auth-card">
+        <h1>Sign in</h1>
+        <div class="sub">Use your work email or an SSO provider.</div>
+
+        <div class="sso-row">
+          <button type="button" class="sso-btn" aria-label="Sign in with GitHub">
+            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4.1.5-.2.5-.4v-1.4c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.2 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-3.9 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.6 7.6 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.5.8 1.2.8 2.1 0 3-1.8 3.7-3.6 3.9.3.3.5.7.5 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg>
+            GitHub
+          </button>
+          <button type="button" class="sso-btn" aria-label="Sign in with Google SSO">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M5 8h6"/></svg>
+            SSO / SAML
+          </button>
+        </div>
+
+        <div class="divider">or with email</div>
+
+        <form action="#" method="post" novalidate>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="username" placeholder="you@company.com" required>
+          </div>
+          <div class="field">
+            <label for="password">
+              Password
+              <a href="#" tabindex="-1">Forgot?</a>
+            </label>
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••••••" required>
+          </div>
+          <button type="submit" class="btn-primary">
+            Continue <span class="arrow">→</span>
+          </button>
+        </form>
+
+        <div class="form-foot">
+          New to Riverbed? <a href="#">Create a workspace</a>
+        </div>
+
+        <div class="legal">
+          By continuing you agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.<br>
+          This session is protected by hardware-key 2FA where enabled.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="foot-meta">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>edge-us-east-2</span>
+      <span class="hidden-sep">·</span>
+      <span>ingest p50 14ms</span>
+      <span class="hidden-sep">·</span>
+      <span>build c4f3a91</span>
+    </div>
+    <div class="foot-links">
+      <a href="https://docs.riverbed.dev">Docs</a>
+      <a href="https://github.com/riverbed-io/agent">Agent</a>
+      <a href="https://status.riverbed.dev">Status</a>
+      <a href="#">Changelog</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="foot-meta">© 2025 Riverbed Labs, Inc.</div>
+  </footer>
+</body>
+</html>

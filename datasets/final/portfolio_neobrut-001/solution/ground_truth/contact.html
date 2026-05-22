@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Locomotive® Studio · Start a project</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* page-specific only */
+  .contact-hero{padding:96px 0 56px;position:relative;overflow:hidden}
+  .contact-hero h1{font-size:clamp(56px,11vw,168px)}
+  .contact-hero .stroke{-webkit-text-stroke:2.5px var(--ink);color:transparent}
+  .contact-hero .swag{font-style:italic;font-weight:500}
+  .contact-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:0;border-top:var(--border) solid var(--ink);border-bottom:var(--border) solid var(--ink)}
+  @media(max-width:980px){.contact-grid{grid-template-columns:1fr}}
+  .contact-form-wrap{padding:56px 48px;border-right:var(--border) solid var(--ink)}
+  @media(max-width:980px){.contact-form-wrap{border-right:0;border-bottom:var(--border) solid var(--ink);padding:40px 24px}}
+  .contact-side{padding:56px 48px;background:var(--accent-2)}
+  @media(max-width:980px){.contact-side{padding:40px 24px}}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:700px){.form-row{grid-template-columns:1fr}}
+  .field{margin-bottom:22px}
+  .field label{display:block;font-family:var(--font-body);font-weight:600;text-transform:uppercase;letter-spacing:0.16em;font-size:11px;margin-bottom:8px}
+  .field input, .field textarea, .field select{
+    width:100%;background:var(--paper);border:var(--border) solid var(--ink);
+    padding:14px 16px;font-family:var(--font-body);font-size:15px;color:var(--ink);
+    box-shadow:6px 6px 0 0 var(--ink);outline:none;border-radius:0;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{transform:translate(2px,2px);box-shadow:4px 4px 0 0 var(--accent)}
+  .field textarea{min-height:170px;resize:vertical;font-family:var(--font-body)}
+  .chips{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{display:inline-flex;align-items:center;cursor:pointer;background:var(--paper);border:var(--border) solid var(--ink);padding:8px 14px;font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:-0.01em}
+  .chip input{position:absolute;opacity:0;pointer-events:none}
+  .chip:hover{background:var(--accent-3);color:#fff}
+  .form-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:14px;flex-wrap:wrap}
+  .form-foot .mono{color:var(--muted)}
+  .offices{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:var(--border) solid var(--ink);border-bottom:var(--border) solid var(--ink);background:var(--bg)}
+  @media(max-width:900px){.offices{grid-template-columns:1fr}}
+  .office{padding:48px 36px;border-right:var(--border) solid var(--ink)}
+  .office:last-child{border-right:0}
+  @media(max-width:900px){.office{border-right:0;border-bottom:var(--border) solid var(--ink)}.office:last-child{border-bottom:0}}
+  .office h3{margin-bottom:18px}
+  .office__city{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:8px}
+  .office__city .mono{color:var(--muted)}
+  .channels{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:var(--border) solid var(--ink)}
+  @media(max-width:900px){.channels{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.channels{grid-template-columns:1fr}}
+  .channel{padding:36px 28px;border-right:var(--border) solid var(--ink);background:var(--bg);transition:background .15s ease}
+  .channel:last-child{border-right:0}
+  .channel:hover{background:var(--accent)}
+  .channel:hover *{color:#fff}
+  .channel .eyebrow{color:var(--muted);margin-bottom:14px;display:block}
+  .channel h4{margin-bottom:6px;font-size:24px;letter-spacing:-0.025em}
+  .channel p{font-size:13px;color:var(--muted);margin:0}
+  .faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:var(--border) solid var(--ink)}
+  @media(max-width:900px){.faq-grid{grid-template-columns:1fr}}
+  .faq-item{padding:32px 28px;border-bottom:var(--border) solid var(--ink);border-right:var(--border) solid var(--ink)}
+  .faq-item:nth-child(2n){border-right:0}
+  @media(max-width:900px){.faq-item{border-right:0}}
+  .faq-item h4{margin-bottom:10px;font-size:22px}
+  .faq-item p{font-size:14px;color:#2a2a2a;margin:0}
+  .stamps{display:flex;gap:32px;align-items:center;flex-wrap:wrap}
+  .b1{transform:rotate(-8deg)}
+  .b2{transform:rotate(6deg);background:var(--accent-3);color:#fff}
+  .b3{transform:rotate(-3deg);background:var(--accent);color:#fff}
+  .floating-star{position:absolute;top:40px;right:60px;transform:rotate(14deg)}
+  .floating-blob{position:absolute;bottom:-30px;left:-30px;opacity:.9}
+  .availability{display:grid;grid-template-columns:60px 1fr auto;gap:18px;align-items:center;padding:18px 0;border-bottom:1.5px solid var(--ink)}
+  .availability:last-child{border-bottom:0}
+  .availability .month{font-family:var(--font-display);font-weight:800;font-size:18px}
+  .availability .status{font-family:var(--font-display);font-weight:700;font-size:13px;padding:4px 10px;border:2px solid var(--ink)}
+  .status--open{background:var(--accent-2)}
+  .status--limited{background:var(--paper)}
+  .status--full{background:var(--ink);color:#fff}
+  .pgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:0;border-top:var(--border) solid var(--ink);border-bottom:var(--border) solid var(--ink)}
+  @media(max-width:900px){.pgrid{grid-template-columns:1fr}}
+  .pgrid > div{padding:48px 36px}
+  .pgrid > div:first-child{border-right:var(--border) solid var(--ink);background:var(--ink);color:#fff}
+  @media(max-width:900px){.pgrid > div:first-child{border-right:0;border-bottom:var(--border) solid var(--ink)}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a href="index.html" class="brand" aria-label="Locomotive home">
+      <span class="brand__dot" aria-hidden="true"></span>
+      <span class="brand__mark">Locomotive<span class="text-accent">®</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="work-index.html">Work</a>
+      <a href="about.html">Studio</a>
+      <a href="about.html#services">Services</a>
+      <a href="about.html#journal">Journal</a>
+      <span class="nav__status mono">Booking Q3 ’25</span>
+      <a href="contact.html" class="btn btn--yellow nav__cta active">Start a project <span class="arrow">→</span></a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="contact-hero wrap-wide">
+    <div class="mono" style="margin-bottom:22px">[ 01 ] — Get in touch · Réponse sous 24h</div>
+    <h1 class="tight">Tell us<br><span class="stroke">what</span> <span class="swag">moves</span><br>you.</h1>
+    <p class="lede" style="max-width:720px;margin-top:36px">We read every brief personally. No bots, no boilerplate, no “thanks for reaching out, an account executive will be in touch.” You write, we write back — usually before our second espresso.</p>
+    <span class="shape shape--star floating-star" aria-hidden="true"></span>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <span>Now booking Q3 ’25</span><span class="star">✺</span>
+      <span>Two slots remaining in September</span><span class="star">✺</span>
+      <span>Hello in EN · FR · QC-FR</span><span class="star">✺</span>
+      <span>Now booking Q3 ’25</span><span class="star">✺</span>
+      <span>Two slots remaining in September</span><span class="star">✺</span>
+      <span>Hello in EN · FR · QC-FR</span><span class="star">✺</span>
+    </div>
+  </div>
+
+  <section class="contact-grid" id="brief">
+    <div class="contact-form-wrap">
+      <div class="eyebrow" style="color:var(--muted);margin-bottom:18px">The brief — 02 / 04</div>
+      <h2 class="tight" style="margin-bottom:8px">Start a project.</h2>
+      <p style="max-width:540px;color:#333;margin-bottom:36px">Fill the form below or write directly to <a class="inline" href="mailto:hello@locomotive.studio">hello@locomotive.studio</a>. Attachments, Figma links, mood files — send it all. The messier the better.</p>
+
+      <form action="#" method="post" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" placeholder="Camille Tremblay" required>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@studio.com" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="company">Company / Brand</label>
+            <input id="company" name="company" type="text" placeholder="Acme Cinematic Goods">
+          </div>
+          <div class="field">
+            <label for="budget">Budget envelope (CAD)</label>
+            <select id="budget" name="budget">
+              <option>Under $40k — quick site, motion accents</option>
+              <option selected>$40k – $120k — design + build</option>
+              <option>$120k – $300k — full cinematic site</option>
+              <option>$300k+ — flagship / multi-market</option>
+              <option>Honestly, we don’t know yet</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>What do you need? (pick all that apply)</label>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" name="scope" value="site"> Website</label>
+            <label class="chip"><input type="checkbox" name="scope" value="motion"> Motion / WebGL</label>
+            <label class="chip"><input type="checkbox" name="scope" value="brand"> Brand system</label>
+            <label class="chip"><input type="checkbox" name="scope" value="art"> Art direction</label>
+            <label class="chip"><input type="checkbox" name="scope" value="campaign"> Launch campaign</label>
+            <label class="chip"><input type="checkbox" name="scope" value="product"> Product / app</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="message">The brief</label>
+          <textarea id="message" name="message" placeholder="Tell us about the project. Audience, timeline, the references you keep showing your team, the things you don’t want it to feel like. Plain language is best."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="timeline">When do you need to launch?</label>
+          <input id="timeline" name="timeline" type="text" placeholder="e.g. October ’25 — tied to product reveal">
+        </div>
+
+        <div class="form-foot">
+          <span class="mono">We reply within one business day, in EN or FR.</span>
+          <button type="submit" class="btn btn--red">Send the brief <span class="arrow">→</span></button>
+        </div>
+      </form>
+    </div>
+
+    <aside class="contact-side">
+      <div class="eyebrow" style="margin-bottom:18px">Direct lines — 03 / 04</div>
+      <h3 class="tight" style="margin-bottom:24px">Skip the form.</h3>
+
+      <table class="meta-table" style="margin-bottom:32px">
+        <tr><th>New work</th><td><a class="inline" href="mailto:hello@locomotive.studio">hello@locomotive.studio</a></td></tr>
+        <tr><th>Press &amp; talks</th><td><a class="inline" href="mailto:press@locomotive.studio">press@locomotive.studio</a></td></tr>
+        <tr><th>Careers</th><td><a class="inline" href="mailto:join@locomotive.studio">join@locomotive.studio</a></td></tr>
+        <tr><th>Partnerships</th><td><a class="inline" href="mailto:partners@locomotive.studio">partners@locomotive.studio</a></td></tr>
+        <tr><th>Phone</th><td>+1 (514) 555 0188</td></tr>
+        <tr><th>Signal</th><td>@locomotive.42</td></tr>
+      </table>
+
+      <div class="stamps">
+        <span class="badge-circle b1">Booking<br>Q3 ’25</span>
+        <span class="badge-circle b2">24h<br>reply</span>
+        <span class="badge-circle b3">EN · FR<br>QC-FR</span>
+      </div>
+    </aside>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap-wide">
+      <div class="row" style="justify-content:space-between;align-items:baseline;margin-bottom:24px;flex-wrap:wrap;gap:16px">
+        <h2 class="tight">Three rooms,<br>one studio.</h2>
+        <p class="mono" style="max-width:340px">Locomotive operates from Montréal, with project crews in Lisbon and Brooklyn. Coffee strength varies. Output does not.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="offices">
+    <div class="office">
+      <div class="office__city">
+        <h3>Montréal HQ</h3>
+        <span class="mono">45.510 °N · ET</span>
+      </div>
+      <p style="max-width:340px;margin-bottom:18px">Home base since 2018. Two floors above a bakery in Vieux-Montréal. Walk-ins welcome with a heads-up.</p>
+      <ul style="list-style:none;padding:0;margin:0;font-size:14px;line-height:1.9">
+        <li>14 Rue Saint-Paul Est</li>
+        <li>Montréal, QC H2Y 1G6</li>
+        <li>Canada</li>
+        <li style="margin-top:10px"><a class="inline" href="mailto:mtl@locomotive.studio">mtl@locomotive.studio</a></li>
+      </ul>
+    </div>
+    <div class="office">
+      <div class="office__city">
+        <h3>Lisbon</h3>
+        <span class="mono">38.722 °N · WET</span>
+      </div>
+      <p style="max-width:340px;margin-bottom:18px">European production room in Príncipe Real. Open since spring ’23, run by Inês &amp; a very serious dog named Pixel.</p>
+      <ul style="list-style:none;padding:0;margin:0;font-size:14px;line-height:1.9">
+        <li>Rua da Escola Politécnica 42</li>
+        <li>1250-101 Lisboa</li>
+        <li>Portugal</li>
+        <li style="margin-top:10px"><a class="inline" href="mailto:lis@locomotive.studio">lis@locomotive.studio</a></li>
+      </ul>
+    </div>
+    <div class="office">
+      <div class="office__city">
+        <h3>Brooklyn</h3>
+        <span class="mono">40.706 °N · ET</span>
+      </div>
+      <p style="max-width:340px;margin-bottom:18px">Satellite desk inside the Pencil Factory, Greenpoint. Two seats, one Risograph, no meetings before 10am.</p>
+      <ul style="list-style:none;padding:0;margin:0;font-size:14px;line-height:1.9">
+        <li>61 Greenpoint Ave, Suite 510</li>
+        <li>Brooklyn, NY 11222</li>
+        <li>United States</li>
+        <li style="margin-top:10px"><a class="inline" href="mailto:nyc@locomotive.studio">nyc@locomotive.studio</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="channels" aria-label="Support channels">
+    <a class="channel" href="#">
+      <span class="eyebrow">Existing client</span>
+      <h4>support@</h4>
+      <p>Bug, broken deploy, urgent CMS question. Mon–Fri, 09:00–18:00 ET.</p>
+    </a>
+    <a class="channel" href="#">
+      <span class="eyebrow">Slack channel</span>
+      <h4>#loco-clients</h4>
+      <p>For active projects only. Invitation included in your kickoff email.</p>
+    </a>
+    <a class="channel" href="#">
+      <span class="eyebrow">Press inquiries</span>
+      <h4>Media kit ↗</h4>
+      <p>Logos, founder bios, recent recognition. Updated July ’25.</p>
+    </a>
+    <a class="channel" href="#">
+      <span class="eyebrow">Recruiting</span>
+      <h4>Open roles</h4>
+      <p>Designer (motion). Developer (WebGL). Producer. Internship — fall ’25.</p>
+    </a>
+  </section>
+
+  <section class="pgrid">
+    <div>
+      <div class="eyebrow" style="color:#FFD53E;margin-bottom:18px">Studio capacity — live</div>
+      <h2 class="tight" style="margin-bottom:24px">What we<br>can take on.</h2>
+      <p style="max-width:440px;color:#cfcfcf">We protect our craft by keeping the studio under-booked on purpose. Here’s what the next two quarters actually look like.</p>
+    </div>
+    <div>
+      <div class="availability">
+        <span class="month">Jul ’25</span>
+        <span>Two projects in flight · production-only slots</span>
+        <span class="status status--full">Full</span>
+      </div>
+      <div class="availability">
+        <span class="month">Aug ’25</span>
+        <span>Strategy &amp; design kickoffs · 1 slot</span>
+        <span class="status status--limited">Limited</span>
+      </div>
+      <div class="availability">
+        <span class="month">Sep ’25</span>
+        <span>New build engagements · 2 slots</span>
+        <span class="status status--open">Open</span>
+      </div>
+      <div class="availability">
+        <span class="month">Oct ’25</span>
+        <span>Long-form retainers / campaigns</span>
+        <span class="status status--open">Open</span>
+      </div>
+      <div class="availability">
+        <span class="month">Nov ’25</span>
+        <span>Flagship redesign window</span>
+        <span class="status status--limited">Limited</span>
+      </div>
+      <div class="availability">
+        <span class="month">Dec ’25</span>
+        <span>Maintenance &amp; small motion sprints only</span>
+        <span class="status status--full">Full</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap-wide">
+      <div class="row" style="justify-content:space-between;align-items:baseline;margin-bottom:8px;flex-wrap:wrap;gap:16px">
+        <div>
+          <div class="eyebrow" style="color:var(--muted);margin-bottom:14px">Before you write — 04 / 04</div>
+          <h2 class="tight">Questions we<br>get a lot.</h2>
+        </div>
+        <a href="about.html" class="btn btn--ghost">Read about the studio <span class="arrow">→</span></a>
+      </div>
+    </div>
+
+    <div class="faq-grid" style="margin-top:40px">
+      <div class="faq-item">
+        <h4>Do you work with startups?</h4>
+        <p>Yes — when there’s a real product and a real story. We’ve launched five Series-A brands in the last two years, including a Montréal-based climate-tech and a Brooklyn fragrance house. We don’t do logo-on-Fiverr-budget work.</p>
+      </div>
+      <div class="faq-item">
+        <h4>What does a project cost?</h4>
+        <p>Single-page motion sites land around $45–80k CAD. Full-site rebuilds with custom WebGL run $120–280k. Flagship multi-market work is bigger. We send a tailored estimate within five business days of receiving your brief.</p>
+      </div>
+      <div class="faq-item">
+        <h4>How long does it take?</h4>
+        <p>A focused site: 8–12 weeks from kickoff. A cinematic flagship: 16–22 weeks. We protect timelines aggressively — no “Q1 became Q3” surprises. If your launch is fixed, tell us in the brief.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Can you white-label or sub-contract?</h4>
+        <p>Occasionally, for agencies we already trust. Reach out through partners@ with the scope, the end client (under NDA is fine), and the build window. We say no more often than yes.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Do you ship code, or only design?</h4>
+        <p>Both. The studio is half designers, half engineers — same room, same Slack, same daily stand-up. We hand over production-ready Next.js, Sanity / Contentful, and the WebGL layer on top.</p>
+      </div>
+      <div class="faq-item">
+        <h4>What if we already have a design team?</h4>
+        <p>Great — most of our best work is collaborative. We can plug in as the motion &amp; build crew, working from your design system, your tokens, and your Figma. We won’t insist on owning the brand.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block block--blue section-tight" style="position:relative;overflow:hidden">
+    <div class="wrap-wide" style="display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap">
+      <div>
+        <div class="eyebrow" style="margin-bottom:14px">Still reading?</div>
+        <h2 class="tight" style="max-width:760px">Skip the form. Email us a sentence, a Figma link, or a voice memo.</h2>
+      </div>
+      <a href="mailto:hello@locomotive.studio" class="btn btn--yellow">hello@locomotive.studio <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__top">
+    <div class="site-footer__bigmark">Let’s make<br>something <span class="underline">move.</span></div>
+
+    <div class="site-footer__cols">
+      <div class="site-footer__col site-footer__contact">
+        <h5>New business</h5>
+        <a href="mailto:hello@locomotive.studio">hello@locomotive.studio</a>
+        <ul style="margin-top:22px">
+          <li>14 Rue Saint-Paul, Montréal QC</li>
+          <li>+1 (514) 555 0188</li>
+          <li>Studio hours · Mon–Fri 09:00–18:00 ET</li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Navigate</h5>
+        <ul>
+          <li><a href="work-index.html">Selected work</a></li>
+          <li><a href="about.html">The studio</a></li>
+          <li><a href="about.html#services">Capabilities</a></li>
+          <li><a href="about.html#journal">Journal</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Elsewhere</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Are.na</a></li>
+          <li><a href="#">Vimeo</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Read.cv</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Recognition</h5>
+        <ul>
+          <li>Awwwards · 12 SOTD</li>
+          <li>FWA · 8 wins</li>
+          <li>CSSDA · Best Studio ’24</li>
+          <li>Webby Honoree ’23</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="site-footer__bottom">
+    <span>© 2018–2025 Locomotive Studio Inc.</span>
+    <span>Built in Montréal · Running on espresso &amp; GSAP</span>
+    <span>v4.2.1 · Last deploy 3h ago</span>
+  </div>
+</footer>
+
+</body>
+</html>

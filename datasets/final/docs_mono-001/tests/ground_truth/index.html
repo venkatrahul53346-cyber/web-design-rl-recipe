@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>glyph — API contracts that stay honest</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .home-hero { padding: 72px 0 56px 0; border-bottom: 1px solid var(--rule); }
+  .home-hero .grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: start; }
+  .home-hero h1 { font-size: 32px; line-height: 1.2; letter-spacing: -0.015em; margin-bottom: 20px; max-width: 18ch; }
+  .home-hero h1 .slash { color: var(--accent); font-weight: 400; }
+  .home-hero p.lead { font-size: 15px; max-width: 46ch; margin-bottom: 28px; color: var(--ink-2); }
+  .home-hero .cta-row { display: flex; gap: 14px; align-items: center; margin-bottom: 22px; }
+  .btn { display: inline-block; font-family: var(--mono); font-size: 12.5px; padding: 10px 18px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg); text-decoration: none; }
+  .btn:hover { background: var(--accent-ink); border-color: var(--accent-ink); color: var(--bg); }
+  .btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--rule-strong); }
+  .btn-secondary:hover { color: var(--accent); border-color: var(--accent); background: transparent; }
+  .install-line { font-size: 12px; color: var(--ink-3); }
+  .install-line code { color: var(--accent); }
+  .term { background: var(--bg-tint); border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); font-size: 12px; }
+  .term .term-head { display:flex; justify-content:space-between; padding: 6px 14px; border-bottom: 1px solid var(--rule); font-size: 11px; color: var(--ink-3); text-transform: lowercase; letter-spacing: 0.02em; }
+  .term pre { margin: 0; border: 0; padding: 14px 16px; background: transparent; font-size: 12px; }
+  .eyebrow-bar { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); padding: 28px 0 14px 0; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; }
+  .eyebrow-bar .meta { color: var(--ink-3); }
+  .section { padding: 44px 0; border-bottom: 1px solid var(--rule); }
+  .section.tight { padding: 28px 0; }
+  .section.wide { padding: 80px 0; }
+  .section-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); margin-bottom: 18px; }
+  .section h2.plain { border: 0; padding: 0; margin: 0 0 28px 0; font-size: 22px; max-width: 28ch; letter-spacing: -0.015em; }
+  .pipeline { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .pipeline .step { padding: 22px 18px; border-right: 1px solid var(--rule); }
+  .pipeline .step:last-child { border-right: 0; }
+  .pipeline .step .num { font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em; margin-bottom: 12px; }
+  .pipeline .step .glyph { width: 28px; height: 28px; margin-bottom: 14px; position: relative; }
+  .pipeline .step h3 { font-size: 13.5px; margin: 0 0 6px 0; }
+  .pipeline .step p { font-size: 12px; color: var(--ink-3); margin: 0; line-height: 1.55; }
+  .g-spec { border: 1px solid var(--ink); }
+  .g-spec::before { content: ""; position: absolute; left: 4px; top: 6px; right: 4px; height: 1px; background: var(--ink); box-shadow: 0 4px 0 var(--ink), 0 8px 0 var(--ink), 0 12px 0 var(--ink); }
+  .g-types { border: 1px solid var(--ink); }
+  .g-types::before { content: "<>"; position: absolute; inset: 0; display:flex; align-items:center; justify-content:center; font-size: 12px; font-weight: 600; color: var(--ink); }
+  .g-mock { border: 1px solid var(--ink); border-radius: 50%; }
+  .g-mock::after { content: ""; position: absolute; left: 50%; top: 6px; width: 1px; height: 16px; background: var(--ink); transform: translateX(-50%); }
+  .g-mock::before { content: ""; position: absolute; left: 6px; top: 50%; width: 16px; height: 1px; background: var(--ink); transform: translateY(-50%); }
+  .g-contract { border: 1px solid var(--ink); position: relative; }
+  .g-contract::before { content: "✓"; position: absolute; inset: 0; display:flex; align-items:center; justify-content:center; font-size: 16px; color: var(--ink); }
+  .g-diff { border: 1px solid var(--ink); position: relative; }
+  .g-diff::before, .g-diff::after { content: ""; position: absolute; left: 4px; right: 4px; height: 1px; background: var(--ink); }
+  .g-diff::before { top: 9px; }
+  .g-diff::after { top: 18px; background: var(--accent); }
+  .two-col { display: grid; grid-template-columns: 1fr 1.1fr; gap: 64px; align-items: start; }
+  .two-col .text h3 { font-size: 18px; letter-spacing: -0.01em; margin-top: 0; margin-bottom: 14px; }
+  .two-col .text p { font-size: 13.5px; }
+  .drift-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .drift-grid .col { padding: 24px 22px; }
+  .drift-grid .col + .col { border-left: 1px solid var(--rule); }
+  .drift-grid .col h4 { margin: 0 0 12px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); }
+  .drift-grid .before { color: var(--warn); }
+  .drift-grid .after { color: var(--ok); }
+  .drift-grid ul { margin: 0; padding-left: 1.2em; font-size: 12.5px; }
+  .drift-grid li { margin-bottom: 8px; color: var(--ink-2); }
+  .langs { display: grid; grid-template-columns: repeat(6, 1fr); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .langs .lang { padding: 18px 16px; border-right: 1px solid var(--rule); font-size: 12.5px; }
+  .langs .lang:last-child { border-right: 0; }
+  .langs .lang .name { color: var(--ink); margin-bottom: 4px; }
+  .langs .lang .note { color: var(--ink-3); font-size: 11.5px; }
+  .langs .lang.beta .note { color: var(--num); }
+  .quote-block { display: grid; grid-template-columns: 80px 1fr 200px; gap: 32px; padding: 36px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); align-items: start; }
+  .quote-block .qmark { font-size: 32px; color: var(--accent); line-height: 1; }
+  .quote-block blockquote { margin: 0; font-size: 16px; line-height: 1.5; color: var(--ink); letter-spacing: -0.005em; }
+  .quote-block .attrib { font-size: 12px; color: var(--ink-3); }
+  .quote-block .attrib strong { display: block; color: var(--ink-2); margin-bottom: 2px; font-weight: 500; }
+  .callout { border-left: 2px solid var(--accent); padding: 14px 18px; background: var(--bg-tint); font-size: 13px; color: var(--ink-2); margin: 0; }
+  .end-cta { padding: 80px 0 72px 0; }
+  .end-cta .grid { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 48px; }
+  .end-cta h2 { border: 0; padding: 0; margin: 0; font-size: 26px; letter-spacing: -0.015em; max-width: 22ch; }
+  .end-cta p { color: var(--ink-3); margin-top: 14px; font-size: 13px; max-width: 50ch; }
+  .changelog-tease { display: grid; grid-template-columns: 140px 1fr; gap: 24px; padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: 12.5px; }
+  .changelog-tease:first-of-type { border-top: 1px solid var(--rule); }
+  .changelog-tease .date { color: var(--ink-3); font-size: 11.5px; }
+  .changelog-tease .v { color: var(--ink); }
+  .changelog-tease .what { color: var(--ink-2); }
+  .changelog-tease .what code { font-size: 11.5px; }
+  @media (max-width: 880px) {
+    .home-hero .grid, .two-col, .end-cta .grid { grid-template-columns: 1fr; gap: 32px; }
+    .pipeline, .langs { grid-template-columns: 1fr 1fr; }
+    .drift-grid { grid-template-columns: 1fr; }
+    .quote-block { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="row">
+      <a href="index.html" class="brand plain" aria-label="Glyph home">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="name">glyph</span>
+        <span class="ver">v0.14.2</span>
+      </a>
+      <nav class="primary-nav" aria-label="Primary">
+        <a href="getting-started.html">Getting started</a>
+        <a href="guides.html">Guides</a>
+        <a href="api-reference.html">Reference</a>
+        <a href="examples.html">Examples</a>
+        <a href="changelog.html">Changelog</a>
+      </nav>
+      <div class="header-utils">
+        <span class="search-stub" role="search">
+          <span>search docs</span>
+          <span class="kbd">⌘K</span>
+        </span>
+        <a class="gh-link" href="https://github.com/glyph-dev/glyph">github ↗</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="home-hero">
+    <div class="container">
+      <div class="grid">
+        <div>
+          <div class="section-eyebrow">glyph <span class="slash" style="color:var(--accent)">/</span> openapi workflow</div>
+          <h1>API contracts<br>that stay <span class="slash">/</span> honest.</h1>
+          <p class="lead">One command turns an OpenAPI spec into typed clients, deterministic mocks, and contract tests — then keeps producer and consumer aligned every time the spec changes.</p>
+          <div class="cta-row">
+            <a href="getting-started.html" class="btn">Read the quickstart →</a>
+            <a href="examples.html" class="btn btn-secondary">See examples</a>
+          </div>
+          <div class="install-line">install · <code>brew install glyph-dev/tap/glyph</code> &nbsp;·&nbsp; macOS, Linux, Windows · Apache 2.0</div>
+        </div>
+
+        <div class="term" aria-label="Terminal demo">
+          <div class="term-head"><span>~/services/billing-api</span><span>zsh</span></div>
+<pre><span class="prompt">$</span> glyph sync openapi.yaml
+<span class="cmt">⠂ resolving spec ........................ ok (v3.1.0)</span>
+<span class="cmt">⠂ generating typescript client .......... ok (42 ops)</span>
+<span class="cmt">⠂ generating go server stubs ............ ok (42 ops)</span>
+<span class="cmt">⠂ generating mock server ................ ok :4010</span>
+<span class="cmt">⠂ generating contract tests ............. ok (118 cases)</span>
+
+<span class="prompt">$</span> glyph diff main..HEAD
+  <span class="kw">breaking</span>  <span class="fn">POST</span> /invoices    response.body.tax_lines: <span class="ty">required</span>
+  <span class="num">additive</span>  <span class="fn">GET</span>  /customers   query.cursor: <span class="ty">added</span>
+  <span class="cmt">      patch</span>  <span class="fn">GET</span>  /invoices/{id}  description updated
+
+<span class="prompt">$</span> glyph contract verify --against staging
+  <span class="str">✓</span> 118 / 118 operations honor the spec
+  <span class="str">✓</span> 0 drift detected · report: .glyph/report.html
+</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-eyebrow">01 · the pipeline</div>
+      <h2 class="plain">From <code>openapi.yaml</code> to honest, tested, typed code — five stages, one command.</h2>
+      <div class="pipeline">
+        <div class="step">
+          <div class="num">001</div>
+          <div class="glyph g-spec"></div>
+          <h3>Resolve</h3>
+          <p>Inline <code>$ref</code>, validate against OpenAPI 3.0/3.1, surface ambiguities before they become bugs.</p>
+        </div>
+        <div class="step">
+          <div class="num">002</div>
+          <div class="glyph g-types"></div>
+          <h3>Type</h3>
+          <p>Emit ergonomic clients in TypeScript, Go, Python, Rust, Kotlin, Swift — with discriminated unions, not <code>any</code>.</p>
+        </div>
+        <div class="step">
+          <div class="num">003</div>
+          <div class="glyph g-mock"></div>
+          <h3>Mock</h3>
+          <p>Spin up a stateful mock server in 200ms. Faker rules, scenario files, latency injection, examples replayed verbatim.</p>
+        </div>
+        <div class="step">
+          <div class="num">004</div>
+          <div class="glyph g-contract"></div>
+          <h3>Verify</h3>
+          <p>Replay 100+ generated cases against any environment. Fails the build the moment the implementation drifts.</p>
+        </div>
+        <div class="step">
+          <div class="num">005</div>
+          <div class="glyph g-diff"></div>
+          <h3>Diff</h3>
+          <p>Semantic diffing classifies each change as <code>breaking</code>, <code>additive</code>, or <code>patch</code>. Block PRs accordingly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wide">
+    <div class="container">
+      <div class="two-col">
+        <div class="text">
+          <div class="section-eyebrow">02 · why bother</div>
+          <h3>Most API drift is invisible until production.</h3>
+          <p>OpenAPI specs rot the moment they leave review. The frontend team trusts a doc that doesn't match the gateway. The backend ships a "non-breaking" rename that silently nulls a field downstream. Pact files go stale. Mocks lie.</p>
+          <p>Glyph fixes the loop by making the spec the single source of truth — and by failing loudly the second the running service stops honoring it. No more <em>"works on the docs site"</em>.</p>
+          <p class="callout">If <code>glyph contract verify</code> passes in CI, your producer and your generated clients agree on every field, every enum, every error shape. That's the whole product.</p>
+        </div>
+        <div>
+          <div class="drift-grid">
+            <div class="col">
+              <h4 class="before">Without contracts</h4>
+              <ul>
+                <li>Spec is updated <em>after</em> the endpoint ships.</li>
+                <li>Frontend types are hand-written, then forgotten.</li>
+                <li>Mock server returns whatever the author remembered.</li>
+                <li>Breaking changes ship under a "chore:" commit.</li>
+                <li>Integration bugs land in staging, not in review.</li>
+                <li>Postman collections diverge from production.</li>
+              </ul>
+            </div>
+            <div class="col">
+              <h4 class="after">With glyph</h4>
+              <ul>
+                <li>Spec change is the first commit in every PR.</li>
+                <li>Clients regenerate on <code>postinstall</code>; the type-checker catches drift.</li>
+                <li>Mock is derived from the spec — examples are honored verbatim.</li>
+                <li><code>glyph diff</code> labels breakage; CI refuses to merge it silently.</li>
+                <li>Contract suite runs against staging on every deploy.</li>
+                <li>One artifact — <code>openapi.yaml</code> — drives every consumer.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-eyebrow">03 · a closer look</div>
+      <h2 class="plain">A generated client reads like one you'd write by hand.</h2>
+
+      <div class="two-col">
+        <div>
+          <div class="code-frame">
+            <div class="code-head"><span class="file">openapi.yaml</span><span class="lang">yaml</span></div>
+<pre><span class="kw">paths</span>:
+  /invoices/{id}:
+    <span class="kw">get</span>:
+      <span class="kw">operationId</span>: <span class="str">getInvoice</span>
+      <span class="kw">parameters</span>:
+        - <span class="kw">in</span>: path
+          <span class="kw">name</span>: id
+          <span class="kw">schema</span>: { <span class="kw">type</span>: <span class="ty">string</span>, <span class="kw">format</span>: uuid }
+      <span class="kw">responses</span>:
+        <span class="num">'200'</span>:
+          <span class="kw">content</span>:
+            application/json:
+              <span class="kw">schema</span>: { $ref: <span class="str">'#/components/schemas/Invoice'</span> }
+        <span class="num">'404'</span>: { $ref: <span class="str">'#/components/responses/NotFound'</span> }
+</pre>
+          </div>
+        </div>
+        <div>
+          <div class="code-frame">
+            <div class="code-head"><span class="file">src/glyph/billing.ts</span><span class="lang">generated · typescript</span></div>
+<pre><span class="cmt">// AUTOGENERATED by glyph v0.14.2 — do not edit.</span>
+<span class="kw">import</span> { <span class="ty">Client</span>, <span class="ty">Result</span> } <span class="kw">from</span> <span class="str">"./runtime"</span>;
+<span class="kw">import</span> { <span class="ty">Invoice</span>, <span class="ty">NotFound</span> } <span class="kw">from</span> <span class="str">"./schemas"</span>;
+
+<span class="kw">export async function</span> <span class="fn">getInvoice</span>(
+  client<span class="pun">:</span> <span class="ty">Client</span>,
+  id<span class="pun">:</span> <span class="ty">string</span>,
+)<span class="pun">:</span> <span class="ty">Promise</span>&lt;<span class="ty">Result</span>&lt;<span class="ty">Invoice</span>, <span class="ty">NotFound</span>&gt;&gt; {
+  <span class="kw">return</span> client.<span class="fn">request</span>({
+    method<span class="pun">:</span> <span class="str">"GET"</span>,
+    path<span class="pun">:</span> <span class="str">`/invoices/${</span>id<span class="str">}`</span>,
+    expects<span class="pun">:</span> { <span class="num">200</span><span class="pun">:</span> <span class="ty">Invoice</span>, <span class="num">404</span><span class="pun">:</span> <span class="ty">NotFound</span> },
+  });
+}
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-top: 22px; color: var(--ink-3); font-size: 12.5px;">Discriminated <code>Result&lt;Ok, Err&gt;</code> types force consumers to handle every documented error. No silent <code>catch</code>. No <code>any</code> creeping in from <code>oneOf</code>.</p>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="container">
+      <div class="section-eyebrow">04 · generators</div>
+      <div class="langs">
+        <div class="lang"><div class="name">typescript</div><div class="note">stable · fetch / undici</div></div>
+        <div class="lang"><div class="name">go</div><div class="note">stable · net/http, chi</div></div>
+        <div class="lang"><div class="name">python</div><div class="note">stable · httpx, pydantic</div></div>
+        <div class="lang"><div class="name">rust</div><div class="note">stable · reqwest, axum</div></div>
+        <div class="lang"><div class="name">kotlin</div><div class="note">stable · ktor</div></div>
+        <div class="lang beta"><div class="name">swift</div><div class="note">beta · 0.14</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wide">
+    <div class="container">
+      <div class="quote-block">
+        <div class="qmark" aria-hidden="true">“</div>
+        <blockquote>We had eleven services and roughly eleven definitions of what "Invoice" meant. Glyph collapsed that into a single spec the gateway, the SDKs, and the integration suite all agree on. Our "works in staging, breaks in prod" tickets dropped to zero in a quarter.</blockquote>
+        <div class="attrib"><strong>Priya Anand</strong>Staff engineer, platform<br>Northwind Logistics</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-eyebrow">05 · recent changes</div>
+      <h2 class="plain">Shipped in the last few weeks.</h2>
+
+      <div class="changelog-tease">
+        <div class="date">2024-11-04 · <span class="v">v0.14.2</span></div>
+        <div class="what">Mock server now honors <code>x-glyph-scenario</code> headers for branching state. Rust generator emits <code>#[non_exhaustive]</code> on response enums.</div>
+      </div>
+      <div class="changelog-tease">
+        <div class="date">2024-10-22 · <span class="v">v0.14.0</span></div>
+        <div class="what">Semantic diff rewrite — <code>glyph diff</code> now classifies 14 distinct change categories and emits a machine-readable JSON report.</div>
+      </div>
+      <div class="changelog-tease">
+        <div class="date">2024-10-03 · <span class="v">v0.13.5</span></div>
+        <div class="what">Swift generator enters beta. Contract verifier gains <code>--parallel</code>; large suites complete ~6× faster on CI.</div>
+      </div>
+      <div class="changelog-tease">
+        <div class="date">2024-09-18 · <span class="v">v0.13.0</span></div>
+        <div class="what">Workspace mode: one <code>glyph.toml</code> can drive multiple specs in a monorepo with shared component libraries.</div>
+      </div>
+
+      <p style="margin-top: 18px; font-size: 12px;"><a href="changelog.html">Full changelog →</a></p>
+    </div>
+  </section>
+
+  <section class="end-cta">
+    <div class="container">
+      <div class="grid">
+        <div>
+          <div class="section-eyebrow">06 · get started</div>
+          <h2>Five minutes from <code>openapi.yaml</code> to a typed client and a passing contract suite.</h2>
+          <p>No account. No telemetry. Apache 2.0. Read the quickstart, run one command, and watch the spec become the source of truth your team actually trusts.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:12px; align-items:flex-start;">
+          <a href="getting-started.html" class="btn">Quickstart →</a>
+          <a href="https://github.com/glyph-dev/glyph" class="btn btn-secondary">Star on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row">
+      <div class="tagline-block">
+        <a href="index.html" class="brand plain"><span class="mark" aria-hidden="true"></span><span class="name">glyph</span></a>
+        <p>API contracts that stay honest. One command from OpenAPI to typed clients, mocks, and contract tests.</p>
+      </div>
+      <div>
+        <h5>Docs</h5>
+        <ul>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="guides.html">Guides</a></li>
+          <li><a href="api-reference.html">CLI reference</a></li>
+          <li><a href="examples.html">Examples</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Project</h5>
+        <ul>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph">Source (GitHub)</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/issues">Issue tracker</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/discussions">Discussions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">RFCs</a></li>
+          <li><a href="#">Contributing</a></li>
+          <li><a href="#">Code of conduct</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">License — Apache 2.0</a></li>
+          <li><a href="#">Security policy</a></li>
+          <li><a href="#">Trademark</a></li>
+          <li><a href="#">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="colophon">
+      <div><span class="status-dot" aria-hidden="true"></span>all systems nominal · build 2024.11.4-a31cf2</div>
+      <div>© 2021–2024 Glyph contributors · Set in JetBrains Mono</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

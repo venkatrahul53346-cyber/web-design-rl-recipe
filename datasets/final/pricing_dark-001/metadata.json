@@ -1,0 +1,59 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "pricing_dark-0000",
+    "archetype": "A8",
+    "vertical": "devtools",
+    "style": {
+      "density": "balanced",
+      "color_regime": "dark-native",
+      "typography": "geometric-sans",
+      "border_language": "hairline-1px",
+      "motif": "clean-iconographic"
+    },
+    "palette_seed": "#EF4444",
+    "font_pair": [
+      "Inter",
+      "Inter",
+      null
+    ],
+    "difficulty": "easy",
+    "sitemap": [
+      "index",
+      "contact",
+      "customers",
+      "enterprise",
+      "compare",
+      "faq"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Riverbed",
+      "tagline": "Observability that follows the request",
+      "value_prop": "Riverbed traces every request across services without manual instrumentation. Open-source agent, hosted query plane, $0 to start.",
+      "product_category": "distributed tracing / observability",
+      "target_audience": "platform and SRE teams"
+    },
+    "notes": "Design reference: linear.app/pricing, vercel.com/pricing, stripe.com/pricing. Background near-black (#0A0A0B / #111114), text near-white (#F5F5F7) at high contrast. Single accent color from the palette used sparingly: highlighted tier card, primary CTA, hover state. Body weight 500 \u2014 slightly heavier than typical for legibility on dark.\n\nPricing page is the centerpiece: 3 tier cards (Free / Pro / Enterprise), side-by-side, with the middle one outlined with a 1px accent stroke and marked 'Recommended' or similar. Each card: tier name, price (large), 1-line description, 6-10 feature bullets with check or dot glyphs, primary CTA. Hairline 1px borders only \u2014 no shadows, no rounded corners beyond 6-8px.\n\nCompare page: full feature-vs-tier matrix, sticky header row, hairline 1px row separators. FAQ: collapsed accordion list, ~10 questions with concise answers.\n\nRiverbed's tagline: \"Observability that follows the request\". Use the value prop in the hero. Avoid saturated gradients. Avoid feature checkboxes that look like form inputs."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "compare",
+    "contact",
+    "customers",
+    "enterprise",
+    "faq",
+    "index"
+  ],
+  "files": [
+    "compare.html",
+    "contact.html",
+    "customers.html",
+    "enterprise.html",
+    "faq.html",
+    "index.html",
+    "styles.css"
+  ],
+  "has_external_css": true,
+  "assets": []
+}

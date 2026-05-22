@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maison Verla — Perfumery in Motion · Locomotive Case Study</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .cs-hero{padding:56px 0 24px;position:relative}
+  .cs-hero h1{font-style:italic;font-weight:900}
+  .cs-hero .outline{-webkit-text-stroke:2px var(--ink);color:transparent;font-style:normal}
+  .cs-eyebrow-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:36px}
+  .cs-eyebrow-row .pill{border:var(--border) solid var(--ink);padding:6px 12px;font-family:var(--font-display);font-weight:700;font-size:13px;background:var(--paper)}
+  .cs-eyebrow-row .pill--red{background:var(--accent-3);color:#fff}
+  .cs-hero__keyart{margin-top:48px;border:var(--border) solid var(--ink);box-shadow:var(--shadow-offset) var(--shadow-offset) 0 0 var(--ink);aspect-ratio:21/9;background:linear-gradient(120deg,#0A0A0A 0%,#0A0A0A 60%,#2D5BFF 60%,#2D5BFF 100%);position:relative;overflow:hidden}
+  .cs-hero__keyart::after{content:"VERLA";position:absolute;left:-2vw;bottom:-3vw;font-family:var(--font-display);font-weight:900;font-size:clamp(140px,22vw,360px);letter-spacing:-0.06em;color:var(--accent-2);line-height:0.8;-webkit-text-stroke:0}
+  .cs-hero__keyart .stamp{position:absolute;top:36px;right:36px;z-index:2}
+  .cs-grid-meta{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;align-items:start}
+  @media(max-width:900px){.cs-grid-meta{grid-template-columns:1fr}.cs-hero__keyart{aspect-ratio:4/3}}
+  .cs-problem{display:grid;grid-template-columns:1fr 1.4fr;gap:64px;align-items:start}
+  @media(max-width:900px){.cs-problem{grid-template-columns:1fr;gap:32px}}
+  .cs-problem .stat{font-family:var(--font-display);font-weight:900;font-size:clamp(64px,9vw,128px);letter-spacing:-0.05em;line-height:0.85}
+  .cs-problem .stat--red{color:var(--accent-3)}
+  .approach-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+  .span-7{grid-column:span 7}
+  .span-5{grid-column:span 5}
+  .span-12{grid-column:span 12}
+  .span-8{grid-column:span 8}
+  .span-4{grid-column:span 4}
+  @media(max-width:900px){.span-7,.span-5,.span-8,.span-4{grid-column:span 12}}
+  .img-frame{border:var(--border) solid var(--ink);box-shadow:var(--shadow-offset) var(--shadow-offset) 0 0 var(--ink);background:#EAEAEA}
+  .img-frame--blue{background:var(--accent)}
+  .img-frame--yellow{background:var(--accent-2)}
+  .img-frame--ink{background:var(--ink)}
+  .img-frame--red{background:var(--accent-3)}
+  .img-tall{aspect-ratio:3/4}
+  .img-square{aspect-ratio:1/1}
+  .img-wide{aspect-ratio:16/9}
+  .pull{font-family:var(--font-display);font-weight:800;font-size:clamp(36px,5vw,72px);letter-spacing:-0.045em;line-height:0.95;padding:48px 0}
+  .pull em{font-style:italic;color:var(--accent-3)}
+  .outcomes{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:var(--border) solid #fff}
+  @media(max-width:900px){.outcomes{grid-template-columns:1fr 1fr}}
+  .outcome{padding:36px 28px;border-right:var(--border) solid #fff;border-bottom:var(--border) solid #fff}
+  .outcome:last-child{border-right:0}
+  .outcome .num{font-family:var(--font-display);font-weight:900;font-size:clamp(56px,7vw,96px);letter-spacing:-0.05em;line-height:0.85}
+  .outcome .lbl{font-size:12px;text-transform:uppercase;letter-spacing:0.16em;margin-top:14px;opacity:0.85}
+  .credits{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+  @media(max-width:900px){.credits{grid-template-columns:1fr}}
+  .scroll-hint{position:absolute;left:28px;bottom:-12px;background:var(--accent-2);border:var(--border) solid var(--ink);padding:6px 12px;font-family:var(--font-display);font-weight:700;transform:rotate(-2deg)}
+  .next-cs{display:grid;grid-template-columns:1fr auto;align-items:center;gap:24px;padding:64px 0}
+  .next-cs h2{font-style:italic}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a href="index.html" class="brand" aria-label="Locomotive home">
+      <span class="brand__dot" aria-hidden="true"></span>
+      <span class="brand__mark">Locomotive<span class="text-accent">®</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="work-index.html" class="active">Work</a>
+      <a href="about.html">Studio</a>
+      <a href="about.html#services">Services</a>
+      <a href="about.html#journal">Journal</a>
+      <span class="nav__status mono">Booking Q3 ’25</span>
+      <a href="contact.html" class="btn btn--yellow nav__cta">Start a project <span class="arrow">→</span></a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="cs-hero wrap-wide">
+    <div class="cs-eyebrow-row">
+      <span class="mono">CASE 014 — 2024</span>
+      <span class="pill">Brand site</span>
+      <span class="pill">E-commerce</span>
+      <span class="pill pill--red">FWA SOTD</span>
+      <span class="pill">Awwwards 9.2</span>
+    </div>
+
+    <h1><span class="outline">Maison</span><br>Verla, <em>bottled.</em></h1>
+    <p class="lede" style="max-width:780px;margin-top:36px">A perfumery built around six olfactory chapters — and a site that lets you scroll through them like a film. Liquid choreography, a custom WebGL bottle, and a checkout that doesn’t fight the romance.</p>
+
+    <div class="cs-hero__keyart">
+      <div class="badge-circle stamp">FWA<br>Site of<br>the Day</div>
+      <span class="scroll-hint mono">↓ Scroll the chapter</span>
+    </div>
+  </section>
+
+  <!-- META TABLE + AT A GLANCE -->
+  <section class="section wrap-wide">
+    <div class="cs-grid-meta">
+      <div>
+        <span class="eyebrow">At a glance</span>
+        <h2 style="margin-top:18px;max-width:14ch">A heritage parfumeur, re-pressed for the web.</h2>
+        <p style="margin-top:28px;max-width:58ch;font-size:16px;line-height:1.55">Founded in Grasse in 1908, Maison Verla had spent a century earning the trust of nez and collector — and almost none of the trust of anyone under forty. They came to us with a question that was really three questions: how do we sell a scent online, how do we keep the ritual, and how do we do both without becoming another minimal-cream-aesthetic perfume brand?</p>
+        <p style="max-width:58ch;font-size:16px;line-height:1.55">We answered with a site that treats every chapter like a short film and every bottle like a sculpture. The catalog still works. The mystery still works. Both at once.</p>
+      </div>
+      <div class="card" style="padding:28px">
+        <table class="meta-table">
+          <tr><th>Client</th><td>Maison Verla · Grasse, FR</td></tr>
+          <tr><th>Year</th><td>2024 — 11-month engagement</td></tr>
+          <tr><th>Sector</th><td>Luxury fragrance, heritage</td></tr>
+          <tr><th>Scope</th><td>Strategy · Identity · Site · WebGL · Shopify Hydrogen</td></tr>
+          <tr><th>Team</th><td>4 designers, 3 engineers, 1 motion lead</td></tr>
+          <tr><th>Stack</th><td>Hydrogen · Three.js · GSAP · Sanity</td></tr>
+          <tr><th>Launch</th><td>April 11, 2024 (Paris Olympia)</td></tr>
+          <tr><th>Live</th><td><a class="inline" href="#">verla.fr ↗</a></td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- THE PROBLEM (RED BLOCK) -->
+  <section class="block block--red section">
+    <div class="wrap-wide">
+      <span class="eyebrow">01 — The Problem</span>
+      <div class="cs-problem" style="margin-top:36px">
+        <div>
+          <div class="stat">−42%</div>
+          <p class="mono" style="margin-top:14px;opacity:0.9">YoY decline in DTC orders from buyers under 40, 2019–2023.</p>
+          <div class="stat" style="margin-top:48px">1 of 6</div>
+          <p class="mono" style="margin-top:14px;opacity:0.9">Chapters of the new collection had any digital presence at launch.</p>
+        </div>
+        <div>
+          <h2 style="font-style:italic">A century of nose. A decade of being invisible online.</h2>
+          <p style="font-size:17px;line-height:1.55;margin-top:24px;max-width:58ch">Verla’s previous site was a PDF catalog with a buy button bolted on. It told you nothing about why a 110ml flacon of <em>Onde Noire</em> costs €380 — only that it does. The bounce rate was 78%. The story stopped at the front door.</p>
+          <p style="font-size:17px;line-height:1.55;max-width:58ch">Worse, the house was preparing to release <strong>Six Chapters</strong> — a serialized collection that demanded narrative pacing the existing site couldn’t hold. We had eleven months until Paris Olympia. We needed a site that could carry a perfumery’s mythology and ship it FedEx the next morning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPROACH -->
+  <section class="section-loose wrap-wide">
+    <span class="eyebrow">02 — The Approach</span>
+    <h2 style="margin-top:20px;max-width:18ch">Treat the catalog like a <span style="-webkit-text-stroke:2px var(--ink);color:transparent">novel</span>, not a grid.</h2>
+    <p class="lede" style="margin-top:28px;max-width:62ch">Three working principles guided every decision — taped to the studio wall in 200pt Inter Tight, naturally.</p>
+
+    <div class="approach-grid" style="margin-top:64px">
+      <article class="card span-7" style="padding:36px">
+        <span class="mono">PRINCIPLE 01</span>
+        <h3 style="margin-top:14px">The bottle is the hero. The UI gets out of the way.</h3>
+        <p style="margin-top:18px;font-size:16px;line-height:1.55">We built a real-time WebGL renderer for every flacon — refractive glass, hand-painted labels, the wax seal that catches the light when you tilt your phone. Hover state on desktop spins the bottle; gyroscope on mobile. No video fallbacks; the glass is the same glass everywhere.</p>
+        <p class="mono" style="color:var(--muted);margin-top:18px">→ 11,000 polys / bottle · 2.1MB total bundle · 60fps on iPhone 12</p>
+      </article>
+      <div class="img-frame img-frame--blue img-tall span-5"></div>
+
+      <div class="img-frame img-frame--ink img-square span-4"></div>
+      <article class="card card--yellow span-8" style="padding:36px">
+        <span class="mono">PRINCIPLE 02</span>
+        <h3 style="margin-top:14px;font-style:italic">Smell with your eyes — synaesthetic typography.</h3>
+        <p style="margin-top:18px;font-size:16px;line-height:1.55">Each of the six chapters has its own type treatment, color regime, and motion signature. <em>Onde Noire</em> drifts vertically like ink in water. <em>Foin Coupé</em> snaps horizontally like a scythe. We composed the system with Verla’s in-house nez, Anaïs Béranger, sketching at the bench. The kerning has a smell.</p>
+      </article>
+
+      <article class="card card--accent span-12" style="padding:48px">
+        <span class="mono" style="opacity:0.85">PRINCIPLE 03</span>
+        <h3 style="margin-top:14px;max-width:22ch">Romance and commerce in the same scroll — no modal in between.</h3>
+        <p style="margin-top:18px;font-size:17px;line-height:1.55;max-width:68ch">The hardest part wasn’t the WebGL. It was making a checkout that felt like turning the last page of a novel, not abandoning one. We rebuilt Verla’s cart in Hydrogen so it lives in the page — a fixed corner sigil that grows weight as you add. No interruption. No flyout. You leave the chapter when you decide to.</p>
+        <p class="mono" style="margin-top:18px;opacity:0.85">→ Add-to-cart latency: 84ms median · cart abandonment dropped 31%</p>
+      </article>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PULL QUOTE / TICKER -->
+  <section class="wrap-wide">
+    <div class="pull">“Locomotive didn’t build us a website. They built the <em>seventh chapter</em> of the collection.”
+      <div class="mono" style="margin-top:24px;color:var(--muted)">— Hugo Verla, Maison Verla, fifth-generation parfumeur</div>
+    </div>
+  </section>
+
+  <div class="ticker">
+    <div class="ticker__track">
+      <span>Onde Noire</span><span class="star">✺</span>
+      <span>Foin Coupé</span><span class="star">✺</span>
+      <span>Vétiver d’Hiver</span><span class="star">✺</span>
+      <span>Iris Pâle</span><span class="star">✺</span>
+      <span>Cuir Mouillé</span><span class="star">✺</span>
+      <span>Ambre 14</span><span class="star">✺</span>
+      <span>Onde Noire</span><span class="star">✺</span>
+      <span>Foin Coupé</span><span class="star">✺</span>
+      <span>Vétiver d’Hiver</span><span class="star">✺</span>
+      <span>Iris Pâle</span><span class="star">✺</span>
+      <span>Cuir Mouillé</span><span class="star">✺</span>
+      <span>Ambre 14</span><span class="star">✺</span>
+    </div>
+  </div>
+
+  <!-- PROCESS GALLERY -->
+  <section class="section-tight wrap-wide">
+    <div style="display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:36px;flex-wrap:wrap">
+      <div>
+        <span class="eyebrow">03 — Process</span>
+        <h3 style="margin-top:14px">Eleven months, six chapters, one bench.</h3>
+      </div>
+      <p class="mono" style="color:var(--muted);max-width:38ch">A scrolling diary from the Grasse residency, Montréal motion lab, and the type sessions held in Anaïs’s atelier.</p>
+    </div>
+
+    <div class="approach-grid">
+      <div class="img-frame img-wide span-8"></div>
+      <div class="img-frame img-frame--red span-4"></div>
+      <div class="img-frame img-frame--yellow span-4"></div>
+      <div class="img-frame img-wide span-8"></div>
+      <div class="img-frame img-frame--ink span-5"></div>
+      <div class="img-frame span-7" style="aspect-ratio:16/9"></div>
+    </div>
+  </section>
+
+  <!-- OUTCOME (INK BLOCK) -->
+  <section class="block block--ink section">
+    <div class="wrap-wide">
+      <span class="eyebrow" style="color:var(--accent-2)">04 — The Outcome</span>
+      <h2 style="margin-top:18px;max-width:16ch;color:#fff">The first month sold like the first edition of a book.</h2>
+      <p class="lede" style="max-width:64ch;margin-top:24px;color:#EAEAEA">Verla’s site went live April 11. The Olympia release sold through in <strong>14 days</strong>. Three of the six chapters re-pressed within the quarter. Press picked it up before marketing did.</p>
+
+      <div class="outcomes" style="margin-top:64px;border:var(--border) solid #fff">
+        <div class="outcome">
+          <div class="num" style="color:var(--accent-2)">+318%</div>
+          <div class="lbl">DTC revenue, first 90 days vs. prior year</div>
+        </div>
+        <div class="outcome">
+          <div class="num" style="color:var(--accent-2)">14 days</div>
+          <div class="lbl">To sell the first Olympia edition</div>
+        </div>
+        <div class="outcome">
+          <div class="num" style="color:var(--accent-2)">−31%</div>
+          <div class="lbl">Cart abandonment, in-page checkout</div>
+        </div>
+        <div class="outcome">
+          <div class="num" style="color:var(--accent-2)">8m 12s</div>
+          <div class="lbl">Median session — up from 47 seconds</div>
+        </div>
+      </div>
+
+      <div style="margin-top:64px;display:flex;gap:18px;flex-wrap:wrap">
+        <a href="#" class="btn btn--yellow">Visit verla.fr <span class="arrow">↗</span></a>
+        <a href="#" class="btn btn--ghost">Watch the build film <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREDITS -->
+  <section class="section wrap-wide">
+    <div class="credits">
+      <div>
+        <span class="eyebrow">Credits</span>
+        <h3 style="margin-top:14px">Who made it.</h3>
+        <table class="meta-table" style="margin-top:28px">
+          <tr><th>Creative Direction</th><td>Léa Tremblay, Marc Beaulieu</td></tr>
+          <tr><th>Design</th><td>Yuki Hara, Sam Okonkwo, Camille Roy</td></tr>
+          <tr><th>Motion</th><td>Théo Lapointe (lead)</td></tr>
+          <tr><th>Engineering</th><td>Ana Petrovic, Liam Wu, Jordan Sirois</td></tr>
+          <tr><th>WebGL</th><td>Ana Petrovic</td></tr>
+          <tr><th>Sound design</th><td>Bureau Sonore, Paris</td></tr>
+          <tr><th>Photography</th><td>Florent Dossin · on-set in Grasse</td></tr>
+        </table>
+      </div>
+      <div>
+        <span class="eyebrow">Recognition</span>
+        <h3 style="margin-top:14px">What it picked up.</h3>
+        <ul class="row-list" style="margin-top:28px;border-top:var(--border) solid var(--ink)">
+          <li><span class="num mono">01</span><span class="label">FWA SOTD</span><span class="meta">May 2024</span></li>
+          <li><span class="num mono">02</span><span class="label">Awwwards SOTD</span><span class="meta">9.2 / 10</span></li>
+          <li><span class="num mono">03</span><span class="label">CSSDA</span><span class="meta">Best Innovation</span></li>
+          <li><span class="num mono">04</span><span class="label">Webby Honoree</span><span class="meta">Fashion &amp; Beauty</span></li>
+          <li><span class="num mono">05</span><span class="label">Communication Arts</span><span class="meta">Interactive ’24</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- NEXT CASE -->
+  <section class="block block--yellow">
+    <div class="wrap-wide next-cs">
+      <div>
+        <span class="mono">CASE 015 →</span>
+        <h2 style="margin-top:12px;max-width:18ch"><em>Hexa Coffee</em> — a roaster’s first dance with motion.</h2>
+      </div>
+      <a href="case-study-B.html" class="btn">Read next case <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__top">
+    <div class="site-footer__bigmark">Let’s make<br>something <span class="underline">move.</span></div>
+
+    <div class="site-footer__cols">
+      <div class="site-footer__col site-footer__contact">
+        <h5>New business</h5>
+        <a href="mailto:hello@locomotive.studio">hello@locomotive.studio</a>
+        <ul style="margin-top:22px">
+          <li>14 Rue Saint-Paul, Montréal QC</li>
+          <li>+1 (514) 555 0188</li>
+          <li>Studio hours · Mon–Fri 09:00–18:00 ET</li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Navigate</h5>
+        <ul>
+          <li><a href="work-index.html">Selected work</a></li>
+          <li><a href="about.html">The studio</a></li>
+          <li><a href="about.html#services">Capabilities</a></li>
+          <li><a href="about.html#journal">Journal</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Elsewhere</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Are.na</a></li>
+          <li><a href="#">Vimeo</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Read.cv</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Recognition</h5>
+        <ul>
+          <li>Awwwards · 12 SOTD</li>
+          <li>FWA · 8 wins</li>
+          <li>CSSDA · Best Studio ’24</li>
+          <li>Webby Honoree ’23</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="site-footer__bottom">
+    <span>© 2018–2025 Locomotive Studio Inc.</span>
+    <span>Built in Montréal · Running on espresso &amp; GSAP</span>
+    <span>v4.2.1 · Last deploy 3h ago</span>
+  </div>
+</footer>
+
+</body>
+</html>

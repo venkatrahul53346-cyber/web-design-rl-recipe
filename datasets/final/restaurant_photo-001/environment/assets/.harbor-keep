@@ -1,0 +1,1 @@
+# Placeholder — keeps environment/assets/ non-empty so Modal's image builder doesn't choke on COPY. Safe to ignore.

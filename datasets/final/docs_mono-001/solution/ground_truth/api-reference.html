@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLI reference — glyph</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .sig-block { background: var(--bg-tint); border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); padding: 14px 20px; margin: 1.4em -20px; font-size: 13px; }
+  .sig-block .sig-name { color: var(--ink); font-weight: 600; }
+  .sig-block .sig-flag { color: var(--accent); }
+  .sig-block .sig-arg { color: var(--num); }
+  table.spec { width: 100%; border-collapse: collapse; margin: 1.2em 0 1.6em 0; font-size: 12.5px; }
+  table.spec th { text-align: left; font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--rule-strong); background: var(--bg-tint); color: var(--ink-2); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  table.spec td { padding: 10px; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-2); }
+  table.spec td.name { color: var(--ink); white-space: nowrap; }
+  table.spec td.type { color: var(--accent); white-space: nowrap; font-size: 12px; }
+  table.spec td.req { color: var(--warn); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  table.spec td.opt { color: var(--ink-3); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  table.spec td code { font-size: 11.5px; }
+  .callout { border-left: 2px solid var(--accent); padding: 10px 14px; margin: 1.6em 0; background: var(--bg-tint); color: var(--ink-2); font-size: 12.5px; }
+  .callout .callout-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 4px; }
+  .meta-row { display: flex; gap: 18px; font-size: 11.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em; margin: 6px 0 18px 0; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+  .meta-row span strong { color: var(--ink-2); font-weight: 500; }
+  .returns-row { font-size: 12.5px; color: var(--ink-2); padding: 8px 0; margin-bottom: 8px; }
+  .returns-row .returns-label { color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; margin-right: 10px; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <div class="row">
+      <a href="index.html" class="brand plain" aria-label="Glyph home">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="name">glyph</span>
+        <span class="ver">v0.14.2</span>
+      </a>
+      <nav class="primary-nav" aria-label="Primary">
+        <a href="getting-started.html">Getting started</a>
+        <a href="guides.html">Guides</a>
+        <a href="api-reference.html" class="active">Reference</a>
+        <a href="examples.html">Examples</a>
+        <a href="changelog.html">Changelog</a>
+      </nav>
+      <div class="header-utils">
+        <span class="search-stub" role="search">
+          <span>search docs</span>
+          <span class="kbd">⌘K</span>
+        </span>
+        <a class="gh-link" href="https://github.com/glyph-dev/glyph">github ↗</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="doc-shell">
+  <aside class="doc-rail" aria-label="Reference navigation">
+    <nav>
+      <div class="rail-section">
+        <h6>cli</h6>
+        <ul>
+          <li><a href="#glyph-generate" class="active">glyph generate</a></li>
+          <li><a href="#glyph-mock">glyph mock</a></li>
+          <li><a href="#glyph-verify">glyph verify</a></li>
+          <li><a href="#glyph-diff">glyph diff</a></li>
+          <li><a href="#glyph-init">glyph init</a></li>
+        </ul>
+      </div>
+      <div class="rail-section">
+        <h6>config</h6>
+        <ul>
+          <li><a href="#glyph-toml">glyph.toml</a></li>
+          <li><a href="#env-vars">Environment variables</a></li>
+          <li><a href="#exit-codes">Exit codes</a></li>
+        </ul>
+      </div>
+      <div class="rail-section">
+        <h6>runtime</h6>
+        <ul>
+          <li><a href="#client-options">Client options</a></li>
+          <li><a href="#mock-server">Mock server API</a></li>
+          <li><a href="#contract-matchers">Contract matchers</a></li>
+        </ul>
+      </div>
+      <div class="rail-section">
+        <h6>integrations</h6>
+        <ul>
+          <li><a href="#github-action">GitHub Action</a></li>
+          <li><a href="#node-sdk">Node SDK</a></li>
+          <li><a href="#go-sdk">Go SDK</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="doc-main">
+    <div class="eyebrow">CLI reference · v0.14.2</div>
+    <h1>Command-line interface</h1>
+    <p class="sub">The <code>glyph</code> binary is the single entry point. Each subcommand reads <code>glyph.toml</code> by default and emits stable, machine-readable output on <code>stderr</code> when <code>--json</code> is set. Flags shown with <code>--no-*</code> negate booleans defined in config.</p>
+
+    <section id="glyph-generate">
+      <h2>glyph generate</h2>
+      <p>Reads an OpenAPI document and emits typed clients for one or more targets. Generation is deterministic: identical input plus identical config produces byte-identical output, which is what makes the <code>verify --frozen</code> check in CI meaningful.</p>
+
+      <div class="meta-row">
+        <span><strong>since</strong> 0.1.0</span>
+        <span><strong>stable</strong> yes</span>
+        <span><strong>side effects</strong> writes to <code>out_dir</code></span>
+      </div>
+
+      <h3>Signature</h3>
+      <div class="sig-block"><span class="prompt">$ </span><span class="sig-name">glyph generate</span> <span class="sig-arg">&lt;spec&gt;</span> <span class="sig-flag">--target</span> <span class="sig-arg">&lt;ts|go|py|rust&gt;</span> <span class="sig-flag">--out</span> <span class="sig-arg">&lt;dir&gt;</span> [<span class="sig-flag">--profile</span> <span class="sig-arg">&lt;name&gt;</span>] [<span class="sig-flag">--frozen</span>] [<span class="sig-flag">--json</span>]</div>
+
+      <h3>Parameters</h3>
+      <table class="spec">
+        <thead>
+          <tr><th>Name</th><th>Type</th><th></th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name"><code>spec</code></td>
+            <td class="type">path | url</td>
+            <td class="req">required</td>
+            <td>Path or URL to the OpenAPI 3.0 / 3.1 document. <code>.yaml</code>, <code>.yml</code>, and <code>.json</code> are auto-detected. Refs are resolved relative to the document root.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--target</code></td>
+            <td class="type">enum</td>
+            <td class="req">required</td>
+            <td>Language target. May be repeated to fan out generation in a single pass (e.g. <code>--target ts --target go</code>).</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--out</code></td>
+            <td class="type">path</td>
+            <td class="req">required</td>
+            <td>Output directory. Glyph treats this as owned: files not in the generation manifest are pruned on each run.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--profile</code></td>
+            <td class="type">string</td>
+            <td class="opt">optional</td>
+            <td>Named profile from <code>[profiles.*]</code> in <code>glyph.toml</code>. Defaults to <code>default</code>.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--frozen</code></td>
+            <td class="type">boolean</td>
+            <td class="opt">optional</td>
+            <td>Fails with exit code <code>17</code> if any output file would change. Use in CI to assert checked-in clients match the spec.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--json</code></td>
+            <td class="type">boolean</td>
+            <td class="opt">optional</td>
+            <td>Emit a structured generation manifest on stdout. Human progress remains on stderr.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Request — invocation</h3>
+      <div class="code-frame">
+        <div class="code-head"><span class="file">shell</span><span class="lang">bash</span></div>
+<pre><span class="prompt">$</span> glyph generate openapi.yaml \
+    <span class="kw">--target</span> ts \
+    <span class="kw">--out</span> ./packages/client \
+    <span class="kw">--profile</span> strict \
+    <span class="kw">--frozen</span> <span class="kw">--json</span></pre>
+      </div>
+
+      <h3>Response — manifest on stdout</h3>
+      <div class="code-frame">
+        <div class="code-head"><span class="file">stdout</span><span class="lang">json</span></div>
+<pre>{
+  <span class="str">"glyph"</span>: <span class="str">"0.14.2"</span>,
+  <span class="str">"target"</span>: <span class="str">"ts"</span>,
+  <span class="str">"profile"</span>: <span class="str">"strict"</span>,
+  <span class="str">"spec_digest"</span>: <span class="str">"sha256:7f3a…b21c"</span>,
+  <span class="str">"operations"</span>: <span class="num">48</span>,
+  <span class="str">"schemas"</span>: <span class="num">112</span>,
+  <span class="str">"files"</span>: [
+    { <span class="str">"path"</span>: <span class="str">"client.ts"</span>,        <span class="str">"bytes"</span>: <span class="num">8421</span>,  <span class="str">"changed"</span>: <span class="kw">false</span> },
+    { <span class="str">"path"</span>: <span class="str">"models/index.ts"</span>, <span class="str">"bytes"</span>: <span class="num">26104</span>, <span class="str">"changed"</span>: <span class="kw">false</span> },
+    { <span class="str">"path"</span>: <span class="str">"runtime.ts"</span>,       <span class="str">"bytes"</span>: <span class="num">3902</span>,  <span class="str">"changed"</span>: <span class="kw">false</span> }
+  ],
+  <span class="str">"frozen_ok"</span>: <span class="kw">true</span>,
+  <span class="str">"elapsed_ms"</span>: <span class="num">214</span>
+}</pre>
+      </div>
+
+      <div class="callout">
+        <span class="callout-label">Note</span>
+        When <code>--frozen</code> trips, the manifest still emits but with <code>frozen_ok: false</code> and a <code>diff</code> array listing the offending files. Pipe through <code>jq '.diff'</code> for a one-glance CI failure.
+      </div>
+    </section>
+
+    <section id="glyph-mock">
+      <h2>glyph mock</h2>
+      <p>Starts a local HTTP server that responds to every operation described in the spec using the operation's <code>example</code>, schema <code>examples</code>, or schema-derived synthetic data — in that order. The server is request-validated: malformed bodies, missing required headers, or out-of-range parameters return <code>400</code> with the failing JSON Pointer, never a generic 500.</p>
+
+      <div class="meta-row">
+        <span><strong>since</strong> 0.4.0</span>
+        <span><strong>stable</strong> yes</span>
+        <span><strong>side effects</strong> binds TCP port</span>
+      </div>
+
+      <h3>Signature</h3>
+      <div class="sig-block"><span class="prompt">$ </span><span class="sig-name">glyph mock</span> <span class="sig-arg">&lt;spec&gt;</span> [<span class="sig-flag">--port</span> <span class="sig-arg">&lt;n&gt;</span>] [<span class="sig-flag">--seed</span> <span class="sig-arg">&lt;n&gt;</span>] [<span class="sig-flag">--latency</span> <span class="sig-arg">&lt;ms&gt;</span>] [<span class="sig-flag">--scenario</span> <span class="sig-arg">&lt;file&gt;</span>] [<span class="sig-flag">--strict-headers</span>]</div>
+
+      <div class="returns-row"><span class="returns-label">returns</span> long-running process; <code>SIGINT</code> shuts down cleanly with a summary of unmatched requests on stderr.</div>
+
+      <h3>Parameters</h3>
+      <table class="spec">
+        <thead>
+          <tr><th>Name</th><th>Type</th><th></th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name"><code>--port</code></td>
+            <td class="type">integer</td>
+            <td class="opt">optional</td>
+            <td>TCP port to bind. Default <code>4010</code>. Pass <code>0</code> to bind to any free port (printed on startup).</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--seed</code></td>
+            <td class="type">integer</td>
+            <td class="opt">optional</td>
+            <td>Deterministic seed for the synthetic-data generator. Same seed + same spec + same request ⇒ same response body.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--latency</code></td>
+            <td class="type">integer | range</td>
+            <td class="opt">optional</td>
+            <td>Injected response delay in ms. Accepts a range (<code>50..300</code>) to simulate jitter.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--scenario</code></td>
+            <td class="type">path</td>
+            <td class="opt">optional</td>
+            <td>YAML file mapping request matchers to canned responses. Useful for testing error paths the spec doesn't surface as defaults.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--strict-headers</code></td>
+            <td class="type">boolean</td>
+            <td class="opt">optional</td>
+            <td>Reject requests whose <code>Content-Type</code> or <code>Accept</code> aren't explicitly declared on the operation. Off by default.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Request — call into the mock</h3>
+      <div class="code-frame">
+        <div class="code-head"><span class="file">shell</span><span class="lang">bash</span></div>
+<pre><span class="prompt">$</span> glyph mock openapi.yaml <span class="kw">--port</span> 4010 <span class="kw">--seed</span> 42 &amp;
+<span class="cmt"># glyph mock · listening on http://127.0.0.1:4010 · seed=42</span>
+
+<span class="prompt">$</span> curl <span class="kw">-sS</span> http://127.0.0.1:4010/v1/invoices/inv_8821 \
+       <span class="kw">-H</span> <span class="str">'Accept: application/json'</span></pre>
+      </div>
+
+      <h3>Response — synthesized from schema</h3>
+      <div class="code-frame">
+        <div class="code-head"><span class="file">200 OK · application/json</span><span class="lang">json</span></div>
+<pre>{
+  <span class="str">"id"</span>: <span class="str">"inv_8821"</span>,
+  <span class="str">"status"</span>: <span class="str">"open"</span>,
+  <span class="str">"customer"</span>: {
+    <span class="str">"id"</span>: <span class="str">"cus_3a91"</span>,
+    <span class="str">"email"</span>: <span class="str">"a.lindgren@example.com"</span>
+  },
+  <span class="str">"line_items"</span>: [
+    { <span class="str">"sku"</span>: <span class="str">"SEAT-ANN"</span>, <span class="str">"qty"</span>: <span class="num">3</span>, <span class="str">"unit_cents"</span>: <span class="num">12000</span> }
+  ],
+  <span class="str">"subtotal_cents"</span>: <span class="num">36000</span>,
+  <span class="str">"currency"</span>: <span class="str">"USD"</span>,
+  <span class="str">"created_at"</span>: <span class="str">"2024-11-04T14:08:11Z"</span>
+}</pre>
+      </div>
+    </section>
+
+    <section id="glyph-verify">
+      <h2>glyph verify</h2>
+      <p>Replays recorded traffic — or live integration tests — against the spec and reports any drift. Each interaction is checked in both directions: the request must be valid against the operation, and the response must satisfy the declared status, headers, and schema. Drift is the only thing it reports; matches are silent unless <code>--verbose</code>.</p>
+
+      <div class="meta-row">
+        <span><strong>since</strong> 0.7.0</span>
+        <span><strong>stable</strong> yes</span>
+        <span><strong>side effects</strong> none (read-only)</span>
+      </div>
+
+      <h3>Signature</h3>
+      <div class="sig-block"><span class="prompt">$ </span><span class="sig-name">glyph verify</span> <span class="sig-arg">&lt;spec&gt;</span> <span class="sig-flag">--recording</span> <span class="sig-arg">&lt;file&gt;</span> [<span class="sig-flag">--include</span> <span class="sig-arg">&lt;glob&gt;</span>] [<span class="sig-flag">--fail-on</span> <span class="sig-arg">&lt;level&gt;</span>] [<span class="sig-flag">--report</span> <span class="sig-arg">&lt;path&gt;</span>]</div>
+
+      <h3>Parameters</h3>
+      <table class="spec">
+        <thead>
+          <tr><th>Name</th><th>Type</th><th></th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name"><code>--recording</code></td>
+            <td class="type">path</td>
+            <td class="req">required</td>
+            <td>HAR file or Glyph <code>.jsonl</code> trace produced by the runtime SDK's <code>record()</code> middleware.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--include</code></td>
+            <td class="type">glob</td>
+            <td class="opt">optional</td>
+            <td>Operation-id glob (e.g. <code>invoices.*</code>) to scope the check. Repeatable. Defaults to all operations.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--fail-on</code></td>
+            <td class="type">enum</td>
+            <td class="opt">optional</td>
+            <td>Severity threshold: <code>error</code> (default), <code>warn</code>, or <code>info</code>. Determines the process exit code.</td>
+          </tr>
+          <tr>
+            <td class="name"><code>--report</code></td>
+            <td class="type">path</td>
+            <td class="opt">optional</td>
+            <td>Write a JUnit-compatible XML report alongside the human summary. Used by the GitHub Action to annotate PRs.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Request — verify a captured trace</h3>
+      <div class="code-frame">
+        <div class="code-head"><span class="file">shell</span><span class="lang">bash</span></div>
+<pre><span class="prompt">$</span> glyph verify openapi.yaml \
+    <span class="kw">--recording</span> ./traces/staging-2024-11-04.jsonl \
+    <span class="kw">--include</span> <span class="str">'invoices.*'</span> \
+    <span class="kw">--fail-on</span> error</pre>
+      </div>
+
+      <h3>Response — drift report on stderr</h3>
+      <div class="code-frame">
+        <div class="code-head"><span class="file">stderr</span><span class="lang">text</span></div>
+<pre><span class="cmt">glyph verify · 1,204 interactions · 3 drifts</span>
+
+<span class="kw">error</span>  invoices.create        response.body
+       at <span class="str">$.line_items[0].tax_rate</span>
+       expected: <span class="ty">number</span> (0..1)
+       received: <span class="str">"0.0875"</span>     <span class="cmt"># string, not number</span>
+       trace:    traces/staging-2024-11-04.jsonl:482
+
+<span class="kw">error</span>  invoices.get           response.status
+       expected: <span class="num">200</span> | <span class="num">404</span>
+       received: <span class="num">418</span>
+       trace:    traces/staging-2024-11-04.jsonl:903
+
+<span class="kw">warn</span>   invoices.list          response.header
+       <span class="str">x-next-cursor</span> declared but absent on 12/40 responses
+
+<span class="cmt">exit 19 (drift detected)</span></pre>
+      </div>
+
+      <div class="callout">
+        <span class="callout-label">See also</span>
+        Pair <code>glyph verify</code> with <a href="#glyph-diff">glyph diff</a> in pre-merge CI: <code>diff</code> blocks breaking spec changes, <code>verify</code> blocks producers that quietly diverge from the spec they claim to honor.
+      </div>
+    </section>
+  </main>
+
+  <aside class="doc-toc" aria-label="On this page">
+    <nav>
+      <h6 style="font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:var(--ink-3);font-weight:600;margin:0 0 10px 12px;">On this page</h6>
+      <ul style="list-style:none;padding:0;margin:0;font-size:12.5px;">
+        <li><a href="#glyph-generate" style="display:block;padding:3px 12px;color:var(--accent);border:0;border-left:1px solid var(--accent);background:var(--bg-tint);">glyph generate</a></li>
+        <li><a href="#glyph-mock" style="display:block;padding:3px 12px;color:var(--ink-2);border:0;border-left:1px solid var(--rule);">glyph mock</a></li>
+        <li><a href="#glyph-verify" style="display:block;padding:3px 12px;color:var(--ink-2);border:0;border-left:1px solid var(--rule);">glyph verify</a></li>
+      </ul>
+    </nav>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row">
+      <div class="tagline-block">
+        <a href="index.html" class="brand plain"><span class="mark" aria-hidden="true"></span><span class="name">glyph</span></a>
+        <p>API contracts that stay honest. One command from OpenAPI to typed clients, mocks, and contract tests.</p>
+      </div>
+      <div>
+        <h5>Docs</h5>
+        <ul>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="guides.html">Guides</a></li>
+          <li><a href="api-reference.html">CLI reference</a></li>
+          <li><a href="examples.html">Examples</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Project</h5>
+        <ul>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph">Source (GitHub)</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/issues">Issue tracker</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/discussions">Discussions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">RFCs</a></li>
+          <li><a href="#">Contributing</a></li>
+          <li><a href="#">Code of conduct</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">License — Apache 2.0</a></li>
+          <li><a href="#">Security policy</a></li>
+          <li><a href="#">Trademark</a></li>
+          <li><a href="#">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="colophon">
+      <div><span class="status-dot" aria-hidden="true"></span>all systems nominal · build 2024.11.4-a31cf2</div>
+      <div>© 2021–2024 Glyph contributors · Set in JetBrains Mono</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

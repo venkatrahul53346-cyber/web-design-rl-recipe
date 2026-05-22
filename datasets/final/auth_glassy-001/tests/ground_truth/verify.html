@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify your email — Mint Ledger</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .verify-card { max-width: 460px; text-align: center; padding: 40px 40px 32px; }
+  .verify-icon {
+    width: 76px; height: 76px;
+    border-radius: 22px;
+    margin: 4px auto 24px;
+    background: linear-gradient(140deg, rgba(167,243,208,0.65) 0%, rgba(96,165,250,0.45) 55%, rgba(221,214,254,0.55) 100%);
+    border: 1px solid rgba(255,255,255,0.9);
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 14px 32px -10px rgba(30,64,175,0.22);
+    position: relative;
+  }
+  .verify-icon svg { width: 36px; height: 36px; color: var(--anchor-ink); }
+  .verify-icon::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 28px;
+    border: 1px dashed rgba(96,165,250,0.28);
+    pointer-events: none;
+  }
+  .verify-card .glass-card__title { font-size: 26px; margin-bottom: 10px; }
+  .verify-card .glass-card__subtitle { font-size: 14px; line-height: 1.6; margin-bottom: 6px; }
+  .verify-email {
+    display: inline-block;
+    margin: 16px 0 26px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    padding: 7px 13px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+  }
+  .verify-email .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--mint-deep);
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+    box-shadow: 0 0 0 4px rgba(110,231,183,0.25);
+  }
+  .verify-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .verify-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 22px 0 18px;
+    font-size: 11px;
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+  }
+  .verify-divider::before, .verify-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--line);
+  }
+  .verify-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 26px;
+    background: var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .verify-meta div {
+    background: rgba(255,255,255,0.55);
+    padding: 12px 14px;
+    text-align: left;
+  }
+  .verify-meta dt {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .verify-meta dd {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    margin: 0;
+  }
+  .resend-row {
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+  .resend-row a { font-weight: 500; }
+  .tiny-note {
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    line-height: 1.55;
+  }
+  .steps-mini {
+    display: flex; gap: 6px; justify-content: center;
+    margin-bottom: 28px;
+  }
+  .steps-mini span {
+    height: 4px; border-radius: 2px; background: var(--line-strong);
+    width: 22px;
+  }
+  .steps-mini span.done { background: var(--mint-deep); width: 22px; }
+  .steps-mini span.active { background: var(--anchor-deep); width: 38px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="/">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12a4 4 0 0 1 0 8H8"/><path d="M4 12h10"/></svg>
+      </span>
+      Mint Ledger
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/product">Product</a>
+      <a href="/integrations">Integrations</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/changelog">Changelog</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-ghost" href="login.html">Sign in</a>
+      <a class="btn btn-primary" style="width:auto;padding:9px 16px;" href="signup.html">Start free</a>
+    </div>
+  </div>
+</header>
+
+<main class="auth-shell">
+  <div class="glass-card verify-card" role="status" aria-live="polite">
+    <div class="steps-mini" aria-hidden="true">
+      <span class="done"></span>
+      <span class="active"></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="verify-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7.5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"/>
+        <path d="M3.5 8 12 13.5 20.5 8"/>
+      </svg>
+    </div>
+
+    <h1 class="glass-card__title">Check your email</h1>
+    <p class="glass-card__subtitle">We sent a verification link to confirm it's really you. Open it on this device to finish setting up your workspace.</p>
+
+    <span class="verify-email"><span class="dot"></span>jordan@northstar-coffee.co</span>
+
+    <div class="verify-actions">
+      <a class="btn btn-primary" href="https://mail.google.com" target="_blank" rel="noopener">Open Gmail</a>
+      <a class="btn btn-secondary" href="https://outlook.live.com" target="_blank" rel="noopener">Open Outlook</a>
+    </div>
+
+    <div class="verify-divider">or</div>
+
+    <p class="resend-row">Didn't get it? <a href="#" id="resend-link">Resend the link</a> &nbsp;·&nbsp; <a href="signup.html">Use a different email</a></p>
+
+    <dl class="verify-meta">
+      <div>
+        <dt>Link expires in</dt>
+        <dd>15 minutes</dd>
+      </div>
+      <div>
+        <dt>Sent from</dt>
+        <dd>hello@mintledger.com</dd>
+      </div>
+    </dl>
+
+    <p class="tiny-note">Still nothing after a minute or two? Check your spam folder, or whitelist <strong style="color:var(--ink-soft);font-weight:500;">mintledger.com</strong> with your IT admin. We never ask for passwords by email.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <a class="brand" href="/">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12a4 4 0 0 1 0 8H8"/><path d="M4 12h10"/></svg>
+        </span>
+        Mint Ledger
+      </a>
+      <p>Close the books before lunch. Mint Ledger automates AP, AR, and reconciliation so small teams can stop chasing receipts.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="/product/ap">Accounts payable</a></li>
+        <li><a href="/product/ar">Accounts receivable</a></li>
+        <li><a href="/product/reconcile">Reconciliation</a></li>
+        <li><a href="/integrations">Integrations</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="/docs">Documentation</a></li>
+        <li><a href="/guides">SMB finance guides</a></li>
+        <li><a href="/changelog">Changelog</a></li>
+        <li><a href="/status">System status</a></li>
+        <li><a href="/support">Help center</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="/about">About</a></li>
+        <li><a href="/customers">Customers</a></li>
+        <li><a href="/security">Security &amp; SOC 2</a></li>
+        <li><a href="/careers">Careers</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="site-footer__base">
+    <span>© 2025 Mint Ledger, Inc. Made for small teams in Brooklyn &amp; Lisbon.</span>
+    <span>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/dpa">DPA</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+# Harbor job config: Modal cloud sandboxes, parallel trials.
+# Use this for the actual eval matrix once the local Docker run is green.
+#
+# Prereq: `modal token new` (token written to ~/.modal.toml).
+# Verify: `modal token info`
+#
+# Run:
+#   harbor run -c configs/modal.yaml
+#
+# Single Modal trial (debug):
+#   harbor trial start -p datasets/web-design/task-0042 -a oracle \
+#     --environment-type modal
+
+job_name: web-design-modal-oracle
+jobs_dir: jobs
+n_attempts: 1
+timeout_multiplier: 1.0
+
+orchestrator:
+  type: local
+  # Modal trials are I/O bound (waiting on sandbox + Claude API), so we can
+  # run more in parallel than CPU count. 30 is what featurebench_modal.yaml
+  # uses; tune up if Modal quota allows.
+  n_concurrent_trials: 30
+  quiet: false
+
+environment:
+  type: modal
+  delete: true
+
+agents:
+  - name: oracle
+
+datasets:
+  - path: datasets/web-design

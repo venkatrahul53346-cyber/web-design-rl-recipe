@@ -1,0 +1,59 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "docs_mono-0000",
+    "archetype": "A3",
+    "vertical": "devtools",
+    "style": {
+      "density": "balanced",
+      "color_regime": "muted-editorial",
+      "typography": "mono-everywhere",
+      "border_language": "hairline-1px",
+      "motif": "clean-iconographic"
+    },
+    "palette_seed": "#3F4856",
+    "font_pair": [
+      "JetBrains Mono",
+      "JetBrains Mono",
+      "JetBrains Mono"
+    ],
+    "difficulty": "hard",
+    "sitemap": [
+      "index",
+      "changelog",
+      "examples",
+      "api-reference",
+      "guides",
+      "getting-started"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Glyph",
+      "tagline": "API contracts that stay honest",
+      "value_prop": "Glyph turns OpenAPI specs into typed clients, mocks, and contract tests in one command \u2014 keeping consumer and producer in sync as the API evolves.",
+      "product_category": "API tooling",
+      "target_audience": "backend engineers and API platform teams"
+    },
+    "notes": "Design reference: oxide.computer/docs, biomejs.dev, rauno.me. Mono typeface across ALL text \u2014 headings, body, code, captions. Hairline 1px borders, NO box-shadows, NO rounded corners (or 0\u20132px max). Background: warm off-white (#FBF8F3 or similar), text: dark ink (#1A1815). Accent (the palette anchor) used sparingly for the logomark, active link state, and inline-code highlight.\n\nLayout: 3-pane on docs pages \u2014 left rail navigation tree (getting-started / api-reference / guides / examples), centre prose+code (~720px max), right rail page TOC. Index can be 2-pane or single-column.\n\nCode blocks must be VISUALLY DISTINCT \u2014 slightly tinted background (#F2EFE7), 1px border on top+bottom, mono code with simulated syntax highlighting via spans/colors (e.g. keywords in #6E5BCB, strings in #007E5A, comments in #888). Prose-style explanations between code blocks.\n\nEach page should have content appropriate to its purpose: getting-started has install/quickstart code, api-reference has parameter tables and response examples, guides has step-by-step recipes, examples has full integration code snippets, changelog is a chronological list of versioned entries. AVOID generic 'feature one / feature two' filler.\n\nGlyph is the product name; \"API contracts that stay honest\" is the tagline."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "api-reference",
+    "changelog",
+    "examples",
+    "getting-started",
+    "guides",
+    "index"
+  ],
+  "files": [
+    "api-reference.html",
+    "changelog.html",
+    "examples.html",
+    "getting-started.html",
+    "guides.html",
+    "index.html",
+    "styles.css"
+  ],
+  "has_external_css": true,
+  "assets": []
+}

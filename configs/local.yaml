@@ -1,0 +1,29 @@
+# Harbor job config: local Docker, single-trial, oracle.
+# Use this for fast iteration on the generator + grader.
+#
+# Run:
+#   harbor run -c configs/local.yaml
+#
+# Or single trial:
+#   harbor trial start -p datasets/web-design/task-0042 -a oracle
+
+job_name: web-design-local-oracle
+jobs_dir: jobs
+n_attempts: 1
+timeout_multiplier: 1.0
+
+orchestrator:
+  type: local
+  n_concurrent_trials: 1
+  quiet: false
+
+environment:
+  type: docker
+  force_build: false
+  delete: true
+
+agents:
+  - name: oracle
+
+datasets:
+  - path: datasets/web-design

@@ -1,0 +1,29 @@
+# Opus on the 10 synthesized final tasks, 10 attempts each = 100 trials.
+# Modal-backed; single agent, n_attempts=10.
+#
+# Run with the Vertex-env-isolation idiom (CLAUDE.md):
+#   env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
+#     ANTHROPIC_API_KEY="$(tr -d '\n\r' < ~/.trial-anthropic-key)" \
+#     harbor run -c configs/final_eval_opus.yaml -y \
+#     --ae ANTHROPIC_API_KEY="$(tr -d '\n\r' < ~/.trial-anthropic-key)"
+
+job_name: final-eval-opus-v34
+jobs_dir: jobs
+n_attempts: 10                  # 10 trials per task per agent
+timeout_multiplier: 1.0
+
+orchestrator:
+  type: local
+  n_concurrent_trials: 20       # Modal handles parallelism
+  quiet: false
+
+environment:
+  type: modal
+  delete: true
+
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-opus-4-7
+
+datasets:
+  - path: datasets/final

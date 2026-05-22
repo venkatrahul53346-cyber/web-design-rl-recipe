@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Changelog · Glyph</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .cl-head { padding: 56px 0 28px 0; border-bottom: 1px solid var(--rule); margin-bottom: 0; }
+  .cl-head .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); margin-bottom: 14px; }
+  .cl-head h1 { margin-bottom: 10px; }
+  .cl-head p.lead { max-width: 60ch; margin-bottom: 18px; }
+  .cl-meta { display: flex; gap: 20px; font-size: 12px; color: var(--ink-3); padding-top: 14px; border-top: 1px solid var(--rule); margin-top: 20px; }
+  .cl-meta span strong { color: var(--ink-2); font-weight: 500; }
+
+  .changelog-list { padding: 8px 0 24px 0; }
+  .changelog-entry {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 48px;
+    padding: 44px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .changelog-entry .meta-col { position: sticky; top: 80px; align-self: start; }
+  .changelog-entry .version-tag { font-size: 18px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+  .changelog-entry .version-tag .v { color: var(--ink-3); font-weight: 400; }
+  .changelog-entry .date { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+  .changelog-entry .badge { display: inline-block; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; padding: 1px 6px; border: 1px solid var(--rule-strong); color: var(--ink-2); margin-top: 12px; }
+  .changelog-entry .badge.breaking { color: var(--warn); border-color: var(--warn); }
+  .changelog-entry .badge.security { color: var(--accent); border-color: var(--accent); }
+  .changelog-entry .commits { font-size: 11.5px; color: var(--ink-3); margin-top: 14px; }
+
+  .change-group { margin-bottom: 22px; }
+  .change-group:last-child { margin-bottom: 0; }
+  .change-group h4 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--ink-3); font-weight: 600; margin: 0 0 10px 0;
+  }
+  .change-group ul { list-style: none; padding: 0; margin: 0; }
+  .change-group li {
+    padding: 6px 0 6px 18px;
+    position: relative;
+    color: var(--ink-2);
+    border-bottom: 1px dashed var(--rule);
+    font-size: 13px;
+  }
+  .change-group li:last-child { border-bottom: 0; }
+  .change-group li::before {
+    content: "—"; position: absolute; left: 0; color: var(--ink-3);
+  }
+  .change-group li code { font-size: 0.9em; }
+  .change-group li .pr { font-size: 11.5px; color: var(--ink-3); margin-left: 4px; }
+
+  .callout {
+    border-left: 2px solid var(--accent);
+    padding: 10px 14px;
+    background: var(--bg-tint);
+    margin: 14px 0 18px 0;
+    font-size: 12.5px;
+    color: var(--ink-2);
+  }
+  .callout strong { color: var(--ink); }
+
+  .cl-foot { padding: 36px 0 0 0; font-size: 12.5px; color: var(--ink-3); }
+  .cl-foot a { color: var(--ink-2); }
+
+  @media (max-width: 760px) {
+    .changelog-entry { grid-template-columns: 1fr; gap: 16px; }
+    .changelog-entry .meta-col { position: static; }
+    pre { margin-left: -28px; margin-right: -28px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="row">
+      <a href="index.html" class="brand plain" aria-label="Glyph home">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="name">glyph</span>
+        <span class="ver">v0.14.2</span>
+      </a>
+      <nav class="primary-nav" aria-label="Primary">
+        <a href="getting-started.html">Getting started</a>
+        <a href="guides.html">Guides</a>
+        <a href="api-reference.html">Reference</a>
+        <a href="examples.html">Examples</a>
+        <a href="changelog.html" class="active">Changelog</a>
+      </nav>
+      <div class="header-utils">
+        <span class="search-stub" role="search">
+          <span>search docs</span>
+          <span class="kbd">⌘K</span>
+        </span>
+        <a class="gh-link" href="https://github.com/glyph-dev/glyph">github ↗</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container-narrow">
+  <section class="cl-head">
+    <div class="eyebrow">Changelog</div>
+    <h1>Releases</h1>
+    <p class="lead">Glyph follows semantic versioning. While we are pre-1.0, minor releases (0.x) may contain breaking changes — these are always flagged and accompanied by codemods where possible.</p>
+    <p>Subscribe via <a href="https://github.com/glyph-dev/glyph/releases.atom">RSS</a>, or watch the <a href="https://github.com/glyph-dev/glyph/releases">GitHub releases feed</a>. Older entries (pre-0.10) live in the <a href="#archive">archive</a>.</p>
+    <div class="cl-meta">
+      <span><strong>current</strong> &nbsp; 0.14.2</span>
+      <span><strong>released</strong> &nbsp; 2024-11-04</span>
+      <span><strong>node</strong> &nbsp; ≥ 18.17</span>
+      <span><strong>spec</strong> &nbsp; OpenAPI 3.0 / 3.1</span>
+    </div>
+  </section>
+
+  <section class="changelog-list">
+
+    <article class="changelog-entry" id="v0-14-2">
+      <div class="meta-col">
+        <div class="version-tag"><span class="v">v</span>0.14.2</div>
+        <div class="date">2024-11-04</div>
+        <div class="badge">patch</div>
+        <div class="commits">17 commits · 4 contributors</div>
+      </div>
+      <div class="body-col">
+        <div class="change-group">
+          <h4>Fixed</h4>
+          <ul>
+            <li><code>glyph generate</code> no longer panics when a <code>oneOf</code> branch is itself a <code>$ref</code> to a discriminator-tagged schema. <span class="pr">#412</span></li>
+            <li>TypeScript client: response bodies typed as <code>never</code> when a 204 was the only documented status. Now correctly emit <code>void</code>. <span class="pr">#418</span></li>
+            <li>Mock server respects <code>x-glyph-seed</code> on nested objects, producing stable fixtures across runs. <span class="pr">#421</span></li>
+            <li>Resolved a race in <code>glyph watch</code> where two near-simultaneous spec writes would emit only one regeneration. <span class="pr">#425</span></li>
+          </ul>
+        </div>
+        <div class="change-group">
+          <h4>Changed</h4>
+          <ul>
+            <li>Contract test diffs now collapse identical array elements past index 3, controlled by <code>--diff-elide</code>.</li>
+            <li>Bumped <code>@apidevtools/json-schema-ref-parser</code> to 11.7.0.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="changelog-entry" id="v0-14-0">
+      <div class="meta-col">
+        <div class="version-tag"><span class="v">v</span>0.14.0</div>
+        <div class="date">2024-10-22</div>
+        <div class="badge breaking">breaking</div>
+        <div class="commits">94 commits · 11 contributors</div>
+      </div>
+      <div class="body-col">
+        <p>Introduces the <strong>producer contract</strong> workflow: Glyph can now record real responses from a running service and diff them against the OpenAPI spec, failing CI when the implementation drifts from the contract.</p>
+        <div class="callout">
+          <strong>Migration:</strong> the <code>glyph test</code> subcommand has been split into <code>glyph test consumer</code> and <code>glyph test producer</code>. Run <code>npx glyph codemod 0.14</code> to update your config and CI scripts.
+        </div>
+        <div class="change-group">
+          <h4>Added</h4>
+          <ul>
+            <li>New command <code>glyph record</code> — captures HTTP traffic via a local proxy and writes a producer contract bundle. <span class="pr">#367</span></li>
+            <li>Producer contract verification: <code>glyph test producer --against build/contract.json</code>.</li>
+            <li>Support for OpenAPI 3.1 <code>patternProperties</code> in both TS and Go generators.</li>
+            <li><code>glyph init</code> now scaffolds a <code>glyph.config.ts</code> with typed config, replacing the previous YAML.</li>
+          </ul>
+        </div>
+        <div class="change-group">
+          <h4>Breaking</h4>
+          <ul>
+            <li><code>glyph test</code> alone is no longer valid. Use the consumer/producer subcommands.</li>
+            <li>The legacy <code>--ts-strict</code> flag has been removed; strictness now follows your project's <code>tsconfig.json</code>.</li>
+            <li>Generated client method names switched from <code>snake_case</code> to the spec's <code>operationId</code> verbatim. Provide <code>--rename camelCase</code> to restore previous behavior.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="changelog-entry" id="v0-13-4">
+      <div class="meta-col">
+        <div class="version-tag"><span class="v">v</span>0.13.4</div>
+        <div class="date">2024-09-30</div>
+        <div class="badge security">security</div>
+        <div class="commits">8 commits · 3 contributors</div>
+      </div>
+      <div class="body-col">
+        <div class="change-group">
+          <h4>Security</h4>
+          <ul>
+            <li><strong>GHSA-7w8x-mpvh-q92f</strong> — the mock server's CORS preflight handler would echo back arbitrary <code>Origin</code> values when <code>--cors-permissive</code> was set. The flag is now ignored unless <code>NODE_ENV=development</code>, and logs a warning. Reported by @nadiakem.</li>
+            <li>Upgraded transitive <code>ws</code> to 8.18.0 to address advisory GHSA-3h5v-q93c-6h2m.</li>
+          </ul>
+        </div>
+        <div class="change-group">
+          <h4>Fixed</h4>
+          <ul>
+            <li>Stack overflow on circular schemas where <code>$ref</code> pointed through an <code>allOf</code> back to the parent. <span class="pr">#341</span></li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="changelog-entry" id="v0-13-0">
+      <div class="meta-col">
+        <div class="version-tag"><span class="v">v</span>0.13.0</div>
+        <div class="date">2024-09-09</div>
+        <div class="badge">minor</div>
+        <div class="commits">62 commits · 9 contributors</div>
+      </div>
+      <div class="body-col">
+        <p>The Go generator graduates from experimental. Output now mirrors the ergonomic choices of the TypeScript generator: tagged unions for <code>oneOf</code>, typed errors per response status, and a <code>WithContext</code> variant for every operation.</p>
+        <div class="code-frame">
+          <div class="code-head"><span class="file">payments_client.go</span><span class="lang">go</span></div>
+<pre><span class="kw">func</span> (c *<span class="ty">Client</span>) <span class="fn">CreateCharge</span>(ctx <span class="ty">context.Context</span>, body <span class="ty">CreateChargeBody</span>) (<span class="ty">CreateChargeResponse</span>, <span class="ty">error</span>) {
+    <span class="cmt">// 200, 402, 422 are typed as distinct branches of the response union</span>
+    <span class="kw">return</span> c.<span class="fn">do</span>(ctx, <span class="str">"POST"</span>, <span class="str">"/v1/charges"</span>, body)
+}</pre>
+        </div>
+        <div class="change-group">
+          <h4>Added</h4>
+          <ul>
+            <li>Go generator: <code>--lang go --module github.com/acme/api</code> is now stable.</li>
+            <li><code>x-glyph-deprecated-after</code> vendor extension — emit a build warning if the current date is past the listed value.</li>
+            <li>Plug-in API for custom templates. See <a href="guides.html#plugins">guides/plugins</a>.</li>
+          </ul>
+        </div>
+        <div class="change-group">
+          <h4>Changed</h4>
+          <ul>
+            <li>Diff output uses unified hunks; legacy side-by-side mode available via <code>--diff-style=side</code>.</li>
+            <li>Default mock latency lowered from 120ms to 0ms. Restore previous behavior with <code>mock.latency = "realistic"</code> in config.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="changelog-entry" id="v0-12-1">
+      <div class="meta-col">
+        <div class="version-tag"><span class="v">v</span>0.12.1</div>
+        <div class="date">2024-08-19</div>
+        <div class="badge">patch</div>
+        <div class="commits">21 commits · 6 contributors</div>
+      </div>
+      <div class="body-col">
+        <div class="change-group">
+          <h4>Fixed</h4>
+          <ul>
+            <li>Windows: paths containing spaces in <code>--out</code> no longer truncate at the first space. <span class="pr">#298</span></li>
+            <li><code>glyph lint</code> reported a false positive on valid <code>nullable: true</code> + <code>enum</code> combinations under OpenAPI 3.0.3. <span class="pr">#301</span></li>
+            <li>Restored compatibility with Node 18.17 — accidentally relied on <code>structuredClone</code> behavior introduced in 18.20. <span class="pr">#305</span></li>
+          </ul>
+        </div>
+        <div class="change-group">
+          <h4>Docs</h4>
+          <ul>
+            <li>Added a <a href="guides.html#monorepo">monorepo guide</a> covering pnpm workspaces and Turborepo caching.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="changelog-entry" id="v0-12-0">
+      <div class="meta-col">
+        <div class="version-tag"><span class="v">v</span>0.12.0</div>
+        <div class="date">2024-07-30</div>
+        <div class="badge breaking">breaking</div>
+        <div class="commits">88 commits · 14 contributors</div>
+      </div>
+      <div class="body-col">
+        <p>Schema resolution rewritten to be incremental. On a typical 4,000-operation spec, <code>glyph generate</code> cold-start time drops from 11.4s to 2.1s; <code>glyph watch</code> re-emits in under 300ms for single-path edits.</p>
+        <div class="change-group">
+          <h4>Added</h4>
+          <ul>
+            <li>Incremental resolver with on-disk cache at <code>.glyph/cache</code>. Disable with <code>--no-cache</code>.</li>
+            <li><code>glyph explain &lt;operationId&gt;</code> — prints the full resolved schema graph for one operation, useful for debugging discriminators.</li>
+          </ul>
+        </div>
+        <div class="change-group">
+          <h4>Breaking</h4>
+          <ul>
+            <li>Spec files must now be UTF-8. UTF-16 BOM-prefixed YAML is rejected with a clear error rather than silently mis-parsed.</li>
+            <li>The <code>--legacy-anyof</code> compatibility flag, deprecated in 0.10, has been removed.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="changelog-entry" id="v0-11-2">
+      <div class="meta-col">
+        <div class="version-tag"><span class="v">v</span>0.11.2</div>
+        <div class="date">2024-06-25</div>
+        <div class="badge">patch</div>
+        <div class="commits">12 commits · 5 contributors</div>
+      </div>
+      <div class="body-col">
+        <div class="change-group">
+          <h4>Fixed</h4>
+          <ul>
+            <li>Contract test runner now exits with code <code>2</code> on spec/implementation drift (was <code>1</code>, indistinguishable from a runner crash). <span class="pr">#251</span></li>
+            <li>Mock server: <code>format: date-time</code> fixtures occasionally produced invalid ISO strings on the last day of a month. <span class="pr">#256</span></li>
+            <li><code>glyph diff</code> truncated change summaries past 50 lines; the limit is now configurable and defaults to unlimited in CI.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="changelog-entry" id="v0-11-0">
+      <div class="meta-col">
+        <div class="version-tag"><span class="v">v</span>0.11.0</div>
+        <div class="date">2024-05-14</div>
+        <div class="badge">minor</div>
+        <div class="commits">71 commits · 10 contributors</div>
+      </div>
+      <div class="body-col">
+        <p>Mocks become first-class. The previous <code>glyph serve</code> command is replaced by <code>glyph mock</code>, which speaks both HTTP and a programmatic in-process API for test harnesses.</p>
+        <div class="change-group">
+          <h4>Added</h4>
+          <ul>
+            <li><code>glyph mock</code> with deterministic fixtures driven by <code>example</code>, <code>examples</code>, and the new <code>x-glyph-seed</code> extension.</li>
+            <li>Programmatic mock: <code>import { mock } from "@glyph/mock"</code> for Vitest, Jest, and Playwright integration.</li>
+            <li>Lint rule <code>no-untagged-oneof</code> — requires a <code>discriminator</code> on every <code>oneOf</code> with three or more branches.</li>
+          </ul>
+        </div>
+        <div class="change-group">
+          <h4>Deprecated</h4>
+          <ul>
+            <li><code>glyph serve</code> prints a deprecation notice and forwards to <code>glyph mock</code>. It will be removed in 0.14.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="cl-foot" id="archive">
+    <h2>Earlier releases</h2>
+    <p>Versions 0.1 through 0.10 are kept for reference but receive no further patches. Read them in the <a href="https://github.com/glyph-dev/glyph/blob/main/CHANGELOG-0.x.md">archived CHANGELOG-0.x.md</a> on GitHub, or browse the <a href="https://github.com/glyph-dev/glyph/tags">tag list</a>.</p>
+    <p>If you are upgrading across a major gap, the <a href="guides.html#upgrade">upgrade guide</a> documents the codemods you should run in order, and what to expect at each step.</p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row">
+      <div class="tagline-block">
+        <a href="index.html" class="brand plain"><span class="mark" aria-hidden="true"></span><span class="name">glyph</span></a>
+        <p>API contracts that stay honest. One command from OpenAPI to typed clients, mocks, and contract tests.</p>
+      </div>
+      <div>
+        <h5>Docs</h5>
+        <ul>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="guides.html">Guides</a></li>
+          <li><a href="api-reference.html">CLI reference</a></li>
+          <li><a href="examples.html">Examples</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Project</h5>
+        <ul>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph">Source (GitHub)</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/issues">Issue tracker</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/discussions">Discussions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">RFCs</a></li>
+          <li><a href="#">Contributing</a></li>
+          <li><a href="#">Code of conduct</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">License — Apache 2.0</a></li>
+          <li><a href="#">Security policy</a></li>
+          <li><a href="#">Trademark</a></li>
+          <li><a href="#">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="colophon">
+      <div><span class="status-dot" aria-hidden="true"></span>all systems nominal · build 2024.11.4-a31cf2</div>
+      <div>© 2021–2024 Glyph contributors · Set in JetBrains Mono</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

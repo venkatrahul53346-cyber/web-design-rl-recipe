@@ -1,0 +1,21 @@
+# Step 2: perturbation ladder. 10 tasks × 4 severities = 40 trials.
+# Run with `harbor run -c configs/calibration_perturb.yaml -y`.
+job_name: calib-perturb-v32
+jobs_dir: jobs
+n_attempts: 1
+timeout_multiplier: 1.0
+
+orchestrator:
+  type: local
+  n_concurrent_trials: 20
+  quiet: false
+
+environment:
+  type: modal
+  delete: true
+
+agents:
+  - name: oracle
+
+datasets:
+  - path: datasets/perturbed

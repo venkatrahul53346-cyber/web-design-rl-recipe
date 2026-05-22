@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technique &mdash; Sandfork</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .tag-header {
+    padding: 64px 0 40px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .tag-header__inner {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 64px;
+    align-items: end;
+  }
+  .tag-header__title {
+    font-family: var(--serif-display);
+    font-weight: 500;
+    font-size: clamp(3rem, 7vw, 5.6rem);
+    line-height: .98;
+    letter-spacing: -0.022em;
+    margin: 0 0 .15em;
+    font-variation-settings: 'opsz' 144;
+  }
+  .tag-header__title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .tag-header__lede {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 1.45rem;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    margin: 0;
+    font-weight: 400;
+  }
+  .tag-header__meta {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .tag-header__count {
+    font-family: var(--serif-text);
+    color: var(--ink-muted);
+    font-size: 0.92rem;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 820px) {
+    .tag-header__inner { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  /* Adjacent tags strip */
+  .tag-rail {
+    border-bottom: 1px solid var(--rule);
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+  }
+  .tag-rail__label {
+    font-family: var(--serif-display);
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-right: 6px;
+  }
+  .tag-rail a.tag { border-bottom: 0; }
+
+  /* Lead story */
+  .lead-story {
+    padding: 56px 0 32px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 56px;
+    align-items: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .lead-story__image { aspect-ratio: 4/3; overflow: hidden; }
+  .lead-story__image img { width: 100%; height: 100%; object-fit: cover; }
+  .lead-story h2 {
+    font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+    line-height: 1.08;
+    margin: .35em 0 .5em;
+    font-weight: 500;
+  }
+  .lead-story h2 a { color: var(--ink); border-bottom: 0; }
+  .lead-story h2 a:hover { color: var(--accent); }
+  .lead-story__dek {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin-bottom: 1.2em;
+  }
+  @media (max-width: 820px) {
+    .lead-story { grid-template-columns: 1fr; gap: 28px; padding: 40px 0 24px; }
+  }
+
+  /* Section heads */
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 12px;
+    margin: 0 0 32px;
+  }
+  .section-head h2 {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.55rem;
+    margin: 0;
+    color: var(--ink);
+  }
+  .section-head__hint {
+    font-family: var(--serif-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* Archive list */
+  .archive {
+    padding: 32px 0 56px;
+  }
+  .archive__list { list-style: none; padding: 0; margin: 0; }
+  .archive__item {
+    display: grid;
+    grid-template-columns: 220px 1fr 140px;
+    gap: 32px;
+    padding: 28px 0;
+    border-top: 1px solid var(--rule);
+    align-items: start;
+  }
+  .archive__item:last-child { border-bottom: 1px solid var(--rule); }
+  .archive__thumb { aspect-ratio: 4/3; overflow: hidden; }
+  .archive__thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .archive__body h3 {
+    font-size: 1.5rem;
+    line-height: 1.15;
+    margin: 0 0 .35em;
+    font-weight: 500;
+  }
+  .archive__body h3 a { color: var(--ink); border-bottom: 0; }
+  .archive__body h3 a:hover { color: var(--accent); }
+  .archive__kicker {
+    font-family: var(--serif-display);
+    font-style: italic;
+    color: var(--accent);
+    font-size: 0.88rem;
+    margin-bottom: 6px;
+  }
+  .archive__dek {
+    color: var(--ink-soft);
+    font-size: 1rem;
+    line-height: 1.55;
+    margin: 0 0 8px;
+    max-width: 36rem;
+  }
+  .archive__meta {
+    font-family: var(--serif-text);
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.55;
+  }
+  .archive__meta .reading { display: block; font-style: italic; color: var(--ink-soft); margin-top: 2px; }
+  @media (max-width: 820px) {
+    .archive__item { grid-template-columns: 140px 1fr; }
+    .archive__meta { grid-column: 1 / -1; text-align: left; }
+  }
+  @media (max-width: 520px) {
+    .archive__item { grid-template-columns: 1fr; }
+  }
+
+  /* Pull quote interlude */
+  .interlude {
+    background: var(--bg-deep);
+    padding: 84px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .interlude__inner { max-width: 48rem; margin: 0 auto; padding: 0 24px; text-align: left; }
+  .interlude blockquote {
+    font-family: var(--serif-display);
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    line-height: 1.25;
+    color: var(--ink);
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 28px 0;
+    margin: 0;
+  }
+  .interlude__attr {
+    font-family: var(--serif-text);
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 18px;
+  }
+
+  /* Subscribe block */
+  .sub-block {
+    background: var(--bg-deep);
+    padding: 56px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .sub-block__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .sub-block h3 {
+    font-size: 2rem;
+    margin: .2em 0 .3em;
+    font-weight: 500;
+  }
+  .sub-block p {
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    margin: 0;
+  }
+  .sub-block__form {
+    display: flex;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 6px;
+  }
+  .sub-block__form input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    font-family: var(--serif-text);
+    font-size: 1.05rem;
+    color: var(--ink);
+    padding: 10px 0;
+    outline: none;
+  }
+  .sub-block__form button {
+    border: 0;
+    background: transparent;
+    font-family: var(--serif-display);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 10px 4px;
+    font-weight: 600;
+  }
+  .sub-block__note {
+    font-family: var(--serif-display);
+    font-style: italic;
+    color: var(--ink-muted);
+    font-size: 0.9rem;
+    margin-top: 14px;
+  }
+  @media (max-width: 820px) {
+    .sub-block__inner { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  /* Pagination */
+  .pagination {
+    padding: 32px 0 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--rule);
+    margin-top: 0;
+  }
+  .pagination__nums {
+    display: flex;
+    gap: 22px;
+    font-family: var(--serif-display);
+    font-variant-numeric: tabular-nums;
+  }
+  .pagination__nums a, .pagination__nums span {
+    color: var(--ink-muted);
+    border-bottom: 0;
+    font-size: 1.05rem;
+  }
+  .pagination__nums .current { color: var(--ink); font-weight: 600; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }
+  .pagination a.next, .pagination a.prev {
+    font-family: var(--serif-display);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+    border-bottom: 0;
+    font-weight: 500;
+  }
+  .pagination a.disabled { color: var(--ink-muted); pointer-events: none; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__top">
+    <div class="issue">Issue No. 07 &middot; Autumn / Winter</div>
+    <div class="date mono-num">Saturday, 16 November 2024</div>
+    <div class="sub-link"><a href="about.html">Subscribe</a></div>
+  </div>
+  <div class="masthead">
+    <h1 class="masthead__title"><a href="index.html">Sandfork</a></h1>
+    <div class="masthead__line">Notes from the cooking class &mdash; published twice a year, on paper.</div>
+  </div>
+  <nav class="site-nav" aria-label="Primary">
+    <div class="site-nav__inner">
+      <a href="index.html">The Issue</a>
+      <a href="tag-page.html">Recipes</a>
+      <a href="tag-page.html" aria-current="page">Technique</a>
+      <a href="tag-page.html">Field Notes</a>
+      <a href="tag-page.html">Pantry</a>
+      <a href="author-page.html">Contributors</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="tag-header">
+    <div class="wrap">
+      <div class="tag-header__inner">
+        <div>
+          <div class="tag-header__meta">
+            <span class="kicker">The Department of &mdash;</span>
+            <span class="tag-header__count">48 pieces &middot; updated weekly</span>
+          </div>
+          <h1 class="tag-header__title"><em>Technique</em></h1>
+        </div>
+        <p class="tag-header__lede">The mechanics of cooking, examined slowly. Knife angles, hydration ratios, the difference a resting period makes &mdash; the small physical literacies that turn a recipe into a meal.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="tag-rail">
+      <span class="tag-rail__label">Adjacent in this section:</span>
+      <a class="tag" href="tag-page.html">Knife Work</a>
+      <a class="tag" href="tag-page.html">Fermentation</a>
+      <a class="tag" href="tag-page.html">Bread &amp; Doughs</a>
+      <a class="tag" href="tag-page.html">Stocks &amp; Bases</a>
+      <a class="tag" href="tag-page.html">Heat &amp; Fire</a>
+      <a class="tag" href="tag-page.html">Pastry</a>
+      <a class="tag" href="tag-page.html">Pickling</a>
+    </div>
+  </div>
+
+  <section class="wrap">
+    <article class="lead-story">
+      <div class="lead-story__image">
+        <img src="rick.jpg" alt="A loaf split open to reveal an open crumb">
+      </div>
+      <div>
+        <span class="kicker">Editor&rsquo;s pick &middot; Long read</span>
+        <h2><a href="article-page.html">The Long Autolyse: What Happens When You Just Leave the Flour Alone</a></h2>
+        <p class="lead-story__dek">For two years Margit Vermeulen baked the same country loaf every Sunday, changing one variable at a time. The findings &mdash; about hydration, time, and the curious patience of gluten &mdash; rearranged the way her bakery thinks about scheduling.</p>
+        <div class="byline">By <strong>Margit Vermeulen</strong> <span class="dot">&bull;</span> Photographs by Jens K&auml;llberg <span class="dot">&bull;</span> 22 min read</div>
+      </div>
+    </article>
+  </section>
+
+  <section class="wrap">
+    <div class="story-grid" style="padding-top:56px;padding-bottom:32px;">
+      <article class="story">
+        <div class="story__image"><img src="rick.jpg" alt="Hands tempering chocolate on marble"></div>
+        <div class="story__kicker"><span class="kicker">On Tempering</span></div>
+        <h3><a href="article-page.html">Marble, Patience, and the Sound Chocolate Makes</a></h3>
+        <p class="story__dek">Why the slab method still beats the seeding method, if you have twenty extra minutes and a thermometer you trust.</p>
+        <div class="story__byline">Ana Bertola &middot; 8 min</div>
+      </article>
+
+      <article class="story">
+        <div class="story__image"><img src="rick.jpg" alt="A copper pan with browned butter"></div>
+        <div class="story__kicker"><span class="kicker">Heat &amp; Fire</span></div>
+        <h3><a href="article-page.html">Brown Butter, Properly: A Defence of Watching the Pan</a></h3>
+        <p class="story__dek">Beurre noisette wants your full attention for ninety seconds. Here is what those ninety seconds are doing.</p>
+        <div class="story__byline">Pieter Maes &middot; 6 min</div>
+      </article>
+
+      <article class="story">
+        <div class="story__image"><img src="rick.jpg" alt="Knife on a wooden board with herbs"></div>
+        <div class="story__kicker"><span class="kicker">Knife Work</span></div>
+        <h3><a href="article-page.html">A Lesson in the Pinch Grip, Repeated Until It Sticks</a></h3>
+        <p class="story__dek">Three professional cooks describe the day the knife stopped feeling like a knife and started feeling like a hand.</p>
+        <div class="story__byline">Yuki Shirakawa &middot; 11 min</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="interlude">
+    <div class="interlude__inner">
+      <blockquote>&ldquo;Technique is what you stop noticing. The moment you have to think about how to fold an omelette, you have already failed the omelette. The work, then, is the long unglamorous business of forgetting on purpose.&rdquo;</blockquote>
+      <div class="interlude__attr">&mdash; from <em>The Long Autolyse</em>, Issue No. 07</div>
+    </div>
+  </section>
+
+  <section class="wrap archive">
+    <div class="section-head">
+      <h2>The full archive, most recent first</h2>
+      <span class="section-head__hint">48 entries</span>
+    </div>
+
+    <ol class="archive__list">
+      <li class="archive__item">
+        <a class="archive__thumb" href="article-page.html"><img src="rick.jpg" alt="Steam rising from a stockpot"></a>
+        <div class="archive__body">
+          <div class="archive__kicker">On stocks</div>
+          <h3><a href="article-page.html">Why a Clear Stock Is a Moral Achievement</a></h3>
+          <p class="archive__dek">In which we cold-start a chicken stock at 4&deg;C, watch it climb for three hours, and never let it boil. The result is a broth you can read a newspaper through.</p>
+          <div class="byline">By <strong>Camille Adesina</strong> <span class="dot">&bull;</span> Photographs by the author</div>
+        </div>
+        <div class="archive__meta">12 Nov 2024<span class="reading">14 min</span></div>
+      </li>
+
+      <li class="archive__item">
+        <a class="archive__thumb" href="article-page.html"><img src="rick.jpg" alt="A ceramic jar of miso"></a>
+        <div class="archive__body">
+          <div class="archive__kicker">On fermentation</div>
+          <h3><a href="article-page.html">A Year in a Jar: Notes on Brown-Rice Miso, From Inoculation to Eating</a></h3>
+          <p class="archive__dek">Twelve months and a small accident with mould. What the home fermenter can learn from the koji-makers of Echizen, and what the koji-makers might learn from a Brussels kitchen with bad insulation.</p>
+          <div class="byline">By <strong>Hideo Tanaka</strong> &amp; <strong>Lien De Smet</strong></div>
+        </div>
+        <div class="archive__meta">04 Nov 2024<span class="reading">19 min</span></div>
+      </li>
+
+      <li class="archive__item">
+        <a class="archive__thumb" href="article-page.html"><img src="rick.jpg" alt="Eggs being separated"></a>
+        <div class="archive__body">
+          <div class="archive__kicker">On eggs</div>
+          <h3><a href="article-page.html">The 63&deg; Egg, and the Tyranny of the Thermometer</a></h3>
+          <p class="archive__dek">Sous-vide eggs are everywhere now, which means almost no one cooks them attentively. A small rebellion against precision, in favour of a pan and the back of your hand.</p>
+          <div class="byline">By <strong>Rosa Lindqvist</strong></div>
+        </div>
+        <div class="archive__meta">28 Oct 2024<span class="reading">7 min</span></div>
+      </li>
+
+      <li class="archive__item">
+        <a class="archive__thumb" href="article-page.html"><img src="rick.jpg" alt="A whetstone with water"></a>
+        <div class="archive__body">
+          <div class="archive__kicker">On knife work</div>
+          <h3><a href="article-page.html">Eighteen Months on a #1000 Whetstone</a></h3>
+          <p class="archive__dek">Sharpening one knife, badly, until you stop sharpening it badly. A confessional, with diagrams, about the only kitchen skill that improves while you sleep.</p>
+          <div class="byline">By <strong>Yuki Shirakawa</strong></div>
+        </div>
+        <div class="archive__meta">19 Oct 2024<span class="reading">10 min</span></div>
+      </li>
+
+      <li class="archive__item">
+        <a class="archive__thumb" href="article-page.html"><img src="rick.jpg" alt="Caramelised onions in a wide pan"></a>
+        <div class="archive__body">
+          <div class="archive__kicker">On the Maillard reaction</div>
+          <h3><a href="article-page.html">Onions, Forty Minutes, No Shortcuts: A Defence of Standing Still</a></h3>
+          <p class="archive__dek">Baking soda, sugar, &ldquo;a glug of water&rdquo; &mdash; we tried all the hacks. None of them produced the colour, smell, or sweetness of leaving the pan alone and stirring it occasionally.</p>
+          <div class="byline">By <strong>Pieter Maes</strong></div>
+        </div>
+        <div class="archive__meta">06 Oct 2024<span class="reading">9 min</span></div>
+      </li>
+
+      <li class="archive__item">
+        <a class="archive__thumb" href="article-page.html"><img src="rick.jpg" alt="A laminated dough being folded"></a>
+        <div class="archive__body">
+          <div class="archive__kicker">On pastry</div>
+          <h3><a href="article-page.html">Laminating Dough in a Warm Kitchen: A Practical Surrender</a></h3>
+          <p class="archive__dek">The literature insists on 18&deg;C. Most home kitchens are 22&deg;C in summer. Here is how the bakers of Lisbon, Bangkok, and Naples cheat &mdash; politely &mdash; and still produce honest croissants.</p>
+          <div class="byline">By <strong>In&ecirc;s Carvalho</strong></div>
+        </div>
+        <div class="archive__meta">22 Sep 2024<span class="reading">16 min</span></div>
+      </li>
+
+      <li class="archive__item">
+        <a class="archive__thumb" href="article-page.html"><img src="rick.jpg" alt="A whole fish on parchment"></a>
+        <div class="archive__body">
+          <div class="archive__kicker">On fish</div>
+          <h3><a href="article-page.html">How to Tell When a Fish Is Done Without Cutting It Open</a></h3>
+          <p class="archive__dek">A short course in the metal-skewer test, the dorsal-fin test, and the test that involves no instruments at all &mdash; only the willingness to look at what is in front of you.</p>
+          <div class="byline">By <strong>Tomas Halld&oacute;rsson</strong></div>
+        </div>
+        <div class="archive__meta">10 Sep 2024<span class="reading">5 min</span></div>
+      </li>
+
+      <li class="archive__item">
+        <a class="archive__thumb" href="article-page.html"><img src="rick.jpg" alt="A wooden spoon stirring polenta"></a>
+        <div class="archive__body">
+          <div class="archive__kicker">On starch</div>
+          <h3><a href="article-page.html">Stirring Polenta for Forty-Five Minutes: An Honest Report</a></h3>
+          <p class="archive__dek">The pressure-cooker version is fine. The instant version is fine. The forty-five-minute version is something else, and worth understanding before you decide it isn&rsquo;t worth your time.</p>
+          <div class="byline">By <strong>Giulia Ravelli</strong></div>
+        </div>
+        <div class="archive__meta">28 Aug 2024<span class="reading">8 min</span></div>
+      </li>
+
+      <li class="archive__item">
+        <a class="archive__thumb" href="article-page.html"><img src="rick.jpg" alt="A cast iron pan over open flame"></a>
+        <div class="archive__body">
+          <div class="archive__kicker">On heat</div>
+          <h3><a href="article-page.html">The Seasoning Argument, Finally Settled (Maybe)</a></h3>
+          <p class="archive__dek">Flaxseed oil. Grapeseed oil. The cast-iron forums. We brought a metallurgist and a pan that had been used every day for thirty-one years.</p>
+          <div class="byline">By <strong>Aoife Brennan</strong></div>
+        </div>
+        <div class="archive__meta">14 Aug 2024<span class="reading">13 min</span></div>
+      </li>
+    </ol>
+
+    <div class="pagination">
+      <a class="prev disabled">&larr; Newer</a>
+      <div class="pagination__nums">
+        <span class="current">1</span>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">4</a>
+        <a href="#">5</a>
+        <a href="#">6</a>
+      </div>
+      <a class="next" href="#">Older &rarr;</a>
+    </div>
+  </section>
+
+  <section class="sub-block">
+    <div class="wrap">
+      <div class="sub-block__inner">
+        <div>
+          <span class="kicker">The Technique dispatch</span>
+          <h3>A short letter, every other Thursday.</h3>
+          <p>One small skill, examined honestly, with the failed attempts left in. Free to read; print subscribers receive the bound edition twice a year.</p>
+        </div>
+        <div>
+          <form class="sub-block__form" onsubmit="event.preventDefault();">
+            <input type="email" placeholder="your@email.address" aria-label="Email address">
+            <button type="submit">Subscribe &rarr;</button>
+          </form>
+          <div class="sub-block__note">No tracking, no &ldquo;content,&rdquo; no Tuesday recipe roundup. Just the letter.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__top">
+    <div class="site-footer__brand">
+      <h3>Sandfork</h3>
+      <p>A cooking newsletter and journal &mdash; printed in Antwerp twice a year, mailed flat to subscribers in forty-one countries.</p>
+    </div>
+    <div class="site-footer__col">
+      <h4>Read</h4>
+      <ul>
+        <li><a href="index.html">Current issue</a></li>
+        <li><a href="tag-page.html">Recipes</a></li>
+        <li><a href="tag-page.html">Technique</a></li>
+        <li><a href="tag-page.html">Field notes</a></li>
+        <li><a href="tag-page.html">Archive</a></li>
+      </ul>
+    </div>
+    <div class="site-footer__col">
+      <h4>The Magazine</h4>
+      <ul>
+        <li><a href="about.html">About Sandfork</a></li>
+        <li><a href="author-page.html">Contributors</a></li>
+        <li><a href="about.html">Subscribe (print)</a></li>
+        <li><a href="about.html">Back issues</a></li>
+        <li><a href="about.html">Stockists</a></li>
+      </ul>
+    </div>
+    <div class="site-footer__col">
+      <h4>Elsewhere</h4>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Substack notes</a></li>
+        <li><a href="#">RSS feed</a></li>
+        <li><a href="about.html">Pitch a story</a></li>
+        <li><a href="about.html">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="site-footer__bottom">
+    <div>&copy; 2024 Sandfork Editions BV &middot; Lange Gasthuisstraat 29, Antwerp</div>
+    <div class="colophon">Set in Fraunces &amp; Source Serif 4. Printed by De Wilde, Ghent.</div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team · Riverbed</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .team-grid { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .panel-head h3 { font-size: var(--fs-md); font-weight: 600; }
+  .panel-head .meta { font-size: var(--fs-xs); font-family: var(--mono); color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+  .panel-body { padding: 14px; }
+  .kpi-strip { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+  .kpi { padding: 14px 16px; border-right: 1px solid var(--border); }
+  .kpi:last-child { border-right: 0; }
+  .kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 6px; }
+  .kpi-value { font-family: var(--mono); font-size: var(--fs-xl); color: var(--text); letter-spacing: -0.01em; }
+  .kpi-sub { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 4px; font-family: var(--mono); }
+  .kpi-sub .up { color: var(--success); }
+  .kpi-sub .down { color: var(--accent); }
+  table.members { width: 100%; border-collapse: collapse; font-size: var(--fs-base); }
+  table.members thead th { position: sticky; top: var(--topbar-h); background: var(--bg); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 500; text-align: left; padding: 8px 14px; border-bottom: 1px solid var(--border); }
+  table.members tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  table.members tbody tr:last-child td { border-bottom: 0; }
+  table.members tbody tr:hover { background: var(--surface-hover); }
+  .member { display: flex; align-items: center; gap: 10px; }
+  .member .avatar { width: 26px; height: 26px; font-size: 11px; flex-shrink: 0; }
+  .member-name { color: var(--text); font-weight: 500; line-height: 1.2; }
+  .member-email { font-size: var(--fs-xs); color: var(--text-dim); font-family: var(--mono); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); white-space: nowrap; }
+  .pill .pdot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
+  .pill.role-owner .pdot { background: var(--accent); }
+  .pill.role-admin .pdot { background: var(--info); }
+  .pill.role-member .pdot { background: var(--success); }
+  .pill.role-viewer .pdot { background: var(--text-dim); }
+  .pill.role-billing .pdot { background: var(--warn); }
+  .pill.status-active .pdot { background: var(--success); }
+  .pill.status-pending .pdot { background: var(--warn); }
+  .pill.status-invited .pdot { background: var(--info); }
+  .pill.status-suspended .pdot { background: var(--accent); }
+  td.mono { font-family: var(--mono); color: var(--text-muted); font-size: var(--fs-xs); }
+  td.actions { text-align: right; }
+  .row-action { color: var(--text-dim); padding: 4px 6px; border-radius: var(--radius-sm); font-family: var(--mono); font-size: 11px; cursor: pointer; }
+  .row-action:hover { background: var(--surface-hover); color: var(--text); }
+  .row-action.danger:hover { color: var(--accent); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 11px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--sans); font-size: var(--fs-sm); cursor: pointer; line-height: 1; }
+  .btn:hover { background: var(--surface-hover); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .btn.primary:hover { background: var(--accent-dim); }
+  .btn.ghost { background: transparent; }
+  .form-row { margin-bottom: 12px; }
+  .form-row label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 6px; font-weight: 500; }
+  .form-row input, .form-row select, .form-row textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 9px; color: var(--text); font-family: var(--sans); font-size: var(--fs-sm); outline: 0; }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--border-strong); }
+  .form-row textarea { font-family: var(--mono); resize: vertical; min-height: 64px; }
+  .form-row .hint { margin-top: 5px; font-size: var(--fs-xs); color: var(--text-dim); font-family: var(--mono); }
+  .invite-foot { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--border); background: var(--surface); }
+  .invite-foot .left { font-size: var(--fs-xs); color: var(--text-dim); font-family: var(--mono); }
+  .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .role-opt { border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; cursor: pointer; }
+  .role-opt.selected { border-color: var(--accent); background: var(--accent-bg); }
+  .role-opt .rname { font-size: var(--fs-sm); color: var(--text); font-weight: 500; }
+  .role-opt .rdesc { font-size: var(--fs-xs); color: var(--text-dim); margin-top: 2px; line-height: 1.35; }
+  .filters-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .filters-bar .chip { font-size: var(--fs-xs); padding: 3px 8px; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-muted); cursor: pointer; font-family: var(--mono); }
+  .filters-bar .chip.active { background: var(--surface-hover); color: var(--text); border-color: var(--border-strong); }
+  .filters-bar .spacer { flex: 1; }
+  .filters-bar input.search { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 8px; color: var(--text); font-size: var(--fs-sm); width: 200px; outline: 0; }
+  .pending-row td { background: rgba(245, 158, 11, 0.03); }
+  .invite-list { font-size: var(--fs-xs); }
+  .invite-list li { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; border-bottom: 1px solid var(--border); }
+  .invite-list li:last-child { border-bottom: 0; }
+  .invite-list .ie { font-family: var(--mono); color: var(--text); }
+  .invite-list .iexp { color: var(--text-dim); font-family: var(--mono); font-size: 10px; }
+  .invite-list .iact { color: var(--text-dim); cursor: pointer; font-family: var(--mono); font-size: 10px; }
+  .invite-list .iact:hover { color: var(--accent); }
+  .footer-spacer { flex: 1; }
+  .site-footer { border-top: 1px solid var(--border); padding: 14px 24px; display: flex; gap: 18px; align-items: center; font-size: var(--fs-xs); color: var(--text-dim); flex-wrap: wrap; }
+  .site-footer .foot-links { display: flex; gap: 14px; margin-left: auto; }
+  .site-footer .foot-links a:hover { color: var(--text); }
+  .site-footer .foot-meta { display: flex; align-items: center; gap: 8px; font-family: var(--mono); }
+  .site-footer .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px rgba(34,197,94,0.15); }
+  .hidden-sep { color: var(--text-dim); }
+  .twofa-yes { color: var(--success); }
+  .twofa-no { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Riverbed</span>
+      <span class="brand-env">prod</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Workspace</div>
+      <a class="nav-item" href="overview.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>
+        Overview
+      </a>
+      <a class="nav-item" href="detail-view.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+        Traces
+        <span class="count">14.2k</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 13l4-4 3 3 5-6"/></svg>
+        Metrics
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v9H2zM2 7h12"/></svg>
+        Logs
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2 2"/></svg>
+        Alerts
+        <span class="count">3</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2v12M2 8h12"/></svg>
+        Dashboards
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">
+        Services
+        <span class="sidebar-heading-action" title="Filter">+</span>
+      </div>
+      <a class="nav-item" href="#"><span class="dot"></span> api-gateway</a>
+      <a class="nav-item" href="#"><span class="dot"></span> checkout-svc</a>
+      <a class="nav-item" href="#"><span class="dot" style="background:var(--warn)"></span> inventory-svc</a>
+      <a class="nav-item" href="#"><span class="dot"></span> notifications</a>
+      <a class="nav-item" href="#"><span class="dot" style="background:var(--accent)"></span> payments-svc</a>
+      <a class="nav-item" href="#"><span class="dot"></span> search-svc</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Account</div>
+      <a class="nav-item active" href="team.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="6" r="2.5"/><path d="M2 14c0-2.2 1.8-4 4-4s4 1.8 4 4M11 7a2 2 0 100-4M14 14c0-1.8-1.2-3.3-3-3.8"/></svg>
+        Team
+      </a>
+      <a class="nav-item" href="billing.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="12" height="9" rx="1"/><path d="M2 7h12"/></svg>
+        Billing
+      </a>
+      <a class="nav-item" href="settings.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M3 13l1.5-1.5M11.5 4.5L13 3"/></svg>
+        Settings
+      </a>
+    </div>
+
+    <div class="sidebar-foot">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>All systems normal</span>
+      <a href="#" class="spacer" style="text-align:right;font-family:var(--mono);font-size:11px;">v2.18.0</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumbs">
+        <a class="crumb" href="#">riverbed-labs</a>
+        <span class="sep">/</span>
+        <a class="crumb" href="#">account</a>
+        <span class="sep">/</span>
+        <span class="crumb current">team</span>
+      </div>
+      <div class="topbar-search">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+        <input placeholder="Search members, roles, emails…">
+        <span class="kbd">⌘K</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Notifications">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 7a4 4 0 118 0v3l1.5 2h-11L4 10V7zM6.5 14a1.5 1.5 0 003 0"/></svg>
+        </button>
+        <div class="user-chip">
+          <span class="avatar">DK</span>
+          <span class="uname">d.kovac</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page">
+      <div class="page-header">
+        <div>
+          <h1>Team</h1>
+          <p>17 members across 3 roles. SAML SSO enforced via Okta. Inactive seats auto-expire after 60 days.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn ghost">Export CSV</button>
+          <button class="btn">Audit log</button>
+          <button class="btn primary">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>
+            Invite member
+          </button>
+        </div>
+      </div>
+
+      <div class="kpi-strip">
+        <div class="kpi">
+          <div class="kpi-label">Active seats</div>
+          <div class="kpi-value">17 / 25</div>
+          <div class="kpi-sub">8 seats available on Scale plan</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Pending invites</div>
+          <div class="kpi-value">3</div>
+          <div class="kpi-sub"><span class="down">2</span> expire in &lt; 48h</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">2FA enrolled</div>
+          <div class="kpi-value">15 / 17</div>
+          <div class="kpi-sub"><span class="up">88.2%</span> coverage · enforced 2025-06-01</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Last 24h sign-ins</div>
+          <div class="kpi-value">42</div>
+          <div class="kpi-sub">12 unique members · 0 failed</div>
+        </div>
+      </div>
+
+      <div class="team-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Members</h3>
+            <span class="meta">17 RESULTS · SYNCED 2m AGO</span>
+          </div>
+          <div class="filters-bar">
+            <span class="chip active">All</span>
+            <span class="chip">Owners</span>
+            <span class="chip">Admins</span>
+            <span class="chip">Members</span>
+            <span class="chip">Viewers</span>
+            <span class="chip">Pending</span>
+            <span class="spacer"></span>
+            <input class="search" placeholder="Filter by name or email…">
+          </div>
+          <table class="members">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>2FA</th>
+                <th>Last active</th>
+                <th>Joined</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar">DK</span>
+                    <div>
+                      <div class="member-name">Dario Kovac</div>
+                      <div class="member-email">dario@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-owner"><span class="pdot"></span> Owner</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-yes">YES · WebAuthn</td>
+                <td class="mono">2m ago</td>
+                <td class="mono">2024-01-08</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#3B82F6,#1E40AF)">PM</span>
+                    <div>
+                      <div class="member-name">Priya Mahesh</div>
+                      <div class="member-email">priya@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-admin"><span class="pdot"></span> Admin</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-yes">YES · TOTP</td>
+                <td class="mono">17m ago</td>
+                <td class="mono">2024-02-14</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#22C55E,#15803D)">JL</span>
+                    <div>
+                      <div class="member-name">Jasper Lindqvist</div>
+                      <div class="member-email">jasper@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-admin"><span class="pdot"></span> Admin</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-yes">YES · WebAuthn</td>
+                <td class="mono">1h ago</td>
+                <td class="mono">2024-02-22</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#F59E0B,#B45309)">TR</span>
+                    <div>
+                      <div class="member-name">Tomás Ribeiro</div>
+                      <div class="member-email">tomas.r@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-member"><span class="pdot"></span> Member</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-yes">YES · TOTP</td>
+                <td class="mono">3h ago</td>
+                <td class="mono">2024-03-04</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#8B5CF6,#5B21B6)">EN</span>
+                    <div>
+                      <div class="member-name">Esi Nyamekye</div>
+                      <div class="member-email">esi@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-member"><span class="pdot"></span> Member</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-yes">YES · WebAuthn</td>
+                <td class="mono">5h ago</td>
+                <td class="mono">2024-04-19</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#06B6D4,#0E7490)">HM</span>
+                    <div>
+                      <div class="member-name">Hiroshi Matsumoto</div>
+                      <div class="member-email">hiroshi@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-member"><span class="pdot"></span> Member</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-no">NO</td>
+                <td class="mono">8h ago</td>
+                <td class="mono">2024-05-02</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#EC4899,#9D174D)">SK</span>
+                    <div>
+                      <div class="member-name">Sana Khoury</div>
+                      <div class="member-email">sana.k@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-member"><span class="pdot"></span> Member</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-yes">YES · TOTP</td>
+                <td class="mono">1d ago</td>
+                <td class="mono">2024-06-11</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#10B981,#065F46)">OB</span>
+                    <div>
+                      <div class="member-name">Olu Babatunde</div>
+                      <div class="member-email">olu@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-member"><span class="pdot"></span> Member</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-yes">YES · WebAuthn</td>
+                <td class="mono">1d ago</td>
+                <td class="mono">2024-07-03</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#A855F7,#6B21A8)">RW</span>
+                    <div>
+                      <div class="member-name">Rina Watanabe</div>
+                      <div class="member-email">rina.w@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-billing"><span class="pdot"></span> Billing</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-yes">YES · TOTP</td>
+                <td class="mono">2d ago</td>
+                <td class="mono">2024-08-21</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#64748B,#334155)">CG</span>
+                    <div>
+                      <div class="member-name">Camille Gauthier</div>
+                      <div class="member-email">camille@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-viewer"><span class="pdot"></span> Viewer</span></td>
+                <td><span class="pill status-active"><span class="pdot"></span> Active</span></td>
+                <td class="mono twofa-yes">YES · TOTP</td>
+                <td class="mono">4d ago</td>
+                <td class="mono">2024-09-09</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:linear-gradient(135deg,#0EA5E9,#075985)">MV</span>
+                    <div>
+                      <div class="member-name">Marek Vlček</div>
+                      <div class="member-email">marek@riverbed.dev</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-viewer"><span class="pdot"></span> Viewer</span></td>
+                <td><span class="pill status-suspended"><span class="pdot"></span> Suspended</span></td>
+                <td class="mono twofa-no">NO</td>
+                <td class="mono">31d ago</td>
+                <td class="mono">2024-04-30</td>
+                <td class="actions"><span class="row-action">···</span></td>
+              </tr>
+              <tr class="pending-row">
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:transparent;border:1px dashed var(--border-strong);color:var(--text-dim)">?</span>
+                    <div>
+                      <div class="member-name" style="color:var(--text-muted)">aditi.shah@acme.io</div>
+                      <div class="member-email">invited by priya@</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-admin"><span class="pdot"></span> Admin</span></td>
+                <td><span class="pill status-pending"><span class="pdot"></span> Pending</span></td>
+                <td class="mono" style="color:var(--text-dim)">—</td>
+                <td class="mono" style="color:var(--text-dim)">—</td>
+                <td class="mono">2025-11-09</td>
+                <td class="actions"><span class="row-action">Resend</span></td>
+              </tr>
+              <tr class="pending-row">
+                <td>
+                  <div class="member">
+                    <span class="avatar" style="background:transparent;border:1px dashed var(--border-strong);color:var(--text-dim)">?</span>
+                    <div>
+                      <div class="member-name" style="color:var(--text-muted)">noah.f@acme.io</div>
+                      <div class="member-email">invited by dario@</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="pill role-member"><span class="pdot"></span> Member</span></td>
+                <td><span class="pill status-pending"><span class="pdot"></span> Pending</span></td>
+                <td class="mono" style="color:var(--text-dim)">—</td>
+                <td class="mono" style="color:var(--text-dim)">—</td>
+                <td class="mono">2025-11-10</td>
+                <td class="actions"><span class="row-action">Resend</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Invite a member</h3>
+              <span class="meta">SCALE · 8 SEATS LEFT</span>
+            </div>
+            <div class="panel-body">
+              <div class="form-row">
+                <label for="emails">Email addresses</label>
+                <textarea id="emails" placeholder="alex@acme.io, jordan@acme.io&#10;one per line or comma-separated"></textarea>
+                <div class="hint">Tip: paste up to 25 emails at once</div>
+              </div>
+
+              <div class="form-row">
+                <label>Role</label>
+                <div class="role-grid">
+                  <div class="role-opt">
+                    <div class="rname">Admin</div>
+                    <div class="rdesc">Manage members, billing, integrations</div>
+                  </div>
+                  <div class="role-opt selected">
+                    <div class="rname">Member</div>
+                    <div class="rdesc">Read &amp; query traces, edit dashboards</div>
+                  </div>
+                  <div class="role-opt">
+                    <div class="rname">Viewer</div>
+                    <div class="rdesc">Read-only access to dashboards</div>
+                  </div>
+                  <div class="role-opt">
+                    <div class="rname">Billing</div>
+                    <div class="rdesc">Invoices &amp; payment methods only</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label for="scope">Scope</label>
+                <select id="scope">
+                  <option>All services (workspace-wide)</option>
+                  <option>checkout-svc, payments-svc</option>
+                  <option>inventory-svc only</option>
+                  <option>Custom scope…</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label for="expiry">Invite expires</label>
+                <select id="expiry">
+                  <option>7 days (recommended)</option>
+                  <option>24 hours</option>
+                  <option>30 days</option>
+                  <option>Never</option>
+                </select>
+              </div>
+            </div>
+            <div class="invite-foot">
+              <div class="left">SAML enforced · invitees must auth via Okta</div>
+              <button class="btn primary">Send invites</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Pending invites</h3>
+              <span class="meta">3 OPEN</span>
+            </div>
+            <ul class="invite-list">
+              <li>
+                <div>
+                  <div class="ie">aditi.shah@acme.io</div>
+                  <div class="iexp">ADMIN · expires in 4d 11h</div>
+                </div>
+                <span class="iact">REVOKE</span>
+              </li>
+              <li>
+                <div>
+                  <div class="ie">noah.f@acme.io</div>
+                  <div class="iexp">MEMBER · expires in 39h</div>
+                </div>
+                <span class="iact">REVOKE</span>
+              </li>
+              <li>
+                <div>
+                  <div class="ie">jules.b@acme.io</div>
+                  <div class="iexp">VIEWER · expires in 11h</div>
+                </div>
+                <span class="iact">REVOKE</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>SSO &amp; provisioning</h3>
+              <span class="meta">OKTA · SCIM</span>
+            </div>
+            <div class="panel-body" style="font-size:var(--fs-sm); color:var(--text-muted); line-height:1.55;">
+              <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border);">
+                <span>SAML SSO</span>
+                <span class="pill status-active"><span class="pdot"></span> Enforced</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
+                <span>SCIM provisioning</span>
+                <span class="pill status-active"><span class="pdot"></span> Synced 2m ago</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                <span>Default role for new SCIM users</span>
+                <span class="pill role-member"><span class="pdot"></span> Member</span>
+              </div>
+              <div style="margin-top:10px;">
+                <a href="#" style="color:var(--accent); font-size:var(--fs-xs); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.06em;">Configure SAML →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        Recent team activity
+        <span class="filters"><span class="row-action">Last 24h</span><span class="row-action">Last 7d</span><span class="row-action">All</span></span>
+      </div>
+
+      <div class="panel">
+        <table class="members">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Actor</th>
+              <th>Event</th>
+              <th>Target</th>
+              <th>IP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">14:42:11</td>
+              <td><div class="member"><span class="avatar" style="width:22px;height:22px;font-size:10px;background:linear-gradient(135deg,#3B82F6,#1E40AF)">PM</span><span class="member-name">priya@</span></div></td>
+              <td>Invited member</td>
+              <td class="mono">aditi.shah@acme.io · admin</td>
+              <td class="mono">82.31.14.5</td>
+            </tr>
+            <tr>
+              <td class="mono">11:08:47</td>
+              <td><div class="member"><span class="avatar" style="width:22px;height:22px;font-size:10px">DK</span><span class="member-name">dario@</span></div></td>
+              <td>Changed role</td>
+              <td class="mono">rina.w@ : member → billing</td>
+              <td class="mono">82.31.14.5</td>
+            </tr>
+            <tr>
+              <td class="mono">09:55:02</td>
+              <td><div class="member"><span class="avatar" style="width:22px;height:22px;font-size:10px;background:linear-gradient(135deg,#22C55E,#15803D)">JL</span><span class="member-name">jasper@</span></div></td>
+              <td>Suspended member</td>
+              <td class="mono">marek@ · inactivity 31d</td>
+              <td class="mono">10.0.7.18</td>
+            </tr>
+            <tr>
+              <td class="mono">Yesterday 22:14</td>
+              <td><div class="member"><span class="avatar" style="width:22px;height:22px;font-size:10px;background:#26262C;color:var(--text-muted)">⚙</span><span class="member-name">scim-sync</span></div></td>
+              <td>Provisioned 1 user</td>
+              <td class="mono">olu@ · group=engineering</td>
+              <td class="mono">okta.idp</td>
+            </tr>
+            <tr>
+              <td class="mono">Yesterday 16:30</td>
+              <td><div class="member"><span class="avatar" style="width:22px;height:22px;font-size:10px">DK</span><span class="member-name">dario@</span></div></td>
+              <td>Enforced 2FA workspace-wide</td>
+              <td class="mono">policy=require_webauthn_or_totp</td>
+              <td class="mono">82.31.14.5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="foot-meta">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>edge-us-east-2</span>
+        <span class="hidden-sep">·</span>
+        <span>ingest p50 14ms</span>
+        <span class="hidden-sep">·</span>
+        <span>build c4f3a91</span>
+      </div>
+      <div class="foot-links">
+        <a href="https://docs.riverbed.dev">Docs</a>
+        <a href="https://github.com/riverbed-io/agent">Agent</a>
+        <a href="https://status.riverbed.dev">Status</a>
+        <a href="#">Changelog</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="foot-meta">© 2025 Riverbed Labs, Inc.</div>
+    </footer>
+  </div>
+</div>
+</body>
+</html>

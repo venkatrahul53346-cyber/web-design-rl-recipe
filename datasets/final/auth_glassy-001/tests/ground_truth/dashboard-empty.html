@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · Mint Ledger</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .app-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 28px 64px;
+      display: grid;
+      grid-template-columns: 232px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    .sidebar {
+      position: sticky;
+      top: 92px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--glass-shadow);
+      padding: 18px 14px;
+    }
+    .workspace {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 14px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 12px;
+      width: 100%;
+    }
+    .workspace__avatar {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--lilac) 0%, var(--mint) 100%);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 13px; color: var(--ink);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+    .workspace__meta { display: flex; flex-direction: column; line-height: 1.2; flex: 1; min-width: 0; }
+    .workspace__name { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .workspace__plan { font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+    .workspace__chev { color: var(--ink-faint); }
+
+    .nav-group { margin-top: 10px; }
+    .nav-group__label {
+      font-size: 11px; font-weight: 600; color: var(--ink-faint);
+      text-transform: uppercase; letter-spacing: 0.09em;
+      padding: 6px 10px 4px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px;
+      border-radius: 9px;
+      color: var(--ink-soft);
+      font-size: 13.5px; font-weight: 500;
+      margin-bottom: 1px;
+      position: relative;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.6); color: var(--ink); }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-item.is-active {
+      background: rgba(96,165,250,0.12);
+      color: var(--anchor-ink);
+      font-weight: 600;
+    }
+    .nav-item .count {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--ink-faint);
+      background: rgba(15,23,42,0.06);
+      padding: 1px 7px; border-radius: 999px;
+      font-weight: 500;
+    }
+
+    .main-col { display: flex; flex-direction: column; gap: 20px; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 4px 0;
+    }
+    .topbar h1 { font-size: 24px; letter-spacing: -0.022em; }
+    .topbar p { font-size: 13px; color: var(--ink-mute); margin-top: 4px; }
+    .topbar__actions { display: flex; gap: 10px; }
+    .topbar__actions .btn { width: auto; padding: 9px 14px; }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .stat {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--glass-shadow);
+      padding: 18px 18px 16px;
+    }
+    .stat__label {
+      font-size: 12px; color: var(--ink-mute);
+      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+    }
+    .stat__value {
+      font-size: 26px; font-weight: 700; letter-spacing: -0.022em;
+      margin-top: 8px; color: var(--ink-faint);
+    }
+    .stat__sub { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+
+    .empty-panel {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--glass-shadow);
+      padding: 64px 48px 56px;
+      text-align: center;
+    }
+    .empty-icon {
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      margin: 0 auto 22px;
+      background: linear-gradient(135deg, rgba(167,243,208,0.6) 0%, rgba(96,165,250,0.35) 60%, rgba(221,214,254,0.6) 100%);
+      border: 1px solid rgba(255,255,255,0.85);
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 10px 24px -10px rgba(30,64,175,0.25);
+    }
+    .empty-icon svg { width: 30px; height: 30px; color: var(--anchor-ink); stroke-width: 2; }
+    .empty-panel h2 { font-size: 24px; letter-spacing: -0.022em; }
+    .empty-panel > p {
+      max-width: 440px; margin: 8px auto 0;
+      font-size: 14px; color: var(--ink-mute);
+    }
+    .empty-actions {
+      display: inline-flex; gap: 10px;
+      margin-top: 24px;
+    }
+    .empty-actions .btn { width: auto; padding: 11px 18px; }
+
+    .checklist {
+      max-width: 520px;
+      margin: 36px auto 0;
+      text-align: left;
+      display: flex; flex-direction: column;
+      gap: 6px;
+    }
+    .checklist__label {
+      font-size: 11px; font-weight: 600; color: var(--ink-faint);
+      text-transform: uppercase; letter-spacing: 0.09em;
+      margin-bottom: 6px; padding-left: 4px;
+    }
+    .checklist-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+    .checklist-item__dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 1.5px dashed var(--ink-faint);
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: transparent;
+    }
+    .checklist-item.is-done .checklist-item__dot {
+      border-style: solid;
+      border-color: var(--mint-deep);
+      background: var(--mint);
+      color: var(--ink);
+    }
+    .checklist-item.is-done .checklist-item__dot svg { width: 11px; height: 11px; }
+    .checklist-item__body { flex: 1; min-width: 0; }
+    .checklist-item__title { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+    .checklist-item__sub { font-size: 12.5px; color: var(--ink-mute); margin-top: 2px; }
+    .checklist-item__cta {
+      font-size: 12.5px; font-weight: 600; color: var(--anchor-deep);
+      flex-shrink: 0;
+    }
+    .checklist-item.is-done .checklist-item__cta { color: var(--ink-faint); font-weight: 500; }
+
+    .help-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+    .help-card {
+      background: rgba(255,255,255,0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      backdrop-filter: blur(14px);
+    }
+    .help-card h3 { font-size: 14px; font-weight: 600; }
+    .help-card p { font-size: 13px; color: var(--ink-mute); margin-top: 4px; }
+    .help-card a { font-size: 13px; font-weight: 600; margin-top: 10px; display: inline-block; }
+
+    @media (max-width: 880px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .stat-row { grid-template-columns: repeat(2, 1fr); }
+      .empty-panel { padding: 44px 24px; }
+      .help-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="/">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12a4 4 0 0 1 0 8H8"/><path d="M4 12h10"/></svg>
+      </span>
+      Mint Ledger
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/product">Product</a>
+      <a href="/integrations">Integrations</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/changelog">Changelog</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-ghost" href="login.html">Sign in</a>
+      <a class="btn btn-primary" style="width:auto;padding:9px 16px;" href="signup.html">Start free</a>
+    </div>
+  </div>
+</header>
+
+<main class="app-shell">
+  <aside class="sidebar" aria-label="Workspace navigation">
+    <button class="workspace" type="button">
+      <span class="workspace__avatar">FR</span>
+      <span class="workspace__meta">
+        <span class="workspace__name">Fern &amp; Rye Co.</span>
+        <span class="workspace__plan">Trial · 14 days left</span>
+      </span>
+      <svg class="workspace__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+
+    <div class="nav-group">
+      <a href="#" class="nav-item is-active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Overview
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M6 7v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+        Payables
+        <span class="count">0</span>
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><polyline points="21 4 21 9 16 9"/></svg>
+        Receivables
+        <span class="count">0</span>
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>
+        Reconciliation
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+        Reports
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group__label">Setup</div>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Banks
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9c.3.6.9 1 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        Settings
+      </a>
+    </div>
+  </aside>
+
+  <section class="main-col">
+    <div class="topbar">
+      <div>
+        <h1>Welcome, Maya 👋</h1>
+        <p>Let's get your books talking to your bank. Most teams finish setup in under nine minutes.</p>
+      </div>
+      <div class="topbar__actions">
+        <a href="#" class="btn btn-secondary" style="width:auto;">Invite teammate</a>
+        <a href="#" class="btn btn-primary" style="width:auto;">Connect bank</a>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat__label">Cash on hand</div>
+        <div class="stat__value">—</div>
+        <div class="stat__sub">Connect a bank to populate</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">Open AP</div>
+        <div class="stat__value">$0</div>
+        <div class="stat__sub">No bills yet</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">Open AR</div>
+        <div class="stat__value">$0</div>
+        <div class="stat__sub">No invoices yet</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">Unreconciled</div>
+        <div class="stat__value">0</div>
+        <div class="stat__sub">All clear — for now</div>
+      </div>
+    </div>
+
+    <div class="empty-panel">
+      <div class="empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13a5 5 0 0 1 0 10H6"/><path d="M3 12h11"/><path d="M7 21l-4-4 4-4"/></svg>
+      </div>
+      <h2>Your ledger is quiet — let's wake it up</h2>
+      <p>Mint Ledger pulls in transactions, matches them to invoices and bills, and posts the result back to your accounting software. It only takes one bank connection to begin.</p>
+      <div class="empty-actions">
+        <a href="#" class="btn btn-primary" style="width:auto;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Connect your bank
+        </a>
+        <a href="#" class="btn btn-secondary" style="width:auto;">Import a CSV instead</a>
+      </div>
+
+      <div class="checklist" aria-label="Setup checklist">
+        <div class="checklist__label">Setup · 1 of 4 complete</div>
+
+        <div class="checklist-item is-done">
+          <span class="checklist-item__dot">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <div class="checklist-item__body">
+            <div class="checklist-item__title">Create your workspace</div>
+            <div class="checklist-item__sub">Fern &amp; Rye Co. · created today</div>
+          </div>
+          <div class="checklist-item__cta">Done</div>
+        </div>
+
+        <div class="checklist-item">
+          <span class="checklist-item__dot"></span>
+          <div class="checklist-item__body">
+            <div class="checklist-item__title">Connect a bank or card account</div>
+            <div class="checklist-item__sub">Read-only via Plaid — supports 12,000+ institutions</div>
+          </div>
+          <a href="#" class="checklist-item__cta">Connect →</a>
+        </div>
+
+        <div class="checklist-item">
+          <span class="checklist-item__dot"></span>
+          <div class="checklist-item__body">
+            <div class="checklist-item__title">Link your accounting software</div>
+            <div class="checklist-item__sub">QuickBooks Online, Xero, Wave, or NetSuite</div>
+          </div>
+          <a href="#" class="checklist-item__cta">Link →</a>
+        </div>
+
+        <div class="checklist-item">
+          <span class="checklist-item__dot"></span>
+          <div class="checklist-item__body">
+            <div class="checklist-item__title">Invite your bookkeeper</div>
+            <div class="checklist-item__sub">Optional — they'll get review-only access to start</div>
+          </div>
+          <a href="#" class="checklist-item__cta">Invite →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-row">
+      <div class="help-card">
+        <h3>New to automated bookkeeping?</h3>
+        <p>A ten-minute walkthrough of how Mint Ledger categorizes, matches, and posts every transaction — and what stays in your hands.</p>
+        <a href="/guides/getting-started">Read the getting-started guide →</a>
+      </div>
+      <div class="help-card">
+        <h3>Migrating from a spreadsheet?</h3>
+        <p>Drop a CSV of your last 90 days of activity and we'll classify it overnight, ready for your review in the morning.</p>
+        <a href="/import">Start a CSV import →</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <a class="brand" href="/">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12a4 4 0 0 1 0 8H8"/><path d="M4 12h10"/></svg>
+        </span>
+        Mint Ledger
+      </a>
+      <p>Close the books before lunch. Mint Ledger automates AP, AR, and reconciliation so small teams can stop chasing receipts.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="/product/ap">Accounts payable</a></li>
+        <li><a href="/product/ar">Accounts receivable</a></li>
+        <li><a href="/product/reconcile">Reconciliation</a></li>
+        <li><a href="/integrations">Integrations</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="/docs">Documentation</a></li>
+        <li><a href="/guides">SMB finance guides</a></li>
+        <li><a href="/changelog">Changelog</a></li>
+        <li><a href="/status">System status</a></li>
+        <li><a href="/support">Help center</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="/about">About</a></li>
+        <li><a href="/customers">Customers</a></li>
+        <li><a href="/security">Security &amp; SOC 2</a></li>
+        <li><a href="/careers">Careers</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="site-footer__base">
+    <span>© 2025 Mint Ledger, Inc. Made for small teams in Brooklyn &amp; Lisbon.</span>
+    <span>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/dpa">DPA</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

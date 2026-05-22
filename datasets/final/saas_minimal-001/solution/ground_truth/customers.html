@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customers — Riverbed</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .quote-lead { font-size: clamp(28px, 3.4vw, 44px); line-height: 1.12; letter-spacing: -0.028em; color: var(--ink); font-weight: 500; max-width: 18ch; }
+  .quote-lead::before { content:'\201C'; color: var(--accent); margin-right: 4px; }
+  .quote-lead::after { content:'\201D'; color: var(--accent); }
+  .attrib { display:flex; align-items:center; gap:14px; margin-top:28px; }
+  .avatar { width:44px; height:44px; border-radius:50%; background:var(--accent-pale); border:1px solid var(--rule); display:flex; align-items:center; justify-content:center; color:var(--accent-ink); font-weight:500; font-size:14px; letter-spacing:-0.01em; }
+  .attrib-meta { font-size:14px; }
+  .attrib-meta .name { color: var(--ink); }
+  .attrib-meta .role { color: var(--ink-3); }
+  .label-row { display:flex; align-items:center; gap:14px; margin-bottom:36px; }
+  .label-row .label { font-size:12px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-4); white-space:nowrap; }
+  .label-row .rule { flex:1; height:1px; background:var(--rule); }
+  .logo-cluster { display:grid; grid-template-columns: repeat(6, 1fr); border-top:1px solid var(--rule); border-left:1px solid var(--rule); }
+  .logo-cell { border-right:1px solid var(--rule); border-bottom:1px solid var(--rule); aspect-ratio: 2/1; display:flex; align-items:center; justify-content:center; color:var(--ink-3); font-size:18px; font-weight:500; letter-spacing:-0.02em; transition: background .15s ease; }
+  .logo-cell:hover { background: var(--bg-elevated); color:var(--ink); }
+  .logo-cell .mark { display:inline-flex; align-items:center; gap:8px; }
+  .logo-cell .dot { width:9px; height:9px; border-radius:50%; background:var(--accent); opacity:.7; }
+  .logo-cell .sq { width:9px; height:9px; background:var(--ink); }
+  .logo-cell .tri { width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-bottom:9px solid var(--accent-ink); }
+  @media (max-width: 880px) { .logo-cluster { grid-template-columns: repeat(3, 1fr); } }
+  .testimonial-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 880px) { .testimonial-grid { grid-template-columns: 1fr; } }
+  .t-card { background: var(--bg-elevated); border:1px solid var(--rule); border-radius: var(--radius-l); padding: 32px; display:flex; flex-direction:column; gap:20px; }
+  .t-card.tint { background: var(--bg-tint); }
+  .t-card blockquote { margin:0; font-size:17px; line-height:1.5; color:var(--ink-2); letter-spacing:-0.005em; }
+  .case-row { display:grid; grid-template-columns: 5fr 7fr; gap:56px; align-items:start; }
+  @media (max-width: 880px) { .case-row { grid-template-columns: 1fr; gap:28px; } }
+  .case-meta { display:flex; flex-direction:column; gap:24px; }
+  .case-meta .name { font-size:24px; letter-spacing:-0.02em; color:var(--ink); font-weight:500; }
+  .case-meta .desc { color:var(--ink-3); font-size:14.5px; }
+  .case-meta .facts { display:grid; grid-template-columns:1fr 1fr; gap:20px 28px; padding-top:8px; border-top:1px solid var(--rule); }
+  .fact .k { font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-4); margin-bottom:6px; }
+  .fact .v { font-size:15px; color:var(--ink); }
+  .case-body h3 { font-size:22px; letter-spacing:-0.02em; margin-bottom:14px; }
+  .case-body p { margin-bottom:14px; color:var(--ink-2); font-size:15px; }
+  .case-body .pull { border-left:2px solid var(--accent); padding:6px 0 6px 18px; margin: 22px 0; color:var(--ink); font-size:16px; line-height:1.5; }
+  .metric-strip { display:grid; grid-template-columns: repeat(4, 1fr); gap:0; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); }
+  .metric { padding: 36px 28px; border-right:1px solid var(--rule); }
+  .metric:last-child { border-right:none; }
+  .metric .num { font-size:40px; letter-spacing:-0.03em; color:var(--ink); font-weight:500; line-height:1; margin-bottom:10px; }
+  .metric .lbl { font-size:13px; color:var(--ink-3); }
+  @media (max-width: 880px) { .metric-strip { grid-template-columns: 1fr 1fr; } .metric:nth-child(2) { border-right:none; } }
+  .cta-band { display:flex; align-items:center; justify-content:space-between; gap:32px; padding: 56px 0; flex-wrap:wrap; }
+  .cta-band h2 { max-width: 22ch; }
+  .cta-actions { display:flex; gap:12px; flex-wrap:wrap; }
+  .industry-pill { display:inline-block; font-size:12px; padding:4px 10px; border:1px solid var(--rule-strong); border-radius:999px; color:var(--ink-2); background:var(--bg-elevated); margin-right:6px; }
+  .industry-pill.mint { background: var(--mint); border-color: transparent; }
+  .industry-pill.peach { background: var(--peach); border-color: transparent; }
+  .industry-pill.lilac { background: var(--lilac); border-color: transparent; }
+  .industry-pill.butter { background: var(--butter); border-color: transparent; }
+  .hero-cust { min-height: 52vh; display:flex; flex-direction:column; justify-content:flex-end; padding-top: 120px; padding-bottom: 64px; }
+  .hero-cust .meta-line { display:flex; gap:24px; color:var(--ink-3); font-size:13px; margin-top:28px; }
+  .hero-cust .meta-line span::before { content:'\2022'; color:var(--rule-strong); margin-right:10px; }
+  .hero-cust .meta-line span:first-child::before { display:none; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="wide nav">
+    <a href="index.html" class="brand" aria-label="Riverbed home">
+      <svg class="brand-mark" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <path d="M2 14 C 6 14, 6 6, 11 6 S 16 14, 20 14" stroke="#0EA5E9" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M2 18 C 6 18, 6 10, 11 10 S 16 18, 20 18" stroke="#0B1620" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>
+      </svg>
+      Riverbed
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html#product">Product</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="customers.html" class="active">Customers</a>
+      <a href="about.html">About</a>
+      <a href="https://docs.riverbed.dev" rel="noopener">Docs</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="https://github.com/riverbed/agent" class="github" rel="noopener" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4.08.55-.17.55-.38v-1.4c-2.2.48-2.67-1.06-2.67-1.06-.36-.92-.88-1.16-.88-1.16-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.2 1.86.86 2.31.66.07-.52.28-.86.5-1.06-1.76-.2-3.6-.88-3.6-3.9 0-.86.31-1.57.81-2.12-.08-.2-.35-1 .08-2.1 0 0 .67-.22 2.2.81a7.6 7.6 0 0 1 4 0c1.52-1.03 2.2-.81 2.2-.81.43 1.1.16 1.9.08 2.1.5.55.8 1.26.8 2.12 0 3.03-1.85 3.7-3.6 3.9.28.25.54.74.54 1.5v2.22c0 .21.15.47.55.38A8 8 0 0 0 8 .2Z"/></svg>
+        <span>4.2k</span>
+      </a>
+      <a href="https://app.riverbed.dev/login" class="btn btn-ghost">Sign in</a>
+      <a href="https://app.riverbed.dev/signup" class="btn btn-primary">Start free<span class="arrow">→</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="hero-cust wide">
+  <span class="eyebrow">Customers</span>
+  <h1 style="margin-top:24px; max-width: 16ch;">Teams that trace every<br>request, ship calmer Fridays.</h1>
+  <p class="lead" style="margin-top:24px; max-width: 56ch;">From series-B fintechs to public infrastructure providers, platform teams use Riverbed to follow a request from the load balancer to the slowest query — without re-instrumenting a single service.</p>
+  <div class="meta-line">
+    <span>410+ teams in production</span>
+    <span>11.4B spans / day</span>
+    <span>SOC 2 Type II</span>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="wide">
+    <div class="label-row"><span class="label">Trusted by platform &amp; SRE teams</span><span class="rule"></span></div>
+    <div class="logo-cluster">
+      <div class="logo-cell"><span class="mark"><span class="dot"></span>Halden</span></div>
+      <div class="logo-cell"><span class="mark">◇ Faroe</span></div>
+      <div class="logo-cell"><span class="mark"><span class="sq"></span>Stradgate</span></div>
+      <div class="logo-cell"><span class="mark">↗ Northbound</span></div>
+      <div class="logo-cell"><span class="mark"><span class="tri"></span>Pivotal/9</span></div>
+      <div class="logo-cell">Cordova</div>
+      <div class="logo-cell">monocle.fm</div>
+      <div class="logo-cell"><span class="mark">◎ Lumenshift</span></div>
+      <div class="logo-cell">Tessera Pay</div>
+      <div class="logo-cell"><span class="mark"><span class="dot"></span>Brackish</span></div>
+      <div class="logo-cell">Kasai Robotics</div>
+      <div class="logo-cell"><span class="mark">// Northwind</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wide grid-asym">
+    <div>
+      <span class="eyebrow">Featured story</span>
+      <h2 style="margin-top:20px;">From 14 dashboards to one timeline.</h2>
+      <p class="lead" style="margin-top:18px;">When Tessera Pay outgrew their stitched-together telemetry stack, the SRE team needed a single place to ask: <em>where did the 3.2 seconds go?</em></p>
+    </div>
+    <div>
+      <p class="quote-lead">Riverbed gave us back the verb. We don't <span style="color:var(--ink-3); font-style:italic;">guess</span> at incidents anymore — we follow the request.</p>
+      <div class="attrib">
+        <div class="avatar">IM</div>
+        <div class="attrib-meta">
+          <div class="name">Iris Mendelsohn</div>
+          <div class="role">Principal SRE, Tessera Pay</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wide">
+    <div class="label-row"><span class="label">What teams say</span><span class="rule"></span></div>
+    <div class="testimonial-grid">
+
+      <article class="t-card">
+        <span class="industry-pill mint">Fintech</span>
+        <blockquote>The auto-instrumentation just <em>worked</em>. We dropped the agent into our Go services on a Tuesday and by Thursday we'd already found a Redis hot-key that had been silently adding 80ms to every checkout for nine months.</blockquote>
+        <div class="attrib" style="margin-top:auto;">
+          <div class="avatar">JO</div>
+          <div class="attrib-meta">
+            <div class="name">Jonah Okafor</div>
+            <div class="role">Staff Engineer, Cordova</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card tint">
+        <span class="industry-pill peach">Logistics</span>
+        <blockquote>We replaced a six-figure observability contract with Riverbed plus three engineers who actually understood our system again. The query plane is fast enough that we can ask exploratory questions during an incident, not just confirm hypotheses.</blockquote>
+        <div class="attrib" style="margin-top:auto;">
+          <div class="avatar">PR</div>
+          <div class="attrib-meta">
+            <div class="name">Priya Rangarajan</div>
+            <div class="role">Director of Platform, Northbound</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card">
+        <span class="industry-pill lilac">Healthtech</span>
+        <blockquote>The open-source agent was non-negotiable for us — patient data never leaves our VPC, but we still get a hosted query plane. That separation of concerns is rare and it's why we picked Riverbed over the incumbents.</blockquote>
+        <div class="attrib" style="margin-top:auto;">
+          <div class="avatar">EH</div>
+          <div class="attrib-meta">
+            <div class="name">Elliot Hauser</div>
+            <div class="role">VP Infrastructure, Lumenshift</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="t-card tint">
+        <span class="industry-pill butter">Developer tools</span>
+        <blockquote>I wrote our last tracing config in 2021 and have not touched it since. New services show up in the topology graph the moment they start serving traffic. That alone earns Riverbed a permanent slot in our stack.</blockquote>
+        <div class="attrib" style="margin-top:auto;">
+          <div class="avatar">SM</div>
+          <div class="attrib-meta">
+            <div class="name">Saoirse Mulligan</div>
+            <div class="role">Engineering Lead, monocle.fm</div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="wide">
+    <div class="metric-strip">
+      <div class="metric"><div class="num">11.4B</div><div class="lbl">Spans ingested per day, across all customers</div></div>
+      <div class="metric"><div class="num">−63%</div><div class="lbl">Median MTTR reduction reported at 90 days</div></div>
+      <div class="metric"><div class="num">38 min</div><div class="lbl">Average time from signup to first trace</div></div>
+      <div class="metric"><div class="num">410+</div><div class="lbl">Production teams on the hosted plane</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-lg">
+  <div class="wide">
+    <div class="label-row"><span class="label">Case study · 01</span><span class="rule"></span></div>
+    <div class="case-row">
+      <aside class="case-meta">
+        <div>
+          <div class="name">Tessera Pay</div>
+          <div class="desc" style="margin-top:8px;">Cross-border payments infrastructure, processing roughly $4.1B / month across 22 countries.</div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Industry</div><div class="v">Fintech</div></div>
+          <div class="fact"><div class="k">Engineers</div><div class="v">180</div></div>
+          <div class="fact"><div class="k">Services</div><div class="v">340+</div></div>
+          <div class="fact"><div class="k">Stack</div><div class="v">Go, Rust, Kafka</div></div>
+          <div class="fact"><div class="k">Switched from</div><div class="v">DIY OTel + Jaeger</div></div>
+          <div class="fact"><div class="k">Live since</div><div class="v">March 2024</div></div>
+        </div>
+        <a href="https://riverbed.dev/blog/tessera-pay" class="btn btn-secondary" style="align-self:flex-start;">Read the full story <span class="arrow">→</span></a>
+      </aside>
+      <div class="case-body">
+        <h3>Tracing a settlement across 14 services without re-instrumenting anything.</h3>
+        <p>Tessera's settlement pipeline touches authorization, fraud scoring, currency conversion, ledger writes and three downstream banking partners. When a payment took longer than expected, isolating the culprit meant pulling logs from 14 dashboards and reconciling timestamps by hand.</p>
+        <p>The team installed Riverbed's open-source agent across their Go and Rust services in a single afternoon — no manual span calls, no SDK rollout, no protobuf wrangling. By the end of the week the platform team could click a single payment ID and watch the request flow across every service, queue and database it touched.</p>
+        <div class="pull">In our first month with Riverbed we found and fixed three latency regressions that had been written off as "the network." None of them were the network.</div>
+        <p>Six months in, Tessera has retired four standalone observability tools, reduced their on-call burden by an estimated 11 hours per engineer per month, and uses Riverbed's query plane during architecture reviews — not just incidents.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wide">
+    <div class="label-row"><span class="label">Case study · 02</span><span class="rule"></span></div>
+    <div class="case-row">
+      <aside class="case-meta">
+        <div>
+          <div class="name">Kasai Robotics</div>
+          <div class="desc" style="margin-top:8px;">Warehouse automation for cold-chain fulfillment. Fleet of 2,800 autonomous pickers across 19 sites.</div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Industry</div><div class="v">Robotics / Logistics</div></div>
+          <div class="fact"><div class="k">Engineers</div><div class="v">62</div></div>
+          <div class="fact"><div class="k">Services</div><div class="v">90, plus edge</div></div>
+          <div class="fact"><div class="k">Stack</div><div class="v">Python, gRPC, ROS 2</div></div>
+          <div class="fact"><div class="k">Switched from</div><div class="v">Datadog APM</div></div>
+          <div class="fact"><div class="k">Live since</div><div class="v">September 2024</div></div>
+        </div>
+        <a href="https://riverbed.dev/blog/kasai-robotics" class="btn btn-secondary" style="align-self:flex-start;">Read the full story <span class="arrow">→</span></a>
+      </aside>
+      <div class="case-body">
+        <h3>Following a pick-task from a tablet, through ROS, to a robot arm — in one trace.</h3>
+        <p>Kasai's pick orchestration spans cloud services, regional edge gateways and ROS 2 nodes running on the robots themselves. Previous APM tools stopped at the cloud boundary, leaving the team to guess whether a 600ms delay came from the dispatcher or the arm controller.</p>
+        <p>Because Riverbed's agent ships as a single static binary with a Python and C++ shim, the team extended tracing all the way onto the robot — without a vendor SDK and without sending data outside the warehouse's local subnet. The hosted query plane stitches edge spans into the same timeline as cloud spans.</p>
+        <div class="pull">For the first time we can see a robot's behavior and the dispatcher's intent in the same view. It changed what kinds of bugs we even bother filing.</div>
+        <p>Kasai now uses Riverbed for fleet-wide performance audits, catching arm-calibration drift via span-duration histograms before it shows up as a missed SLA. The team estimates Riverbed has paid for itself twice over in avoided re-picks.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tint">
+  <div class="wide">
+    <div class="label-row"><span class="label">In one sentence</span><span class="rule"></span></div>
+    <div class="grid grid-3">
+      <div class="card-bare">
+        <p style="font-size:17px; color:var(--ink); letter-spacing:-0.01em;">"The cheapest tracing tool we've ever bought, measured in engineer-hours."</p>
+        <div class="attrib"><div class="avatar">RV</div><div class="attrib-meta"><div class="name">Renata Voss</div><div class="role">CTO, Brackish</div></div></div>
+      </div>
+      <div class="card-bare">
+        <p style="font-size:17px; color:var(--ink); letter-spacing:-0.01em;">"Our incident reviews actually have evidence in them now."</p>
+        <div class="attrib"><div class="avatar">DK</div><div class="attrib-meta"><div class="name">Dmitri Kowalczyk</div><div class="role">SRE Manager, Halden</div></div></div>
+      </div>
+      <div class="card-bare">
+        <p style="font-size:17px; color:var(--ink); letter-spacing:-0.01em;">"It is the first observability vendor I have not had to apologize for."</p>
+        <div class="attrib"><div class="avatar">AT</div><div class="attrib-meta"><div class="name">Amara Tilden</div><div class="role">Head of Platform, Faroe</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-sm">
+  <div class="wide">
+    <div class="cta-band">
+      <h2>Start tracing in under an hour.<br><span style="color:var(--ink-3);">Or read about the teams who already do.</span></h2>
+      <div class="cta-actions">
+        <a href="https://app.riverbed.dev/signup" class="btn btn-primary">Start free <span class="arrow">→</span></a>
+        <a href="https://docs.riverbed.dev/quickstart" class="btn btn-secondary">Read the docs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wide">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <svg class="brand-mark" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <path d="M2 14 C 6 14, 6 6, 11 6 S 16 14, 20 14" stroke="#0EA5E9" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M2 18 C 6 18, 6 10, 11 10 S 16 18, 20 18" stroke="#0B1620" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>
+          </svg>
+          Riverbed
+        </a>
+        <p>Observability that follows the request — across every service, queue and database in your stack.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="index.html#tracing">Distributed tracing</a></li>
+          <li><a href="index.html#query">Query plane</a></li>
+          <li><a href="integrations.html">Integrations</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="https://status.riverbed.dev">Status</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Developers</h5>
+        <ul>
+          <li><a href="https://docs.riverbed.dev">Documentation</a></li>
+          <li><a href="https://docs.riverbed.dev/quickstart">Quickstart</a></li>
+          <li><a href="https://github.com/riverbed/agent">GitHub agent</a></li>
+          <li><a href="https://docs.riverbed.dev/api">API reference</a></li>
+          <li><a href="https://docs.riverbed.dev/changelog">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="customers.html">Customers</a></li>
+          <li><a href="https://riverbed.dev/blog">Blog</a></li>
+          <li><a href="https://riverbed.dev/careers">Careers</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="https://riverbed.dev/privacy">Privacy</a></li>
+          <li><a href="https://riverbed.dev/terms">Terms</a></li>
+          <li><a href="https://riverbed.dev/security">Security</a></li>
+          <li><a href="https://riverbed.dev/dpa">DPA</a></li>
+          <li><a href="https://trust.riverbed.dev">Trust center</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>© 2025 Riverbed Labs, Inc. — Made in Berlin &amp; Brooklyn.</span>
+      <a href="https://status.riverbed.dev" class="status-dot">All systems normal</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

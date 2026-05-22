@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overview · Riverbed</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* page-specific composition only — no token overrides */
+  .kpi-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); overflow: hidden; }
+  .kpi-cell { padding: 14px 16px 12px; border-right: 1px solid var(--border); position: relative; }
+  .kpi-cell:last-child { border-right: 0; }
+  .kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between; }
+  .kpi-value { font-family: var(--mono); font-size: 22px; color: var(--text); margin-top: 6px; letter-spacing: -0.01em; font-feature-settings: 'tnum'; }
+  .kpi-value .unit { font-size: 12px; color: var(--text-dim); margin-left: 2px; }
+  .kpi-trend { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-family: var(--mono); font-size: 11px; }
+  .kpi-trend.up { color: var(--success); }
+  .kpi-trend.down { color: var(--accent); }
+  .kpi-trend.flat { color: var(--text-dim); }
+  .kpi-trend .vs { color: var(--text-dim); margin-left: 2px; }
+  .kpi-spark { position: absolute; right: 14px; top: 12px; opacity: 0.9; }
+
+  .split { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin-top: 16px; }
+  @media (max-width: 1100px) { .split { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .panel-head h3 { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+  .panel-head .meta { font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+  .panel-body { padding: 14px; }
+  .panel-body.flush { padding: 0; }
+
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .seg button { background: transparent; border: 0; color: var(--text-muted); font-family: var(--mono); font-size: 11px; padding: 3px 8px; cursor: pointer; border-right: 1px solid var(--border); }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: var(--surface-hover); color: var(--text); }
+
+  /* chart */
+  .chart { width: 100%; height: 240px; display: block; }
+  .chart-legend { display: flex; gap: 16px; padding: 10px 14px 14px; font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+  .chart-legend .swatch { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+
+  /* feed */
+  .feed { max-height: 360px; overflow-y: auto; }
+  .feed-item { display: grid; grid-template-columns: 56px 1fr auto; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); align-items: start; }
+  .feed-item:last-child { border-bottom: 0; }
+  .feed-time { font-family: var(--mono); font-size: 11px; color: var(--text-dim); padding-top: 1px; }
+  .feed-body { font-size: 12px; color: var(--text); line-height: 1.45; }
+  .feed-body .svc { font-family: var(--mono); color: var(--text-muted); }
+  .feed-meta { font-family: var(--mono); font-size: 11px; color: var(--text-dim); white-space: nowrap; }
+
+  /* pills */
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 1px 7px 1px 6px; border: 1px solid var(--border); border-radius: 999px; font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+  .pill .pdot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
+  .pill.ok .pdot { background: var(--success); } .pill.ok { color: var(--success); }
+  .pill.err .pdot { background: var(--accent); } .pill.err { color: var(--accent); }
+  .pill.warn .pdot { background: var(--warn); } .pill.warn { color: var(--warn); }
+  .pill.info .pdot { background: var(--info); } .pill.info { color: var(--info); }
+
+  /* http method tags */
+  .m { font-family: var(--mono); font-size: 10px; padding: 1px 4px; border-radius: 3px; letter-spacing: 0.04em; }
+  .m.get { color: #60A5FA; background: rgba(59,130,246,0.10); }
+  .m.post { color: #34D399; background: rgba(16,185,129,0.10); }
+  .m.delete { color: #F87171; background: rgba(239,68,68,0.10); }
+  .m.put { color: #FBBF24; background: rgba(245,158,11,0.10); }
+
+  /* services table */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .tbl thead th { position: sticky; top: 0; background: var(--bg); text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 500; padding: 8px 14px; border-bottom: 1px solid var(--border); }
+  .tbl thead th.r { text-align: right; }
+  .tbl tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+  .tbl tbody tr:last-child td { border-bottom: 0; }
+  .tbl tbody tr:hover { background: var(--surface-hover); }
+  .tbl td.mono, .tbl th.mono { font-family: var(--mono); }
+  .tbl td.r { text-align: right; font-family: var(--mono); }
+  .svc-name { display: inline-flex; align-items: center; gap: 8px; }
+  .svc-name .sq { width: 8px; height: 8px; border-radius: 2px; background: var(--info); }
+
+  /* waterfall */
+  .waterfall { padding: 12px 14px 14px; }
+  .wf-head { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--text-dim); padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  .wf-row { display: grid; grid-template-columns: 170px 1fr 60px; gap: 10px; align-items: center; padding: 4px 0; font-size: 12px; }
+  .wf-svc { font-family: var(--mono); font-size: 11px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wf-svc .op { color: var(--text-dim); }
+  .wf-bar-track { position: relative; height: 8px; background: var(--bg); border-radius: 2px; }
+  .wf-bar { position: absolute; top: 0; bottom: 0; border-radius: 2px; }
+  .wf-dur { text-align: right; font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+
+  /* footer override for in-app */
+  .site-footer { border-top: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 11px; color: var(--text-dim); flex-wrap: wrap; }
+  .site-footer .foot-meta { display: flex; align-items: center; gap: 10px; font-family: var(--mono); }
+  .site-footer .foot-links { display: flex; gap: 14px; }
+  .site-footer .foot-links a { color: var(--text-muted); }
+  .site-footer .foot-links a:hover { color: var(--text); }
+  .site-footer .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px rgba(34,197,94,0.15); }
+  .hidden-sep { color: var(--text-dim); }
+
+  /* small btn fallback in case CSS file truncated */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 12px; cursor: pointer; font-family: var(--sans); }
+  .btn:hover { background: var(--surface-hover); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: #DC2626; }
+  .btn .kbd { margin-left: 2px; }
+
+  .grid-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+  @media (max-width: 1100px) { .grid-cards { grid-template-columns: 1fr; } }
+
+  .err-list { display: flex; flex-direction: column; }
+  .err-row { display: grid; grid-template-columns: 1fr auto; padding: 9px 14px; border-bottom: 1px solid var(--border); gap: 10px; }
+  .err-row:last-child { border-bottom: 0; }
+  .err-msg { font-family: var(--mono); font-size: 11px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .err-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .err-count { font-family: var(--mono); font-size: 11px; color: var(--accent); text-align: right; }
+  .err-count .delta { color: var(--text-dim); font-size: 10px; display: block; }
+
+  .deploys { padding: 0; }
+  .dep-row { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); align-items: start; }
+  .dep-row:last-child { border-bottom: 0; }
+  .dep-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; background: var(--success); }
+  .dep-dot.r { background: var(--accent); }
+  .dep-dot.w { background: var(--warn); }
+  .dep-title { font-size: 12px; color: var(--text); }
+  .dep-sub { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .dep-time { font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-align: right; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Riverbed</span>
+      <span class="brand-env">prod</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Workspace</div>
+      <a class="nav-item active" href="overview.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>
+        Overview
+      </a>
+      <a class="nav-item" href="detail-view.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+        Traces
+        <span class="count">14.2k</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 13l4-4 3 3 5-6"/></svg>
+        Metrics
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v9H2zM2 7h12"/></svg>
+        Logs
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2 2"/></svg>
+        Alerts
+        <span class="count">3</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2v12M2 8h12"/></svg>
+        Dashboards
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">
+        Services
+        <span class="sidebar-heading-action" title="Filter">+</span>
+      </div>
+      <a class="nav-item" href="#"><span class="dot"></span> api-gateway</a>
+      <a class="nav-item" href="#"><span class="dot"></span> checkout-svc</a>
+      <a class="nav-item" href="#"><span class="dot" style="background:var(--warn)"></span> inventory-svc</a>
+      <a class="nav-item" href="#"><span class="dot"></span> notifications</a>
+      <a class="nav-item" href="#"><span class="dot" style="background:var(--accent)"></span> payments-svc</a>
+      <a class="nav-item" href="#"><span class="dot"></span> search-svc</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Account</div>
+      <a class="nav-item" href="team.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="6" r="2.5"/><path d="M2 14c0-2.2 1.8-4 4-4s4 1.8 4 4M11 7a2 2 0 100-4M14 14c0-1.8-1.2-3.3-3-3.8"/></svg>
+        Team
+      </a>
+      <a class="nav-item" href="billing.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="12" height="9" rx="1"/><path d="M2 7h12"/></svg>
+        Billing
+      </a>
+      <a class="nav-item" href="settings.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M3 13l1.5-1.5M11.5 4.5L13 3"/></svg>
+        Settings
+      </a>
+    </div>
+
+    <div class="sidebar-foot">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>All systems normal</span>
+      <a href="#" class="spacer" style="text-align:right;font-family:var(--mono);font-size:11px;">v2.18.0</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumbs">
+        <a class="crumb" href="#">acme-prod</a>
+        <span class="sep">/</span>
+        <span class="crumb current">Overview</span>
+      </div>
+      <div class="topbar-search">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+        <input placeholder="Search traces, services, spans…" />
+        <span class="kbd">⌘K</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Notifications">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a4 4 0 014 4v3l1 2H3l1-2V6a4 4 0 014-4zM6.5 13a1.5 1.5 0 003 0"/></svg>
+        </button>
+        <div class="user-chip">
+          <span class="avatar">NV</span>
+          <span class="uname">n.vasquez</span>
+        </div>
+      </div>
+    </div>
+
+    <main class="page">
+      <div class="page-header">
+        <div>
+          <h1>Overview</h1>
+          <p>Real-time signal from every traced request across 6 services and 142 endpoints.</p>
+        </div>
+        <div class="page-header-actions">
+          <div class="seg" role="tablist" aria-label="Time range">
+            <button>15m</button>
+            <button class="on">1h</button>
+            <button>6h</button>
+            <button>24h</button>
+            <button>7d</button>
+          </div>
+          <button class="btn"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8a5 5 0 0110-1M13 8a5 5 0 01-10 1"/><path d="M13 3v3.5H9.5M3 13v-3.5H6.5"/></svg> Refresh <span class="kbd">R</span></button>
+          <button class="btn primary">Share view</button>
+        </div>
+      </div>
+
+      <!-- KPI strip: fused 4-column bordered panel -->
+      <div class="kpi-strip" role="group" aria-label="Key metrics">
+        <div class="kpi-cell">
+          <div class="kpi-label">Requests / min</div>
+          <div class="kpi-value">48,219<span class="unit">rpm</span></div>
+          <div class="kpi-trend up">▲ 6.4%<span class="vs">vs prev hr</span></div>
+          <svg class="kpi-spark" width="68" height="24" viewBox="0 0 68 24">
+            <polyline fill="none" stroke="#22C55E" stroke-width="1.3" points="0,16 6,15 12,17 18,13 24,14 30,11 36,12 42,8 48,9 54,7 60,8 68,4"/>
+          </svg>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">p95 latency</div>
+          <div class="kpi-value">214<span class="unit">ms</span></div>
+          <div class="kpi-trend down">▲ 22ms<span class="vs">SLO 250ms</span></div>
+          <svg class="kpi-spark" width="68" height="24" viewBox="0 0 68 24">
+            <polyline fill="none" stroke="#EF4444" stroke-width="1.3" points="0,12 6,11 12,13 18,10 24,12 30,9 36,11 42,8 48,10 54,6 60,7 68,3"/>
+          </svg>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Error rate</div>
+          <div class="kpi-value">0.42<span class="unit">%</span></div>
+          <div class="kpi-trend flat">▼ 0.03pp<span class="vs">7d avg 0.51%</span></div>
+          <svg class="kpi-spark" width="68" height="24" viewBox="0 0 68 24">
+            <polyline fill="none" stroke="#8A8A92" stroke-width="1.3" points="0,14 6,12 12,15 18,13 24,11 30,14 36,12 42,13 48,11 54,14 60,12 68,13"/>
+          </svg>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Traces ingested</div>
+          <div class="kpi-value">2.89<span class="unit">M / hr</span></div>
+          <div class="kpi-trend up">▲ 1.1%<span class="vs">sampling 1:10</span></div>
+          <svg class="kpi-spark" width="68" height="24" viewBox="0 0 68 24">
+            <polyline fill="none" stroke="#3B82F6" stroke-width="1.3" points="0,18 6,16 12,15 18,14 24,12 30,13 36,10 42,11 48,8 54,9 60,6 68,5"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Chart + Activity feed split -->
+      <div class="split">
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Latency by service</h3>
+            <span class="meta">p50 · p95 · p99 — last 60m, 1m bins</span>
+          </div>
+          <div class="panel-body flush">
+            <svg class="chart" viewBox="0 0 720 240" preserveAspectRatio="none" aria-label="Latency chart">
+              <!-- dashed grid -->
+              <g stroke="#26262C" stroke-dasharray="2 3" stroke-width="1" opacity="0.6">
+                <line x1="0" y1="40" x2="720" y2="40"/>
+                <line x1="0" y1="90" x2="720" y2="90"/>
+                <line x1="0" y1="140" x2="720" y2="140"/>
+                <line x1="0" y1="190" x2="720" y2="190"/>
+              </g>
+              <!-- y labels -->
+              <g font-family="JetBrains Mono, monospace" font-size="9" fill="#5C5C63">
+                <text x="6" y="38">400ms</text>
+                <text x="6" y="88">300ms</text>
+                <text x="6" y="138">200ms</text>
+                <text x="6" y="188">100ms</text>
+              </g>
+              <!-- x labels -->
+              <g font-family="JetBrains Mono, monospace" font-size="9" fill="#5C5C63">
+                <text x="60" y="230">14:10</text>
+                <text x="180" y="230">14:20</text>
+                <text x="300" y="230">14:30</text>
+                <text x="420" y="230">14:40</text>
+                <text x="540" y="230">14:50</text>
+                <text x="660" y="230">15:00</text>
+              </g>
+              <!-- p99 red -->
+              <polyline fill="none" stroke="#EF4444" stroke-width="1.4" points="40,80 80,72 120,90 160,68 200,75 240,60 280,82 320,55 360,70 400,48 440,62 480,40 520,58 560,50 600,72 640,45 680,52 720,38"/>
+              <!-- p95 amber -->
+              <polyline fill="none" stroke="#F59E0B" stroke-width="1.4" points="40,118 80,112 120,124 160,108 200,116 240,102 280,120 320,98 360,110 400,92 440,104 480,86 520,100 560,94 600,112 640,90 680,98 720,84"/>
+              <!-- p50 blue -->
+              <polyline fill="none" stroke="#3B82F6" stroke-width="1.4" points="40,168 80,164 120,172 160,160 200,166 240,156 280,170 320,152 360,162 400,148 440,158 480,144 520,154 560,150 600,164 640,146 680,152 720,142"/>
+              <!-- deploy marker -->
+              <line x1="420" y1="20" x2="420" y2="210" stroke="#E5E5E7" stroke-dasharray="3 3" stroke-width="0.8" opacity="0.5"/>
+              <text x="424" y="30" font-family="JetBrains Mono, monospace" font-size="9" fill="#E5E5E7" opacity="0.7">deploy 2f9c</text>
+            </svg>
+            <div class="chart-legend">
+              <span><span class="swatch" style="background:#3B82F6"></span>p50</span>
+              <span><span class="swatch" style="background:#F59E0B"></span>p95</span>
+              <span><span class="swatch" style="background:#EF4444"></span>p99</span>
+              <span style="margin-left:auto;color:var(--text-dim)">aggregated across 6 services</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Activity</h3>
+            <span class="meta">streaming · last 30m</span>
+          </div>
+          <div class="panel-body flush feed">
+            <div class="feed-item">
+              <div class="feed-time">15:02:41</div>
+              <div class="feed-body"><span class="pill err"><span class="pdot"></span>5xx spike</span> &nbsp; <span class="svc">payments-svc</span> returned <code>503</code> on <code>/v2/charges</code> — 14 requests in 60s</div>
+              <div class="feed-meta">trace 7f1a</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-time">15:01:08</div>
+              <div class="feed-body"><span class="pill info"><span class="pdot"></span>deploy</span> &nbsp; <span class="svc">checkout-svc</span> rolled out <code>2f9c4e1</code> via argocd · 3 pods updated</div>
+              <div class="feed-meta">+1m12s</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-time">14:58:33</div>
+              <div class="feed-body"><span class="pill warn"><span class="pdot"></span>slow span</span> &nbsp; <span class="svc">inventory-svc</span> · <code>pg.query</code> took <code>1.42s</code> (p99 threshold 800ms)</div>
+              <div class="feed-meta">trace b03d</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-time">14:55:11</div>
+              <div class="feed-body"><span class="pill ok"><span class="pdot"></span>resolved</span> &nbsp; alert <code>gateway-saturation</code> auto-closed after 4m below threshold</div>
+              <div class="feed-meta">alert 218</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-time">14:52:02</div>
+              <div class="feed-body"><span class="pill info"><span class="pdot"></span>agent</span> &nbsp; <span class="svc">search-svc</span> connected agent <code>v2.18.0</code> from <code>edge-us-east-2</code></div>
+              <div class="feed-meta">node 4</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-time">14:49:47</div>
+              <div class="feed-body"><span class="pill err"><span class="pdot"></span>error</span> &nbsp; <span class="svc">api-gateway</span> · <code>upstream connect timeout</code> to payments-svc:8443</div>
+              <div class="feed-meta">trace 9ee2</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-time">14:46:30</div>
+              <div class="feed-body"><span class="pill"><span class="pdot"></span>note</span> &nbsp; r.kapoor annotated trace <code>3c81</code>: “retry storm originated at gateway, not payments”</div>
+              <div class="feed-meta">5h ago</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-time">14:44:12</div>
+              <div class="feed-body"><span class="pill warn"><span class="pdot"></span>quota</span> &nbsp; ingest sampling switched <code>1:5 → 1:10</code> on tag <code>tier=free</code></div>
+              <div class="feed-meta">auto</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Service health table + Top errors + Deploys -->
+      <div class="section-title">
+        Service health
+        <span class="filters"><button class="btn">All services</button><button class="btn">RED metrics</button></span>
+      </div>
+
+      <section class="panel">
+        <div class="panel-body flush">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Version</th>
+                <th class="r">RPM</th>
+                <th class="r">p50</th>
+                <th class="r">p95</th>
+                <th class="r">p99</th>
+                <th class="r">Errors</th>
+                <th>Trend</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="svc-name"><span class="sq" style="background:#3B82F6"></span><span class="mono">api-gateway</span></span></td>
+                <td class="mono" style="color:var(--text-muted)">v4.12.2</td>
+                <td class="r">18,402</td>
+                <td class="r">12ms</td>
+                <td class="r">38ms</td>
+                <td class="r">71ms</td>
+                <td class="r" style="color:var(--text-muted)">0.18%</td>
+                <td><svg width="80" height="18" viewBox="0 0 80 18"><polyline fill="none" stroke="#3B82F6" stroke-width="1.2" points="0,12 10,11 20,13 30,10 40,12 50,9 60,11 70,8 80,9"/></svg></td>
+                <td><span class="pill ok"><span class="pdot"></span>healthy</span></td>
+              </tr>
+              <tr>
+                <td><span class="svc-name"><span class="sq" style="background:#22C55E"></span><span class="mono">checkout-svc</span></span></td>
+                <td class="mono" style="color:var(--text-muted)">v2.7.0</td>
+                <td class="r">9,118</td>
+                <td class="r">42ms</td>
+                <td class="r">128ms</td>
+                <td class="r">241ms</td>
+                <td class="r" style="color:var(--text-muted)">0.31%</td>
+                <td><svg width="80" height="18" viewBox="0 0 80 18"><polyline fill="none" stroke="#22C55E" stroke-width="1.2" points="0,10 10,11 20,9 30,10 40,8 50,11 60,9 70,10 80,8"/></svg></td>
+                <td><span class="pill ok"><span class="pdot"></span>healthy</span></td>
+              </tr>
+              <tr>
+                <td><span class="svc-name"><span class="sq" style="background:#F59E0B"></span><span class="mono">inventory-svc</span></span></td>
+                <td class="mono" style="color:var(--text-muted)">v1.4.9</td>
+                <td class="r">6,402</td>
+                <td class="r">88ms</td>
+                <td class="r">412ms</td>
+                <td class="r" style="color:var(--warn)">1.42s</td>
+                <td class="r" style="color:var(--warn)">1.07%</td>
+                <td><svg width="80" height="18" viewBox="0 0 80 18"><polyline fill="none" stroke="#F59E0B" stroke-width="1.2" points="0,12 10,10 20,11 30,8 40,9 50,5 60,7 70,4 80,3"/></svg></td>
+                <td><span class="pill warn"><span class="pdot"></span>degraded</span></td>
+              </tr>
+              <tr>
+                <td><span class="svc-name"><span class="sq" style="background:#A78BFA"></span><span class="mono">notifications</span></span></td>
+                <td class="mono" style="color:var(--text-muted)">v3.0.1</td>
+                <td class="r">4,860</td>
+                <td class="r">22ms</td>
+                <td class="r">61ms</td>
+                <td class="r">98ms</td>
+                <td class="r" style="color:var(--text-muted)">0.06%</td>
+                <td><svg width="80" height="18" viewBox="0 0 80 18"><polyline fill="none" stroke="#A78BFA" stroke-width="1.2" points="0,10 10,9 20,11 30,8 40,10 50,9 60,11 70,8 80,10"/></svg></td>
+                <td><span class="pill ok"><span class="pdot"></span>healthy</span></td>
+              </tr>
+              <tr>
+                <td><span class="svc-name"><span class="sq" style="background:#EF4444"></span><span class="mono">payments-svc</span></span></td>
+                <td class="mono" style="color:var(--text-muted)">v6.2.0-rc.3</td>
+                <td class="r">3,114</td>
+                <td class="r">68ms</td>
+                <td class="r">312ms</td>
+                <td class="r" style="color:var(--accent)">2.18s</td>
+                <td class="r" style="color:var(--accent)">3.42%</td>
+                <td><svg width="80" height="18" viewBox="0 0 80 18"><polyline fill="none" stroke="#EF4444" stroke-width="1.2" points="0,12 10,10 20,9 30,11 40,6 50,8 60,4 70,3 80,2"/></svg></td>
+                <td><span class="pill err"><span class="pdot"></span>incident</span></td>
+              </tr>
+              <tr>
+                <td><span class="svc-name"><span class="sq" style="background:#06B6D4"></span><span class="mono">search-svc</span></span></td>
+                <td class="mono" style="color:var(--text-muted)">v0.19.4</td>
+                <td class="r">6,323</td>
+                <td class="r">34ms</td>
+                <td class="r">102ms</td>
+                <td class="r">188ms</td>
+                <td class="r" style="color:var(--text-muted)">0.22%</td>
+                <td><svg width="80" height="18" viewBox="0 0 80 18"><polyline fill="none" stroke="#06B6D4" stroke-width="1.2" points="0,11 10,10 20,12 30,9 40,11 50,8 60,10 70,9 80,11"/></svg></td>
+                <td><span class="pill ok"><span class="pdot"></span>healthy</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid-cards">
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Top errors</h3>
+            <span class="meta">last 1h</span>
+          </div>
+          <div class="panel-body flush err-list">
+            <div class="err-row">
+              <div>
+                <div class="err-msg">upstream connect error: payments-svc:8443</div>
+                <div class="err-sub"><span class="m get">GET</span> /v2/charges · api-gateway → payments-svc</div>
+              </div>
+              <div class="err-count">1,284<span class="delta">▲ 412</span></div>
+            </div>
+            <div class="err-row">
+              <div>
+                <div class="err-msg">pq: deadlock detected on inventory_lock</div>
+                <div class="err-sub"><span class="m post">POST</span> /reserve · inventory-svc</div>
+              </div>
+              <div class="err-count">387<span class="delta">▲ 60</span></div>
+            </div>
+            <div class="err-row">
+              <div>
+                <div class="err-msg">context deadline exceeded (timeout=800ms)</div>
+                <div class="err-sub"><span class="m get">GET</span> /catalog/search · search-svc</div>
+              </div>
+              <div class="err-count">204<span class="delta">▼ 18</span></div>
+            </div>
+            <div class="err-row">
+              <div>
+                <div class="err-msg">stripe.api_error: card_declined</div>
+                <div class="err-sub"><span class="m post">POST</span> /v2/charges · payments-svc</div>
+              </div>
+              <div class="err-count">91<span class="delta">— 0</span></div>
+            </div>
+            <div class="err-row">
+              <div>
+                <div class="err-msg">unauthorized: invalid bearer token</div>
+                <div class="err-sub"><span class="m delete">DELETE</span> /v1/cart/{id} · checkout-svc</div>
+              </div>
+              <div class="err-count">48<span class="delta">▲ 6</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Slowest trace · last 5m</h3>
+            <span class="meta">trace 7f1a · 2.18s · 14 spans</span>
+          </div>
+          <div class="panel-body waterfall">
+            <div class="wf-head">
+              <span>0ms</span><span>500ms</span><span>1000ms</span><span>1500ms</span><span>2180ms</span>
+            </div>
+            <div class="wf-row">
+              <div class="wf-svc">api-gateway <span class="op">/charges</span></div>
+              <div class="wf-bar-track"><div class="wf-bar" style="left:0%;width:100%;background:#3B82F6"></div></div>
+              <div class="wf-dur">2.18s</div>
+            </div>
+            <div class="wf-row">
+              <div class="wf-svc">checkout-svc <span class="op">.process</span></div>
+              <div class="wf-bar-track"><div class="wf-bar" style="left:2%;width:96%;background:#22C55E"></div></div>
+              <div class="wf-dur">2.10s</div>
+            </div>
+            <div class="wf-row">
+              <div class="wf-svc">inventory-svc <span class="op">.reserve</span></div>
+              <div class="wf-bar-track"><div class="wf-bar" style="left:6%;width:18%;background:#F59E0B"></div></div>
+              <div class="wf-dur">392ms</div>
+            </div>
+            <div class="wf-row">
+              <div class="wf-svc">postgres <span class="op">SELECT … FOR UPDATE</span></div>
+              <div class="wf-bar-track"><div class="wf-bar" style="left:10%;width:13%;background:#8A8A92"></div></div>
+              <div class="wf-dur">281ms</div>
+            </div>
+            <div class="wf-row">
+              <div class="wf-svc">payments-svc <span class="op">.charge</span></div>
+              <div class="wf-bar-track"><div class="wf-bar" style="left:26%;width:70%;background:#EF4444"></div></div>
+              <div class="wf-dur">1.52s</div>
+            </div>
+            <div class="wf-row">
+              <div class="wf-svc">stripe.api <span class="op">POST /charges</span></div>
+              <div class="wf-bar-track"><div class="wf-bar" style="left:30%;width:62%;background:#A78BFA"></div></div>
+              <div class="wf-dur">1.34s</div>
+            </div>
+            <div class="wf-row">
+              <div class="wf-svc">notifications <span class="op">.email</span></div>
+              <div class="wf-bar-track"><div class="wf-bar" style="left:94%;width:5%;background:#06B6D4"></div></div>
+              <div class="wf-dur">112ms</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Recent deploys</h3>
+            <span class="meta">argocd · github</span>
+          </div>
+          <div class="panel-body flush deploys">
+            <div class="dep-row">
+              <div class="dep-dot"></div>
+              <div>
+                <div class="dep-title">checkout-svc → <span style="font-family:var(--mono);color:var(--text-muted)">v2.7.0</span></div>
+                <div class="dep-sub">2f9c4e1 · m.okafor · “backport idempotency-key bugfix”</div>
+              </div>
+              <div class="dep-time">14:53</div>
+            </div>
+            <div class="dep-row">
+              <div class="dep-dot r"></div>
+              <div>
+                <div class="dep-title">payments-svc → <span style="font-family:var(--mono);color:var(--accent)">v6.2.0-rc.3</span></div>
+                <div class="dep-sub">a1d77c2 · auto-rolled back after p99 breach · 14:32 → 14:38</div>
+              </div>
+              <div class="dep-time">14:38</div>
+            </div>
+            <div class="dep-row">
+              <div class="dep-dot"></div>
+              <div>
+                <div class="dep-title">search-svc → <span style="font-family:var(--mono);color:var(--text-muted)">v0.19.4</span></div>
+                <div class="dep-sub">cc40918 · l.chen · “tantivy index tuning + warmup”</div>
+              </div>
+              <div class="dep-time">13:11</div>
+            </div>
+            <div class="dep-row">
+              <div class="dep-dot w"></div>
+              <div>
+                <div class="dep-title">inventory-svc → <span style="font-family:var(--mono);color:var(--text-muted)">v1.4.9</span></div>
+                <div class="dep-sub">7e22a0b · canary 25% · awaiting promotion gate (latency)</div>
+              </div>
+              <div class="dep-time">11:48</div>
+            </div>
+            <div class="dep-row">
+              <div class="dep-dot"></div>
+              <div>
+                <div class="dep-title">api-gateway → <span style="font-family:var(--mono);color:var(--text-muted)">v4.12.2</span></div>
+                <div class="dep-sub">b81f3ee · n.vasquez · “envoy upstream timeout 800ms”</div>
+              </div>
+              <div class="dep-time">Yesterday</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="foot-meta">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>edge-us-east-2</span>
+        <span class="hidden-sep">·</span>
+        <span>ingest p50 14ms</span>
+        <span class="hidden-sep">·</span>
+        <span>build c4f3a91</span>
+      </div>
+      <div class="foot-links">
+        <a href="https://docs.riverbed.dev">Docs</a>
+        <a href="https://github.com/riverbed-io/agent">Agent</a>
+        <a href="https://status.riverbed.dev">Status</a>
+        <a href="#">Changelog</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="foot-meta">© 2025 Riverbed Labs, Inc.</div>
+    </footer>
+  </div>
+</div>
+</body>
+</html>

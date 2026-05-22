@@ -1,0 +1,59 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "portfolio_neobrut-0000",
+    "archetype": "A7",
+    "vertical": "agency",
+    "style": {
+      "density": "balanced",
+      "color_regime": "neobrutalist-high-contrast",
+      "typography": "variable-display",
+      "border_language": "neobrutalist-thick",
+      "motif": "illustration-heavy"
+    },
+    "palette_seed": "#3B82F6",
+    "font_pair": [
+      "Inter Display",
+      "Inter",
+      null
+    ],
+    "difficulty": "hard",
+    "sitemap": [
+      "index",
+      "contact",
+      "about",
+      "case-study-A",
+      "case-study-B",
+      "work-index"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Locomotive",
+      "tagline": "Motion-led design and engineering",
+      "value_prop": "We build sites that move. Award-winning interactive experiences for brands with stories worth animating.",
+      "product_category": "creative studio",
+      "target_audience": "brands with cinematic ambitions"
+    },
+    "notes": "Design reference: basicagency.com, locomotive.ca, areweb.studio. Background a single bold color from the palette OR pure off-white (#FAFAFA). Borders: solid 2-3px BLACK on every card / button / image frame. Drop shadows are BLACK and offset hard (translateX 4px, translateY 4px), no blur. Buttons translate-on-hover into their shadow. NO gradients, NO rounded corners over 4px.\n\nTypography is the lead character: oversized display headlines (120-180px on desktop), variable-axis treatment if the font supports it, mixed weights and slants for visual rhythm. Body type small and tight (14-15px). Color is structural: bold blocks of yellow / red / blue used as backgrounds for sections.\n\nIndex: oversized hero word/phrase that takes a third of the screen, case-study tiles in an asymmetric grid (3 of different sizes, with captions below). Work-index: more tiles, possibly with hover-state image-swap implied by an enlarged thumbnail. Case-study pages: title, client/year/role meta block, problem statement, hero image, approach, outcome with images interspersed. About: agency manifesto (short prose), team grid (4-8 placeholder people), services list. Contact: oversized email link, address, social links.\n\nLocomotive is a design studio \u2014 \"Motion-led design and engineering\". Use as the wordmark in heavy black + a single accent color. Avoid: corporate cleanness, even spacing on all sides of every block, default Tailwind shadows."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "about",
+    "case-study-A",
+    "case-study-B",
+    "contact",
+    "index",
+    "work-index"
+  ],
+  "files": [
+    "about.html",
+    "case-study-A.html",
+    "case-study-B.html",
+    "contact.html",
+    "index.html",
+    "styles.css",
+    "work-index.html"
+  ],
+  "has_external_css": true,
+  "assets": []
+}

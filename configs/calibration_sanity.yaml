@@ -1,0 +1,28 @@
+# Step 1 of grader-confidence protocol: sanity ladder.
+# Runs oracle and nop on all 10 calibration tasks. 20 trials total.
+# Expected: oracle ~1.0 across all tasks; nop ~0 across all tasks.
+#
+# Run:
+#   env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
+#     harbor run -c configs/calibration_sanity.yaml
+
+job_name: calib-sanity-v34
+jobs_dir: jobs
+n_attempts: 1
+timeout_multiplier: 1.0
+
+orchestrator:
+  type: local
+  n_concurrent_trials: 10
+  quiet: false
+
+environment:
+  type: modal
+  delete: true
+
+agents:
+  - name: oracle
+  - name: nop
+
+datasets:
+  - path: datasets/calibration

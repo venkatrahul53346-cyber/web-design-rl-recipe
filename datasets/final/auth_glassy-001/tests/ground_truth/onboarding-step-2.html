@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invite your team — Mint Ledger</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .steps { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:28px; }
+  .step-dot { width:8px; height:8px; border-radius:999px; background: rgba(15,23,42,0.12); transition: all 160ms ease; }
+  .step-dot.done { background: var(--mint-deep); }
+  .step-dot.active { width:26px; height:8px; border-radius:999px; background: var(--anchor-deep); }
+  .step-label { font-size:12px; color: var(--ink-mute); text-align:center; margin-bottom:10px; letter-spacing:0.04em; text-transform:uppercase; font-weight:500; }
+  .invite-card { max-width: 560px; }
+  .invite-row { display:grid; grid-template-columns: 1fr 150px 32px; gap:10px; align-items:center; margin-bottom:10px; }
+  .invite-row .input { padding:10px 12px; }
+  .role-select { font-size:13px; }
+  .remove-btn {
+    width:32px; height:32px; border-radius:8px; border:1px solid var(--line);
+    background: rgba(255,255,255,0.5); color: var(--ink-faint); cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    transition: all 120ms ease;
+  }
+  .remove-btn:hover { color: var(--ink); border-color: var(--line-strong); background: rgba(255,255,255,0.85); }
+  .remove-btn svg { width:14px; height:14px; }
+  .add-row {
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:13px; font-weight:500; color: var(--anchor-deep);
+    background:none; border:none; padding:6px 0; cursor:pointer; margin-top:4px;
+  }
+  .add-row:hover { color: var(--anchor-ink); }
+  .add-row svg { width:14px; height:14px; }
+  .role-legend {
+    margin-top:22px; padding:16px 18px;
+    background: rgba(255,255,255,0.45);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: var(--radius-lg);
+    font-size:12.5px; color: var(--ink-soft); line-height:1.55;
+  }
+  .role-legend strong { color: var(--ink); font-weight:600; }
+  .role-legend p { font-size:12.5px; margin:0 0 6px; color: var(--ink-soft); }
+  .role-legend p:last-child { margin-bottom:0; }
+  .divider {
+    display:flex; align-items:center; gap:12px;
+    font-size:11px; color: var(--ink-faint); text-transform:lowercase; letter-spacing:0.06em;
+    margin: 24px 0 18px;
+  }
+  .divider::before, .divider::after {
+    content:''; flex:1; height:1px; background: var(--line);
+  }
+  .link-share {
+    display:flex; gap:8px; align-items:center; margin-bottom:8px;
+  }
+  .link-share .input { font-family: ui-monospace, SFMono-Regular, monospace; font-size:12.5px; color: var(--ink-soft); }
+  .link-copy {
+    flex-shrink:0; padding:10px 14px; font-size:13px;
+    background: rgba(255,255,255,0.7); border:1px solid var(--line-strong);
+    border-radius: var(--radius); color: var(--ink); cursor:pointer; font-weight:500;
+  }
+  .link-copy:hover { background: rgba(255,255,255,0.95); }
+  .link-hint { font-size:12px; color: var(--ink-faint); margin-bottom:24px; }
+  .nav-buttons { display:flex; gap:10px; margin-top:8px; }
+  .nav-buttons .btn-secondary { width:auto; flex:0 0 auto; padding: 11px 18px; }
+  .nav-buttons .btn-primary { flex:1; }
+  .skip-link { text-align:center; margin-top:14px; font-size:13px; color: var(--ink-mute); }
+  .skip-link a { font-weight:500; }
+  @media (max-width: 540px) {
+    .invite-row { grid-template-columns: 1fr; gap:8px; }
+    .remove-btn { justify-self:start; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="/">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12a4 4 0 0 1 0 8H8"/><path d="M4 12h10"/></svg>
+      </span>
+      Mint Ledger
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/product">Product</a>
+      <a href="/integrations">Integrations</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/changelog">Changelog</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-ghost" href="login.html">Sign in</a>
+      <a class="btn btn-primary" style="width:auto;padding:9px 16px;" href="signup.html">Start free</a>
+    </div>
+  </div>
+</header>
+
+<main class="auth-shell">
+  <div class="glass-card invite-card">
+    <div class="step-label">Step 2 of 4</div>
+    <div class="steps" aria-label="Onboarding progress">
+      <span class="step-dot done" aria-label="Workspace created"></span>
+      <span class="step-dot active" aria-label="Invite teammates, current step"></span>
+      <span class="step-dot" aria-label="Connect bank"></span>
+      <span class="step-dot" aria-label="Import ledger"></span>
+    </div>
+
+    <h1 class="glass-card__title">Bring your team along</h1>
+    <p class="glass-card__subtitle">Mint Ledger works best when your bookkeeper, ops lead, and approvers are in the same workspace. Add them now — you can always invite more later.</p>
+
+    <form>
+      <div class="invite-row">
+        <input class="input" type="email" placeholder="alex@acme.com" value="sasha@acme.com" aria-label="Teammate email 1">
+        <select class="input role-select" aria-label="Role 1">
+          <option>Admin</option>
+          <option selected>Bookkeeper</option>
+          <option>Approver</option>
+          <option>Viewer</option>
+        </select>
+        <button type="button" class="remove-btn" aria-label="Remove row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div class="invite-row">
+        <input class="input" type="email" placeholder="jordan@acme.com" aria-label="Teammate email 2">
+        <select class="input role-select" aria-label="Role 2">
+          <option>Admin</option>
+          <option>Bookkeeper</option>
+          <option selected>Approver</option>
+          <option>Viewer</option>
+        </select>
+        <button type="button" class="remove-btn" aria-label="Remove row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div class="invite-row">
+        <input class="input" type="email" placeholder="name@company.com" aria-label="Teammate email 3">
+        <select class="input role-select" aria-label="Role 3">
+          <option>Admin</option>
+          <option>Bookkeeper</option>
+          <option>Approver</option>
+          <option selected>Viewer</option>
+        </select>
+        <button type="button" class="remove-btn" aria-label="Remove row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <button type="button" class="add-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        Add another teammate
+      </button>
+
+      <div class="role-legend">
+        <p><strong>Admin</strong> — full access, billing, can connect banks &amp; remove members.</p>
+        <p><strong>Bookkeeper</strong> — posts entries, categorises, runs reconciliation.</p>
+        <p><strong>Approver</strong> — reviews and signs off on AP runs and journal entries.</p>
+        <p><strong>Viewer</strong> — read-only access to reports and the ledger.</p>
+      </div>
+
+      <div class="divider">or share an invite link</div>
+
+      <div class="link-share">
+        <input class="input" type="text" readonly value="https://app.mintledger.com/join/acme-q4j2x" aria-label="Invite link">
+        <button type="button" class="link-copy">Copy</button>
+      </div>
+      <p class="link-hint">Anyone with this link can request to join Acme Co. as a Viewer. Expires in 7 days.</p>
+
+      <div class="nav-buttons">
+        <a href="onboarding-step-1.html" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">Send invites &amp; continue</button>
+      </div>
+
+      <p class="skip-link"><a href="onboarding-step-3.html">Skip for now — I'll invite the team later</a></p>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <a class="brand" href="/">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12a4 4 0 0 1 0 8H8"/><path d="M4 12h10"/></svg>
+        </span>
+        Mint Ledger
+      </a>
+      <p>Close the books before lunch. Mint Ledger automates AP, AR, and reconciliation so small teams can stop chasing receipts.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="/product/ap">Accounts payable</a></li>
+        <li><a href="/product/ar">Accounts receivable</a></li>
+        <li><a href="/product/reconcile">Reconciliation</a></li>
+        <li><a href="/integrations">Integrations</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="/docs">Documentation</a></li>
+        <li><a href="/guides">SMB finance guides</a></li>
+        <li><a href="/changelog">Changelog</a></li>
+        <li><a href="/status">System status</a></li>
+        <li><a href="/support">Help center</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="/about">About</a></li>
+        <li><a href="/customers">Customers</a></li>
+        <li><a href="/security">Security &amp; SOC 2</a></li>
+        <li><a href="/careers">Careers</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="site-footer__base">
+    <span>© 2025 Mint Ledger, Inc. Made for small teams in Brooklyn &amp; Lisbon.</span>
+    <span>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/dpa">DPA</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

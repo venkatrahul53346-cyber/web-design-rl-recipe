@@ -1,0 +1,35 @@
+# Step 3: cross-model ladder. 3 models × 10 calibration tasks = 30 trials.
+# Verifies the grader can rank models that are expected to differ in capability.
+#
+# Run with the Vertex-env-isolation idiom (see CLAUDE.md):
+#   env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
+#     ANTHROPIC_API_KEY="$(tr -d '\n\r' < ~/.trial-anthropic-key)" \
+#     harbor run -c configs/calibration_models.yaml -y \
+#     --ae ANTHROPIC_API_KEY="$(tr -d '\n\r' < ~/.trial-anthropic-key)"
+
+job_name: calib-models-v3
+jobs_dir: jobs
+n_attempts: 1
+timeout_multiplier: 1.0
+
+orchestrator:
+  type: local
+  # 30 concurrent trials. Modal handles the parallelism; the bottleneck is
+  # Anthropic API rate limits, which usually allow this comfortably.
+  n_concurrent_trials: 15
+  quiet: false
+
+environment:
+  type: modal
+  delete: true
+
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-haiku-4-5
+  - name: claude-code
+    model_name: anthropic/claude-sonnet-4-6
+  - name: claude-code
+    model_name: anthropic/claude-opus-4-7
+
+datasets:
+  - path: datasets/calibration

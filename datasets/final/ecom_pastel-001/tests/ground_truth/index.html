@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wren &amp; Bell — Knitwear from Naples</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* Index-only compositions. Hairline, no shadows, no radii. */
+  .editorial-split {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 80px;
+    align-items: end;
+  }
+  @media (max-width: 900px) {
+    .editorial-split { grid-template-columns: 1fr; gap: 40px; }
+  }
+  .editorial-split__media {
+    aspect-ratio: 4 / 5;
+    background: var(--bg-deep);
+    border: 1px solid var(--rule-soft);
+    overflow: hidden;
+  }
+  .editorial-split__media img { width: 100%; height: 100%; object-fit: cover; }
+  .editorial-split__text { padding-bottom: 32px; max-width: 460px; }
+  .editorial-split__text h2 { margin: 14px 0 22px; }
+  .editorial-split__text p + p { margin-top: 16px; }
+  .editorial-split__text .btn--link { margin-top: 32px; }
+
+  /* Numbered manifest */
+  .manifest {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (max-width: 800px) { .manifest { grid-template-columns: 1fr; } }
+  .manifest__item {
+    padding: 44px 36px 48px;
+    border-right: 1px solid var(--rule-soft);
+  }
+  .manifest__item:last-child { border-right: 0; }
+  @media (max-width: 800px) {
+    .manifest__item { border-right: 0; border-bottom: 1px solid var(--rule-soft); }
+    .manifest__item:last-child { border-bottom: 0; }
+  }
+  .manifest__num {
+    font-size: 13px; font-weight: 500; letter-spacing: 0.14em;
+    color: var(--ink-mute); margin-bottom: 28px;
+  }
+  .manifest__item h3 { font-size: 22px; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .manifest__item p { font-size: 14px; }
+
+  /* Featured pair: asymmetric, edge-bleed on left */
+  .featured-pair {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 48px;
+    align-items: stretch;
+  }
+  @media (max-width: 900px) { .featured-pair { grid-template-columns: 1fr; } }
+  .featured-pair__lead {
+    aspect-ratio: 4 / 5;
+    background: var(--bg-deep);
+    border: 1px solid var(--rule-soft);
+    overflow: hidden;
+  }
+  .featured-pair__lead img { width: 100%; height: 100%; object-fit: cover; }
+  .featured-pair__stack { display: flex; flex-direction: column; justify-content: space-between; gap: 32px; }
+  .featured-pair__caption {
+    padding-top: 6px;
+  }
+  .featured-pair__caption h3 { font-size: 16px; font-weight: 500; }
+  .featured-pair__caption .price { color: var(--ink); font-variant-numeric: tabular-nums; font-size: 14px; }
+  .featured-pair__meta-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .featured-pair__small {
+    aspect-ratio: 4 / 5;
+    background: var(--bg-deep);
+    border: 1px solid var(--rule-soft);
+    overflow: hidden;
+  }
+  .featured-pair__small img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* Drop schedule — quiet calendar */
+  .schedule {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .schedule { grid-template-columns: 1fr; gap: 32px; } }
+  .schedule h2 { max-width: 12ch; }
+  .schedule__list { display: flex; flex-direction: column; }
+  .schedule__row {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    gap: 32px;
+    padding: 22px 0;
+    border-top: 1px solid var(--rule-soft);
+    align-items: baseline;
+  }
+  .schedule__row:last-child { border-bottom: 1px solid var(--rule-soft); }
+  .schedule__season { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500; }
+  .schedule__pieces { font-size: 15px; color: var(--ink); }
+  .schedule__pieces em { font-style: italic; color: var(--ink-mute); font-weight: 300; display: block; margin-top: 2px; font-size: 13px; }
+  .schedule__status { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
+  .schedule__status.is-soon { color: var(--accent-deep); }
+  .schedule__status.is-closed { color: var(--ink-mute); }
+
+  /* Letter from the workshop */
+  .letter {
+    background: var(--bg-alt);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .letter__inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 96px var(--gutter) 100px;
+    text-align: left;
+  }
+  .letter__body { font-size: 18px; line-height: 1.7; color: var(--ink-soft); font-weight: 300; }
+  .letter__body p + p { margin-top: 22px; }
+  .letter__sign {
+    margin-top: 36px;
+    font-style: italic;
+    color: var(--ink-mute);
+    font-weight: 300;
+  }
+
+  /* Hero text colour override note: hero CSS already inverts. */
+  .hero__inner h1 { max-width: 12ch; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__announce">Free shipping in the EU &amp; UK. <em>Spring drop — limited to 240 pieces per style.</em></div>
+  <div class="site-header__inner">
+    <nav class="site-nav" aria-label="primary">
+      <a href="collection.html">Shop</a>
+      <a href="journal.html">Journal</a>
+      <a href="about.html">The Workshop</a>
+    </nav>
+    <a class="site-logo" href="index.html">Wren &amp; Bell <span>·</span></a>
+    <div class="site-utils">
+      <a href="#">Search</a>
+      <a href="#">Account</a>
+      <a href="cart.html">Bag<span class="cart-count">(0)</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO: full-bleed photo, bottom-left text -->
+  <section class="section section--hero">
+    <div class="hero">
+      <img class="hero__image" src="rick.jpg" alt="Cashmere knitwear photographed in Naples" />
+      <div class="hero__content">
+        <div class="hero__inner">
+          <div class="eyebrow">Spring 2025 — Drop 01</div>
+          <h1>Knitwear, in season again.</h1>
+          <p>Four pieces, knit in Naples on machines that haven't changed since 1986. In cashmere and merino, and nothing else.</p>
+          <a class="btn" href="collection.html">See the drop</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDITORIAL SPLIT: object portrait + thesis text -->
+  <section class="section section--loose">
+    <div class="wrap">
+      <div class="editorial-split">
+        <div class="editorial-split__media">
+          <img src="rick.jpg" alt="The Cammino crewneck in oat" />
+        </div>
+        <div class="editorial-split__text">
+          <div class="eyebrow">No. 01 — The Cammino Crewneck</div>
+          <h2>A crewneck that took us nine months and three trips to Biella.</h2>
+          <p>We rejected six yarns before settling on a 4-ply Mongolian cashmere spun in Piedmont — heavier than the industry standard, finished with steam rather than chemical washing.</p>
+          <p class="serif-note">It softens with wear. It does not pill in the first month, because we do not cheat the gauge.</p>
+          <a class="btn--link" href="collection.html">Read the construction notes →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFEST: three numbered principles, hairline divided -->
+  <section class="section section--tight">
+    <div class="wrap-tight">
+      <div class="manifest">
+        <div class="manifest__item">
+          <div class="manifest__num">01 / Place</div>
+          <h3>Knit in Naples, by hand-fed machine.</h3>
+          <p>Our workshop sits above a courtyard in the Sanità. Six Stoll machines, two finishers, one linker. No middlemen, no white-label factory.</p>
+        </div>
+        <div class="manifest__item">
+          <div class="manifest__num">02 / Pace</div>
+          <h3>Four releases a year. No restocks.</h3>
+          <p>When a colour sells out, it is out. We would rather close a style than rush a re-run on the wrong yarn lot.</p>
+        </div>
+        <div class="manifest__item">
+          <div class="manifest__num">03 / Repair</div>
+          <h3>Mended, free, for five years.</h3>
+          <p>Send us a hole or a snagged sleeve and we will fix it on the original linker — invisibly, and without charging you for it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED PAIR: asymmetric duo with meta -->
+  <section class="section">
+    <div class="wrap">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 36px;">
+        <div>
+          <div class="eyebrow" style="margin-bottom:10px;">In the drop</div>
+          <h2 style="max-width: 18ch;">Two of the four pieces, photographed in March.</h2>
+        </div>
+        <a class="btn--link" href="collection.html">All four →</a>
+      </div>
+      <div class="featured-pair">
+        <div>
+          <div class="featured-pair__lead">
+            <img src="rick.jpg" alt="The Alta cardigan in sand" />
+          </div>
+          <div class="featured-pair__caption">
+            <div class="featured-pair__meta-row">
+              <h3>The Alta Cardigan</h3>
+              <span class="price">€ 485</span>
+            </div>
+            <p class="serif-note">3-ply cashmere · sand, ash, rose · sizes 0–4</p>
+          </div>
+        </div>
+        <div class="featured-pair__stack">
+          <div>
+            <div class="featured-pair__small">
+              <img src="rick.jpg" alt="The Vela polo in merino" />
+            </div>
+            <div class="featured-pair__caption">
+              <div class="featured-pair__meta-row">
+                <h3>The Vela Polo</h3>
+                <span class="price">€ 220</span>
+              </div>
+              <p class="serif-note">Fine-gauge merino · sky, oat, ink</p>
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--rule-soft); padding-top: 24px;">
+            <div class="eyebrow" style="margin-bottom: 10px;">Next on the rail</div>
+            <p style="font-size: 14px;">The Cammino crewneck and the Porto roll-neck arrive Thursday, 3 April, at 10:00 CET. The previous drop is now archive.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE: drop calendar, quiet -->
+  <section class="section">
+    <div class="wrap-tight">
+      <div class="schedule">
+        <div>
+          <div class="eyebrow" style="margin-bottom: 14px;">The Year, Knit</div>
+          <h2>Our calendar, in full.</h2>
+        </div>
+        <div class="schedule__list">
+          <div class="schedule__row">
+            <span class="schedule__season">Spring 25</span>
+            <span class="schedule__pieces">Cammino crewneck · Vela polo · Alta cardigan · Porto roll-neck<em>240 pieces per style · 3 April, 10:00 CET</em></span>
+            <span class="schedule__status is-soon">Opens Thursday</span>
+          </div>
+          <div class="schedule__row">
+            <span class="schedule__season">Summer 25</span>
+            <span class="schedule__pieces">Linen-merino tee · open-knit camp shirt<em>Late June</em></span>
+            <span class="schedule__status">Announced</span>
+          </div>
+          <div class="schedule__row">
+            <span class="schedule__season">Autumn 25</span>
+            <span class="schedule__pieces">Heavy cashmere shawl-collar · ribbed beanie<em>Mid-October</em></span>
+            <span class="schedule__status">Announced</span>
+          </div>
+          <div class="schedule__row">
+            <span class="schedule__season">Winter 24</span>
+            <span class="schedule__pieces">Ravello turtleneck · Faro pullover · Liso scarf<em>Closed February</em></span>
+            <span class="schedule__status is-closed">Sold out</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LETTER FROM THE WORKSHOP -->
+  <section class="letter">
+    <div class="letter__inner">
+      <div class="eyebrow" style="margin-bottom: 28px;">A note from the workshop</div>
+      <div class="letter__body">
+        <p>We started Wren &amp; Bell because the knitwear we wanted no longer existed at a price a person could justify. Not the cashmere of the eighties — the kind that holds its shape after a decade — but the version of it being sold today, thinned and rushed and finished by a machine that doesn't know the yarn.</p>
+        <p>So we found Luigi, who has run the same six knitting frames for thirty-eight years, and we agreed to make four pieces. Then four more. Then four more.</p>
+        <p>If you only ever buy one of our sweaters, we will have done our job.</p>
+      </div>
+      <div class="letter__sign">— Greta &amp; Tomas, founders</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>Wren &amp; Bell</h3>
+        <p>Knitwear made in Naples on machines from the eighties. Four pieces a year, in cashmere and merino — nothing more.</p>
+        <form class="newsletter" onsubmit="event.preventDefault()">
+          <input type="email" placeholder="Your email" aria-label="Email address" />
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+      <div class="footer-col">
+        <h4>SHOP</h4>
+        <ul>
+          <li><a href="collection.html">All knitwear</a></li>
+          <li><a href="collection.html">Cashmere</a></li>
+          <li><a href="collection.html">Merino</a></li>
+          <li><a href="collection.html">Spring '25</a></li>
+          <li><a href="collection.html">Archive</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>HOUSE</h4>
+        <ul>
+          <li><a href="about.html">The Workshop</a></li>
+          <li><a href="journal.html">Journal</a></li>
+          <li><a href="about.html#materials">Materials</a></li>
+          <li><a href="about.html#care">Care &amp; Repair</a></li>
+          <li><a href="about.html#stockists">Stockists</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>SUPPORT</h4>
+        <ul>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Wholesale</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-base">
+      <div>© Wren &amp; Bell s.r.l. — Vico Lungo Gelso 41, Napoli</div>
+      <ul>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Instagram</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

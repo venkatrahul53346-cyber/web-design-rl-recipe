@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pliny — An AI second pair of eyes for your code</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific only */
+  .hero-stack { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 36px; }
+  .hero-stack .lede { text-align: center; margin: 0 auto; }
+  .hero-meta { display: flex; gap: 28px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .hero-meta span { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.06em; text-transform: uppercase; }
+  .hero-meta .sep { color: var(--rule-strong); }
+
+  /* Floating PR card mock that replaces the product image */
+  .stage-mock {
+    position: relative;
+    width: min(960px, 86%);
+    margin: 24px auto 0;
+    border: 1px solid var(--rule);
+    background: var(--bg-elev);
+  }
+  .stage-mock .bar {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 20px; border-bottom: 1px solid var(--rule);
+    font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.06em;
+  }
+  .stage-mock .bar .light { width: 8px; height: 8px; background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+  .stage-mock .bar .path { color: var(--ink-dim); }
+  .stage-mock .bar .path em { font-style: normal; color: var(--ink); }
+  .stage-mock .body-grid { display: grid; grid-template-columns: 56px 1fr; font-family: var(--mono); font-size: 12.5px; line-height: 1.7; }
+  .stage-mock .gutter { background: #080808; color: var(--ink-faint); text-align: right; padding: 18px 12px; border-right: 1px solid var(--rule); user-select: none; }
+  .stage-mock .code { padding: 18px 22px; color: var(--ink); white-space: pre; overflow-x: auto; }
+  .stage-mock .code .k { color: #c084fc; }
+  .stage-mock .code .s { color: #86efac; }
+  .stage-mock .code .c { color: var(--ink-faint); }
+  .stage-mock .annot {
+    border-top: 1px solid var(--rule);
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 18px;
+    align-items: center;
+  }
+  .stage-mock .annot .tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); padding: 4px 8px; }
+  .stage-mock .annot p { font-size: 13.5px; color: var(--ink); line-height: 1.5; }
+  .stage-mock .annot p em { font-style: normal; color: var(--ink-dim); }
+  .stage-mock .annot .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+
+  /* Floor glow under mock */
+  .stage-wrap { position: relative; isolation: isolate; }
+  .stage-wrap::before {
+    content: ''; position: absolute; left: 50%; bottom: -40px;
+    width: 56%; height: 180px;
+    background: radial-gradient(ellipse at center, var(--accent-glow), transparent 65%);
+    transform: translateX(-50%); filter: blur(40px); z-index: -1; opacity: 0.6;
+  }
+
+  /* Logo strip */
+  .trust-strip { display: flex; justify-content: space-between; align-items: center; gap: 40px; flex-wrap: wrap; }
+  .trust-strip .label-mono { flex-shrink: 0; }
+  .trust-strip .logos { display: flex; gap: 56px; flex-wrap: wrap; align-items: center; }
+  .trust-strip .logos span { font-family: var(--display); font-variation-settings: 'wght' 500; font-size: 18px; letter-spacing: -0.02em; color: var(--ink-dim); }
+
+  /* The Three-Pass section — asymmetric */
+  .triptych { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .triptych > article { padding: 56px 40px 64px; border-right: 1px solid var(--rule); position: relative; }
+  .triptych > article:last-child { border-right: 0; }
+  .triptych .num { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.1em; }
+  .triptych h3 { font-size: clamp(28px, 3vw, 40px); line-height: 1.02; letter-spacing: -0.035em; margin: 28px 0 18px; }
+  .triptych p { color: var(--ink-dim); font-size: 14.5px; line-height: 1.6; max-width: 36ch; }
+  .triptych .tick { margin-top: 36px; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); border-top: 1px solid var(--rule); padding-top: 16px; }
+  @media (max-width: 900px) {
+    .triptych { grid-template-columns: 1fr; }
+    .triptych > article { border-right: 0; border-bottom: 1px solid var(--rule); }
+    .triptych > article:last-child { border-bottom: 0; }
+  }
+
+  /* Beat overrides */
+  .beat-block { padding: 56px 0; }
+  .beat .beat-copy h2 em { color: var(--ink-dim); }
+  .beat-media .demo {
+    border: 1px solid var(--rule);
+    background: var(--bg-elev);
+    padding: 24px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--ink);
+    min-height: 360px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .demo .row { display: grid; grid-template-columns: 18px 1fr; gap: 10px; }
+  .demo .row .mark { color: var(--accent); }
+  .demo .row .mark.ok { color: #86efac; }
+  .demo .row .mark.dim { color: var(--ink-faint); }
+  .demo .row p { color: var(--ink); }
+  .demo .row p em { font-style: normal; color: var(--ink-dim); }
+  .demo .head { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 0.08em; color: var(--ink-faint); text-transform: uppercase; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+  .demo .diff { font-family: var(--mono); font-size: 12px; line-height: 1.7; }
+  .demo .diff .add { color: #86efac; }
+  .demo .diff .del { color: #fca5a5; }
+  .demo .diff .ctx { color: var(--ink-dim); }
+  .demo .verdict { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); }
+  .demo .verdict .ok { color: #86efac; }
+  .demo .verdict .warn { color: var(--accent); }
+
+  @media (max-width: 820px) {
+    .beat { grid-template-columns: 1fr; gap: 48px; }
+    .beat.beat-reverse > :first-child { order: 0; }
+  }
+
+  /* Voices — quote block, no card */
+  .voices { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--rule); }
+  .voices blockquote { padding: 56px 56px 56px 0; border-right: 1px solid var(--rule); }
+  .voices blockquote:nth-child(even) { padding-left: 56px; padding-right: 0; border-right: 0; }
+  .voices blockquote p { font-family: var(--display); font-variation-settings: 'wght' 460; font-size: clamp(22px, 2.3vw, 30px); line-height: 1.15; letter-spacing: -0.025em; color: var(--ink); }
+  .voices blockquote p em { font-style: normal; color: var(--ink-dim); font-variation-settings: 'wght' 300, 'slnt' -6; }
+  .voices footer { margin-top: 28px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+  .voices footer strong { color: var(--ink); font-weight: 500; }
+  @media (max-width: 820px) {
+    .voices { grid-template-columns: 1fr; }
+    .voices blockquote { padding: 48px 0 !important; border-right: 0; border-bottom: 1px solid var(--rule); }
+    .voices blockquote:last-child { border-bottom: 0; }
+  }
+
+  /* Numbers strip */
+  .numbers { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .numbers > div { padding: 48px 32px; border-right: 1px solid var(--rule); }
+  .numbers > div:last-child { border-right: 0; }
+  .numbers .n { font-family: var(--display); font-variation-settings: 'wght' 460; font-size: clamp(40px, 4.4vw, 64px); letter-spacing: -0.04em; line-height: 1; font-feature-settings: 'tnum'; }
+  .numbers .l { margin-top: 16px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+  @media (max-width: 820px) {
+    .numbers { grid-template-columns: 1fr 1fr; }
+    .numbers > div:nth-child(2n) { border-right: 0; }
+    .numbers > div:nth-child(1), .numbers > div:nth-child(2) { border-bottom: 1px solid var(--rule); }
+  }
+
+  /* Closing CTA — page is the call to action */
+  .closer { text-align: center; }
+  .closer .display-l em { display: block; }
+  .closer .cta-row { margin-top: 56px; display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+  .closer .fine { margin-top: 28px; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.06em; }
+
+  /* Active nav state */
+  .site-header nav a[href="index.html"] { color: var(--ink); position: relative; }
+  .site-header nav a[href="index.html"]::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -6px;
+    height: 1px; background: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="index.html">
+    <span>Pliny</span><span class="dot" aria-hidden="true"></span>
+  </a>
+  <nav aria-label="Primary">
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="story.html">Story</a></li>
+      <li><a href="specs.html">Specs</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="press.html">Press</a></li>
+    </ul>
+  </nav>
+  <div class="end">
+    <span class="accent-dot" aria-hidden="true"></span>
+    <a href="preorder.html">Reserve&nbsp;→</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="s-hero">
+    <div class="wrap">
+      <div class="hero-stack">
+        <span class="eyebrow"><span class="dot"></span>Pliny v0.9.3 — Now in private beta</span>
+        <h1 class="display display-xl">A second pair<br>of <em>eyes</em> on every<br>pull&nbsp;request.</h1>
+        <p class="lede">Pliny reads your PR the moment it opens — traces the change through the rest of the codebase, flags the regression you didn't see, and leaves concrete, line-level suggestions before your team finishes lunch.</p>
+        <div class="hero-meta">
+          <span>Trained on your repo</span>
+          <span class="sep">/</span>
+          <span>GitHub · GitLab · Bitbucket</span>
+          <span class="sep">/</span>
+          <span>SOC&nbsp;2 Type&nbsp;II</span>
+        </div>
+        <a class="btn btn-primary btn-xl" href="preorder.html">Reserve a seat <span class="arrow">→</span></a>
+      </div>
+
+      <div class="stage-wrap">
+        <div class="stage-mock" role="img" aria-label="Example pull request review by Pliny">
+          <div class="bar">
+            <span class="light" aria-hidden="true"></span>
+            <span class="path">acme/payments <em>· PR #4127</em> — refactor: idempotency on charge retry</span>
+          </div>
+          <div class="body-grid">
+            <pre class="gutter">218
+219
+220
+221
+222
+223</pre>
+<pre class="code"><span class="k">async function</span> chargeCustomer(invoiceId) {
+  <span class="k">const</span> invoice = <span class="k">await</span> db.invoices.find(invoiceId);
+  <span class="k">if</span> (invoice.status === <span class="s">'paid'</span>) <span class="k">return</span> invoice;
+  <span class="c">// retry without idempotency key</span>
+  <span class="k">return</span> stripe.charges.create({ amount: invoice.total, customer: invoice.customer });
+}</pre>
+          </div>
+          <div class="annot">
+            <span class="tag">Regression</span>
+            <p>Removing the idempotency key on line 222 will <em>double-charge customers</em> when the retry job fires twice within the 24h window — same failure mode you patched in PR #3801.</p>
+            <span class="meta">pliny · 0.41s</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <section class="s-short">
+    <div class="wrap">
+      <div class="rule"></div>
+      <div class="trust-strip" style="padding: 36px 0;">
+        <span class="label-mono">REVIEWING CODE AT —</span>
+        <div class="logos">
+          <span>Linear</span>
+          <span>Ramp</span>
+          <span>Cursor</span>
+          <span>Replicate</span>
+          <span>Modal</span>
+          <span>Warp</span>
+        </div>
+      </div>
+      <div class="rule"></div>
+    </div>
+  </section>
+
+  <!-- THREE PASS (asymmetric triptych) -->
+  <section class="s-tall">
+    <div class="wrap">
+      <div style="max-width: 720px; margin-bottom: 96px;">
+        <span class="eyebrow" style="display:block; margin-bottom: 28px;"><span class="dot"></span>How Pliny reviews</span>
+        <h2 class="display display-m">Three passes <em>before</em> a human ever opens the diff.</h2>
+      </div>
+
+      <div class="triptych">
+        <article>
+          <span class="num">— 01</span>
+          <h3>Read the repo,<br>not just the diff.</h3>
+          <p>Pliny indexes your full tree, your migrations, your prior PRs and your incident write-ups. Every comment is grounded in the conventions you've already agreed on — not generic textbook advice.</p>
+          <div class="tick">CONTEXT WINDOW · 4.2M TOKENS</div>
+        </article>
+        <article>
+          <span class="num">— 02</span>
+          <h3>Trace the change<br>across boundaries.</h3>
+          <p>It follows the call graph: API → service → worker → schema. If a rename leaks into a Kafka topic name or breaks a frozen contract test, Pliny will say so before CI does.</p>
+          <div class="tick">AVG. SYMBOLS WALKED · 3,180</div>
+        </article>
+        <article>
+          <span class="num">— 03</span>
+          <h3>File concrete,<br>line-level fixes.</h3>
+          <p>No "consider refactoring." Pliny leaves a suggested patch you can click to commit — with a short rationale and a link to the prior PR or runbook that informed it.</p>
+          <div class="tick">SUGGESTIONS ACCEPTED · 71%</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEAT 1 — image-left -->
+  <section class="s-mid">
+    <div class="wrap">
+      <div class="beat">
+        <div class="beat-media">
+          <div class="demo">
+            <div class="head"><span>PR #4127 · /payments/charges.ts</span><span>3 findings</span></div>
+            <div class="row"><span class="mark">●</span><p><strong>Idempotency removed.</strong> <em>Will reintroduce the double-charge from incident IR-118.</em></p></div>
+            <div class="row"><span class="mark">●</span><p><strong>Untyped error path.</strong> <em>StripeError isn't caught; bubbles to BullMQ retry — fee on every retry.</em></p></div>
+            <div class="row"><span class="mark ok">○</span><p><strong>Test coverage holds.</strong> <em>retry.spec.ts asserts the previous behavior — update or delete?</em></p></div>
+            <div class="row"><span class="mark dim">○</span><p><strong>Style.</strong> <em>Prefer `chargeAttempt` over `chargeCustomer` per CONTRIBUTING.md §4.</em></p></div>
+            <div class="verdict"><span>VERDICT</span><span class="warn">REQUEST CHANGES · 2 BLOCKING</span></div>
+          </div>
+        </div>
+        <div class="beat-copy">
+          <span class="eyebrow"><span class="dot"></span>The review</span>
+          <h2 class="display">It catches the <em>regression</em>, not the typo.</h2>
+          <p class="body body-dim" style="margin-top: 20px;">Linters find unused imports. Pliny finds the bug you shipped six months ago that's about to ship again. Each finding is ranked by blast radius and tied back to the exact prior incident, migration, or contract test that informs it.</p>
+          <p class="body body-dim" style="margin-top: 16px;">When Pliny isn't sure, it says so. When it is, it commits a suggested patch.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEAT 2 — image-right, reversed -->
+  <section class="s-mid" style="border-top: 1px solid var(--rule);">
+    <div class="wrap">
+      <div class="beat beat-reverse">
+        <div class="beat-media">
+          <div class="demo">
+            <div class="head"><span>SUGGESTED PATCH · charges.ts</span><span>1-CLICK COMMIT</span></div>
+<pre class="diff"><span class="ctx">  async function chargeCustomer(invoiceId, <span class="add">idempotencyKey</span>) {</span>
+<span class="ctx">    const invoice = await db.invoices.find(invoiceId);</span>
+<span class="ctx">    if (invoice.status === 'paid') return invoice;</span>
+<span class="del">-   return stripe.charges.create({</span>
+<span class="del">-     amount: invoice.total,</span>
+<span class="del">-     customer: invoice.customer</span>
+<span class="del">-   });</span>
+<span class="add">+   return stripe.charges.create(</span>
+<span class="add">+     { amount: invoice.total, customer: invoice.customer },</span>
+<span class="add">+     { idempotencyKey }</span>
+<span class="add">+   );</span>
+<span class="ctx">  }</span></pre>
+            <div class="verdict"><span>RATIONALE · MATCHES PATTERN IN /billing/refund.ts:88</span><span class="ok">APPLY ✓</span></div>
+          </div>
+        </div>
+        <div class="beat-copy">
+          <span class="eyebrow"><span class="dot"></span>The fix</span>
+          <h2 class="display">A patch, <em>not</em> a paragraph.</h2>
+          <p class="body body-dim" style="margin-top: 20px;">Every suggestion ships as a committable diff. Pliny matches the style of the file it's editing — your indent width, your error conventions, your naming. Hit apply, it lands. Reject it, Pliny remembers and stops suggesting that pattern.</p>
+          <p class="body body-dim" style="margin-top: 16px;">Reviews finish in minutes. The PR description stays clean of bot-noise.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NUMBERS -->
+  <section class="s-short">
+    <div class="wrap">
+      <div class="numbers">
+        <div>
+          <div class="n">41,208</div>
+          <div class="l">PRs reviewed today</div>
+        </div>
+        <div>
+          <div class="n">71%</div>
+          <div class="l">Suggestions accepted</div>
+        </div>
+        <div>
+          <div class="n">0.41s</div>
+          <div class="l">Median time to first comment</div>
+        </div>
+        <div>
+          <div class="n">3.2×</div>
+          <div class="l">Faster merge, measured</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VOICES -->
+  <section class="s-mid">
+    <div class="wrap">
+      <div style="max-width: 640px; margin-bottom: 72px;">
+        <span class="eyebrow" style="display:block; margin-bottom: 24px;"><span class="dot"></span>From the early access</span>
+        <h2 class="display display-s">Engineers who already <em>have</em> taste.</h2>
+      </div>
+      <div class="voices">
+        <blockquote>
+          <p>Pliny caught a race in our cache invalidation that <em>three humans, including me, had already approved.</em> It's not replacing review — it's making review honest.</p>
+          <footer><strong>Maya Okonkwo</strong> · Staff Engineer, Ramp</footer>
+        </blockquote>
+        <blockquote>
+          <p>The thing nobody mentions about AI review tools is that <em>most of them are noise.</em> Pliny is the first one I haven't muted by week two.</p>
+          <footer><strong>Henrik Vasquez</strong> · Eng Lead, Linear</footer>
+        </blockquote>
+        <blockquote>
+          <p>It reads our migrations folder. It knows our naming. It writes review comments that sound like our most pedantic principal engineer — <em>which is a compliment, I think.</em></p>
+          <footer><strong>Priya Anand</strong> · Director of Platform, Modal</footer>
+        </blockquote>
+        <blockquote>
+          <p>We turned off three other bots the day we installed Pliny. Our PR threads are <em>readable again.</em></p>
+          <footer><strong>Jules Bremer</strong> · CTO, Warp</footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSER -->
+  <section class="s-tall closer">
+    <div class="wrap-tight">
+      <span class="eyebrow" style="display:block; margin-bottom: 40px;"><span class="dot"></span>Private beta · seat #1,847 of 2,500</span>
+      <h2 class="display display-l">Give your team<br>a second pair<br>of <em>eyes.</em></h2>
+      <div class="cta-row">
+        <a class="btn btn-primary btn-xl" href="preorder.html">Reserve a seat <span class="arrow">→</span></a>
+        <a class="btn btn-xl" href="specs.html">Read the specs</a>
+      </div>
+      <p class="fine">$40 / engineer / month · cancel any time · no card to reserve</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="footer-top">
+      <div class="mark">Pliny<span class="dot" aria-hidden="true"></span></div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="specs.html">Technical specs</a></li>
+          <li><a href="story.html">The story</a></li>
+          <li><a href="preorder.html">Reserve a seat</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="press.html">Press &amp; media</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">Security &amp; SOC 2</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">Careers — 4 open</a></li>
+          <li><a href="mailto:hello@pliny.dev">hello@pliny.dev</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">Privacy &amp; terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© Pliny Labs, Inc. — Made in Brooklyn &amp; Lisbon</span>
+      <span class="status"><span class="live" aria-hidden="true"></span> All systems nominal · v0.9.3</span>
+      <span>Reviewing 41,208 PRs today</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

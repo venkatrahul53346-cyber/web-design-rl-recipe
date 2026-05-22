@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Menu — Salt &amp; Field</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .menu-intro-grid { display: grid; grid-template-columns: 5fr 7fr; gap: 80px; align-items: end; }
+  @media (max-width: 820px) { .menu-intro-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+  .course-block { padding: 64px 0; border-top: 1px solid var(--rule); }
+  .course-block:first-of-type { border-top: 0; padding-top: 24px; }
+  .course-head { display: grid; grid-template-columns: 5fr 7fr; gap: 56px; margin-bottom: 48px; align-items: baseline; }
+  .course-head .course-num { font-family: var(--serif); font-style: italic; color: var(--accent); font-size: 1.1rem; }
+  .course-head h2 { margin-top: 8px; }
+  .course-head .course-note { font-family: var(--serif); font-style: italic; color: var(--ink-soft); font-size: 1.1rem; line-height: 1.5; }
+  @media (max-width: 820px) { .course-head { grid-template-columns: 1fr; gap: 16px; } }
+
+  .dish-row { display: grid; grid-template-columns: 5fr 7fr; gap: 56px; padding: 28px 0; border-top: 1px solid var(--rule-soft); }
+  .dish-row:first-of-type { border-top: 0; }
+  .dish-name { font-family: var(--serif); font-size: 1.5rem; line-height: 1.15; }
+  .dish-name .amp { font-style: italic; color: var(--accent); }
+  .dish-origin { display: block; font-family: var(--serif); font-style: italic; font-size: 0.95rem; color: var(--ink-mute); margin-top: 6px; }
+  .dish-desc { font-family: var(--serif); font-style: italic; font-size: 1.05rem; line-height: 1.55; color: var(--ink-soft); }
+  .dish-tags { margin-top: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .tag { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-ochre); font-weight: 500; }
+  @media (max-width: 820px) { .dish-row { grid-template-columns: 1fr; gap: 10px; } }
+
+  .figure-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 64px 0; }
+  .figure-strip figure img { aspect-ratio: 1 / 1; object-fit: cover; background: var(--bg-deep); }
+  .figure-strip figcaption { font-family: var(--serif); font-style: italic; font-size: 0.95rem; color: var(--ink-mute); padding-top: 10px; }
+  @media (max-width: 820px) { .figure-strip { grid-template-columns: 1fr; } }
+
+  .price-box { background: var(--bg-warm); border: 1px solid var(--rule); padding: 48px 40px; }
+  .price-box .row { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 0; border-top: 1px solid var(--rule-soft); }
+  .price-box .row:first-child { border-top: 0; }
+  .price-box .row .label { font-family: var(--serif); font-size: 1.2rem; }
+  .price-box .row .price { font-family: var(--serif); font-size: 1.2rem; color: var(--ink-soft); }
+  .price-box .row .sub { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: 0.95rem; }
+
+  .pairings-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 64px; align-items: start; }
+  @media (max-width: 820px) { .pairings-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+  .drink-list { }
+  .drink-row { display: grid; grid-template-columns: 1fr auto; gap: 24px; padding: 18px 0; border-top: 1px solid var(--rule-soft); align-items: baseline; }
+  .drink-row:first-of-type { border-top: 0; }
+  .drink-name { font-family: var(--serif); font-size: 1.15rem; }
+  .drink-note { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: 0.95rem; margin-top: 4px; }
+  .drink-price { font-family: var(--serif); font-size: 1.05rem; color: var(--ink-soft); white-space: nowrap; }
+
+  .footnotes { font-family: var(--serif); font-style: italic; font-size: 1rem; color: var(--ink-soft); line-height: 1.7; max-width: 720px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav" aria-label="Primary">
+    <div class="nav-left">
+      <a href="menu.html" class="nav-link current">Menu</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="location.html" class="nav-link">Location</a>
+      <a href="press.html" class="nav-link">Press</a>
+    </div>
+    <a href="index.html" class="nav-brand">Salt <span class="amp">&amp;</span> Field</a>
+    <div class="nav-right">
+      <span class="nav-meta">Thu&ndash;Sun &middot; 5:30 &amp; 8:00</span>
+      <a href="reservations.html" class="nav-cta">Reserve</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="page-head">
+    <div class="wrap">
+      <div class="menu-intro-grid">
+        <div>
+          <p class="eyebrow eyebrow-accent">The menu &middot; Late autumn</p>
+          <h1 class="display-l">Nine courses, <span class="serif italic">written the morning of.</span></h1>
+        </div>
+        <div>
+          <p class="dek">What follows is the menu we are serving this week. It will change by Thursday next &mdash; perhaps a fish, perhaps the squash that finally turned. We cook what the field gives us, and the field is not in a hurry.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap-narrow">
+
+      <div class="course-block">
+        <div class="course-head">
+          <div>
+            <span class="course-num">i. &mdash; to begin</span>
+            <h2 class="display-m">Snacks from the garden</h2>
+          </div>
+          <p class="course-note">Brought to the table together, eaten with your hands, while the kitchen finishes the bread.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Buckwheat tart, smoked trout roe</div>
+            <span class="dish-origin">trout from McFadden Farm, three miles south</span>
+            <div class="dish-tags"><span class="tag">Field</span></div>
+          </div>
+          <p class="dish-desc">A thin shell of toasted buckwheat, cr&egrave;me fra&icirc;che whipped with horseradish from the back row, and a spoon of orange roe cured in our own salt.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Roasted koshihikari rice, nori, brown butter</div>
+            <span class="dish-origin">rice from Massa Organics, Sacramento Valley</span>
+            <div class="dish-tags"><span class="tag">Vegetarian</span></div>
+          </div>
+          <p class="dish-desc">One perfect mouthful of crisped rice, dusted with seaweed we toast each morning, finished with butter cooked dark in a copper pan.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Chicory leaf, anchovy, lardo</div>
+            <span class="dish-origin">chicories grown in row 14</span>
+          </div>
+          <p class="dish-desc">A single bitter leaf, draped with cured pork fat from the Berkshire we raised last spring, and a half anchovy from the Cantabrian.</p>
+        </div>
+      </div>
+
+      <div class="course-block">
+        <div class="course-head">
+          <div>
+            <span class="course-num">ii. &mdash; from the garden</span>
+            <h2 class="display-m">First courses</h2>
+          </div>
+          <p class="course-note">Cool, raw, and very close to the ground. We pull these things in the hour before service.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Sungold tomato, last of the season</div>
+            <span class="dish-origin">picked Thursday morning, hoop house three</span>
+            <div class="dish-tags"><span class="tag">Vegan</span><span class="tag">Field</span></div>
+          </div>
+          <p class="dish-desc">Halved and dressed only with green olive oil from a friend in Hopland, a few grains of finishing salt, and basil leaves the size of your thumbnail.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Hokkaido squash, hazelnut, brown bread</div>
+            <span class="dish-origin">squash cured six weeks in the barn</span>
+            <div class="dish-tags"><span class="tag">Vegetarian</span></div>
+          </div>
+          <p class="dish-desc">Roasted whole until collapsing, served warm with toasted hazelnuts, crumbs of rye bread, and a spoonful of yogurt from Stornetta dairy.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Hand-cut tagliatelle, walnut, sage brown butter</div>
+            <span class="dish-origin">eggs from our forty-three hens</span>
+          </div>
+          <p class="dish-desc">Pasta rolled to order from flour milled Wednesday in Petaluma, sauced quietly with black walnuts we cracked in October and sage from the herb bed.</p>
+        </div>
+      </div>
+
+      <div class="figure-strip" aria-hidden="true">
+        <figure>
+          <img src="rick.jpg" alt="">
+          <figcaption>The tomato course, plated.</figcaption>
+        </figure>
+        <figure>
+          <img src="rick.jpg" alt="">
+          <figcaption>Pasta, rolled Thursday at four.</figcaption>
+        </figure>
+        <figure>
+          <img src="rick.jpg" alt="">
+          <figcaption>The last hokkaidos, from the barn.</figcaption>
+        </figure>
+      </div>
+
+      <div class="course-block">
+        <div class="course-head">
+          <div>
+            <span class="course-num">iii. &mdash; from the coast</span>
+            <h2 class="display-m">The fish course</h2>
+          </div>
+          <p class="course-note">Whatever Albion landed that morning, cooked simply, with what the garden offered alongside it.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Black cod, fennel pollen, brassica greens</div>
+            <span class="dish-origin">line-caught off Albion, Wednesday evening</span>
+          </div>
+          <p class="dish-desc">Cured in salt for an hour, then cooked skin-down in a single cast pan until the edges crisp. Served on a bed of mustard greens wilted in cod fat.</p>
+        </div>
+      </div>
+
+      <div class="course-block">
+        <div class="course-head">
+          <div>
+            <span class="course-num">iv. &mdash; from the field</span>
+            <h2 class="display-m">Mains</h2>
+          </div>
+          <p class="course-note">A single shared plate, brought to the center of the table. We carve at the pass and serve from a wooden board.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Lamb shoulder, fire-roasted &amp; rested overnight</div>
+            <span class="dish-origin">Stemple Creek Ranch, Marin coast</span>
+            <div class="dish-tags"><span class="tag">Shared</span></div>
+          </div>
+          <p class="dish-desc">Rubbed with crushed coriander and rosemary, cooked over oak embers for nine hours, then rested the full night before being warmed and pulled to the bone.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Heirloom beans <span class="amp">&amp;</span> bitter greens</div>
+            <span class="dish-origin">Rancho Gordo, Napa</span>
+            <div class="dish-tags"><span class="tag">Vegan</span></div>
+          </div>
+          <p class="dish-desc">Yellow eye beans simmered with onion and bay, finished with the last of our escarole, a great deal of black pepper, and a slick of olive oil.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Hearth bread, cultured butter, farm salt</div>
+            <span class="dish-origin">baked in the wood oven at three p.m.</span>
+          </div>
+          <p class="dish-desc">Naturally leavened over four days, baked dark, served warm. Butter churned Wednesday from Stornetta cream. The salt is ours, evaporated in a flat pan on the porch.</p>
+        </div>
+      </div>
+
+      <div class="course-block">
+        <div class="course-head">
+          <div>
+            <span class="course-num">v. &mdash; to end</span>
+            <h2 class="display-m">Dessert &amp; after</h2>
+          </div>
+          <p class="course-note">Two small things, a coffee if you like, and a glass of something amber on the porch.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Quince poached in late-harvest riesling</div>
+            <span class="dish-origin">quince from the old tree by the road</span>
+            <div class="dish-tags"><span class="tag">Vegetarian</span></div>
+          </div>
+          <p class="dish-desc">Cooked slowly until the color of garnet, served warm with a quenelle of cr&egrave;me &eacute;paisse and a brittle of toasted oats.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Buckwheat honey ice cream, sea salt</div>
+            <span class="dish-origin">honey from Bee Hunter Wines &amp; Apiary</span>
+          </div>
+          <p class="dish-desc">Made in the morning, scooped at the table, finished with a turn of black pepper and a few crystals of our coarse finishing salt.</p>
+        </div>
+
+        <div class="dish-row">
+          <div>
+            <div class="dish-name">Petits fours &mdash; three small bites</div>
+            <span class="dish-origin">whatever was beautiful that afternoon</span>
+          </div>
+          <p class="dish-desc">A walnut shortbread, a square of olive oil cake with fig jam, and a single dark chocolate filled with bay leaf cream.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section section-deep">
+    <div class="wrap-narrow">
+      <div class="editorial-grid">
+        <div>
+          <p class="eyebrow eyebrow-accent">The price</p>
+          <h2 class="display-m">One menu, <span class="serif italic">one price.</span></h2>
+          <p class="dek" style="margin-top: 20px;">We serve only the tasting menu. Tax and a twenty percent service charge are included on the final bill &mdash; no tip is expected.</p>
+        </div>
+        <div class="price-box">
+          <div class="row">
+            <span class="label">Tasting menu</span>
+            <span class="price">$185</span>
+          </div>
+          <div class="row">
+            <span class="label">Wine pairing <span class="sub">&mdash; six pours</span></span>
+            <span class="price">$125</span>
+          </div>
+          <div class="row">
+            <span class="label">Non-alcoholic pairing</span>
+            <span class="price">$65</span>
+          </div>
+          <div class="row">
+            <span class="label">Reserve pairing <span class="sub">&mdash; older bottles</span></span>
+            <span class="price">$240</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-loose">
+    <div class="wrap-narrow">
+      <p class="eyebrow eyebrow-accent" style="margin-bottom: 18px;">Drinks</p>
+      <h2 class="display-l" style="margin-bottom: 56px;">A short list, mostly local, <span class="serif italic">always changing.</span></h2>
+
+      <div class="pairings-grid">
+        <div>
+          <h3 class="display-s" style="margin-bottom: 28px;">By the glass</h3>
+          <div class="drink-list">
+            <div class="drink-row">
+              <div>
+                <div class="drink-name">Handley Cellars Brut Ros&eacute;, 2020</div>
+                <div class="drink-note">Anderson Valley &mdash; pinot &amp; chardonnay, four years on lees</div>
+              </div>
+              <span class="drink-price">$22</span>
+            </div>
+            <div class="drink-row">
+              <div>
+                <div class="drink-name">Lichen Estate Pinot Gris, 2022</div>
+                <div class="drink-note">Boonville &mdash; pressed on skins for nine days, amber</div>
+              </div>
+              <span class="drink-price">$18</span>
+            </div>
+            <div class="drink-row">
+              <div>
+                <div class="drink-name">Drew Family Cellars Pinot Noir, 2021</div>
+                <div class="drink-note">Mendocino Ridge &mdash; cool-climate, raised in neutral oak</div>
+              </div>
+              <span class="drink-price">$24</span>
+            </div>
+            <div class="drink-row">
+              <div>
+                <div class="drink-name">Martha Stoumen Nero d&rsquo;Avola, 2022</div>
+                <div class="drink-note">Mendocino &mdash; carbonic, bright, served cool</div>
+              </div>
+              <span class="drink-price">$20</span>
+            </div>
+            <div class="drink-row">
+              <div>
+                <div class="drink-name">Foursight Sauvignon Blanc, 2023</div>
+                <div class="drink-note">Boonville &mdash; no oak, picked early, taut</div>
+              </div>
+              <span class="drink-price">$16</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="display-s" style="margin-bottom: 28px;">Non-alcoholic</h3>
+          <div class="drink-list">
+            <div class="drink-row">
+              <div>
+                <div class="drink-name">Bay laurel &amp; quince shrub</div>
+                <div class="drink-note">our quince, our vinegar, sparkling water</div>
+              </div>
+              <span class="drink-price">$11</span>
+            </div>
+            <div class="drink-row">
+              <div>
+                <div class="drink-name">Toasted barley tea, served warm</div>
+                <div class="drink-note">barley roasted in the wood oven Thursday</div>
+              </div>
+              <span class="drink-price">$8</span>
+            </div>
+            <div class="drink-row">
+              <div>
+                <div class="drink-name">Fennel &amp; meyer lemon soda</div>
+                <div class="drink-note">fennel from row eight, pressed lemon, house bubbles</div>
+              </div>
+              <span class="drink-price">$10</span>
+            </div>
+            <div class="drink-row">
+              <div>
+                <div class="drink-name">Equator coffee, French press</div>
+                <div class="drink-note">single origin, brought to the table after dessert</div>
+              </div>
+              <span class="drink-price">$7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight section-warm">
+    <div class="wrap-narrow">
+      <p class="eyebrow" style="margin-bottom: 20px;">A few notes</p>
+      <div class="footnotes">
+        <p>The menu is set. We are happy to accommodate allergies and intolerances with at least forty-eight hours&rsquo; notice &mdash; please write to us when you reserve. We cannot offer substitutions on the night.</p>
+        <p>We are not able to serve a vegetarian or vegan version of the full menu in the dining room, but we do offer a dedicated plant-based tasting on Sundays with notice. Children twelve and older are welcome.</p>
+        <p>Service runs roughly two and a half hours. The kitchen closes after the eight o&rsquo;clock seating; if you&rsquo;d like to linger on the porch with a glass of something, we&rsquo;d love that.</p>
+      </div>
+      <div style="margin-top: 40px;">
+        <a href="reservations.html" class="btn">Reserve a table</a>
+        <a href="location.html" class="btn-link" style="margin-left: 24px;">Directions &amp; hours</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">Salt <span class="amp">&amp;</span> Field</div>
+        <p class="footer-tag">A forty-seat restaurant on a regenerative farm in the Anderson Valley. Tasting menus only, Thursday through Sunday.</p>
+        <p style="font-size: 0.88rem; line-height: 1.6;">2840 Greenwood Ridge Road<br>Philo, California 95466<br><a href="tel:+17078954400">(707) 895-4400</a></p>
+      </div>
+      <div class="footer-col">
+        <h4>Visit</h4>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="menu.html">Tasting menu</a></li>
+          <li><a href="location.html">Directions</a></li>
+          <li><a href="location.html#hours">Hours</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>The Farm</h4>
+        <ul>
+          <li><a href="about.html">Our story</a></li>
+          <li><a href="about.html#chef">Chef &amp; team</a></li>
+          <li><a href="about.html#farm">Growing practices</a></li>
+          <li><a href="press.html">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Stay close</h4>
+        <ul>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Private events</a></li>
+          <li><a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2024 Salt &amp; Field. All rights reserved.</span>
+      <span class="footer-meta">Grown, cooked, and served in Mendocino County.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

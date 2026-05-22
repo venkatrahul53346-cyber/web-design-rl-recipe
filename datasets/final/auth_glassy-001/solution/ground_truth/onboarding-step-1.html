@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set up your workspace — Mint Ledger</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .onboarding-shell {
+    min-height: calc(100vh - 76px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 56px 24px 80px;
+  }
+  .onboarding-card {
+    width: 100%;
+    max-width: 560px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--glass-shadow);
+    padding: 36px 40px 32px;
+  }
+  .steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(15,23,42,0.12);
+    transition: width 160ms ease, background 160ms ease;
+  }
+  .step-dot.done { background: var(--mint-deep); }
+  .step-dot.active {
+    width: 28px;
+    background: var(--anchor-deep);
+  }
+  .step-label {
+    margin-left: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-mute);
+    letter-spacing: 0.02em;
+  }
+  .onboarding-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--anchor-ink);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+  .onboarding-title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .onboarding-sub {
+    font-size: 14px;
+    color: var(--ink-mute);
+    margin-bottom: 28px;
+    max-width: 440px;
+  }
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .field-grid .field { margin-bottom: 0; }
+  .choice-group {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .choice {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: var(--radius-lg);
+    background: rgba(255,255,255,0.5);
+    border: 1px solid var(--line-strong);
+    cursor: pointer;
+    transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+  }
+  .choice:hover {
+    background: rgba(255,255,255,0.78);
+    border-color: rgba(96,165,250,0.5);
+  }
+  .choice input { position: absolute; opacity: 0; pointer-events: none; }
+  .choice input:checked + .choice-body {
+    color: var(--ink);
+  }
+  .choice:has(input:checked) {
+    border-color: var(--anchor-deep);
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.18);
+  }
+  .choice-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, rgba(96,165,250,0.18), rgba(167,243,208,0.32));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--anchor-ink);
+    flex-shrink: 0;
+  }
+  .choice-icon svg { width: 20px; height: 20px; }
+  .choice-body { flex: 1; }
+  .choice-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .choice-meta {
+    font-size: 12px;
+    color: var(--ink-mute);
+    margin-top: 2px;
+  }
+  .choice-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line-strong);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 120ms ease;
+  }
+  .choice:has(input:checked) .choice-check {
+    background: var(--anchor-deep);
+    border-color: var(--anchor-deep);
+  }
+  .choice-check svg { width: 12px; height: 12px; opacity: 0; }
+  .choice:has(input:checked) .choice-check svg { opacity: 1; }
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0 18px;
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+  .actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 26px;
+  }
+  .actions-row .btn-secondary { width: auto; padding: 11px 18px; }
+  .actions-row .btn-primary { flex: 1; }
+  .micro-foot {
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    text-align: center;
+  }
+  .micro-foot a { font-weight: 500; }
+  @media (max-width: 520px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .onboarding-card { padding: 28px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="/">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12a4 4 0 0 1 0 8H8"/><path d="M4 12h10"/></svg>
+      </span>
+      Mint Ledger
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/product">Product</a>
+      <a href="/integrations">Integrations</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/changelog">Changelog</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-ghost" href="login.html">Sign in</a>
+      <a class="btn btn-primary" style="width:auto;padding:9px 16px;" href="signup.html">Start free</a>
+    </div>
+  </div>
+</header>
+
+<main class="onboarding-shell">
+  <section class="onboarding-card" aria-labelledby="onb-title">
+    <div class="steps" aria-label="Onboarding progress: step 1 of 4">
+      <span class="step-dot active" aria-current="step"></span>
+      <span class="step-dot"></span>
+      <span class="step-dot"></span>
+      <span class="step-dot"></span>
+      <span class="step-label">Step 1 of 4 · About your team</span>
+    </div>
+
+    <div class="onboarding-eyebrow">Welcome to Mint Ledger</div>
+    <h1 id="onb-title" class="onboarding-title">Tell us about your team</h1>
+    <p class="onboarding-sub">A few quick details so we can tailor your ledger, default accounts, and AP/AR workflows. You can change everything later in Settings.</p>
+
+    <form action="onboarding-step-2.html" method="post" novalidate>
+      <div class="field">
+        <label for="company">Company name</label>
+        <input class="input" id="company" name="company" type="text" placeholder="e.g. Loamwell Coffee Co." required>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label for="role">Your role</label>
+          <select class="input" id="role" name="role" required>
+            <option value="" disabled selected>Select a role</option>
+            <option>Founder / CEO</option>
+            <option>Operations lead</option>
+            <option>Finance / Controller</option>
+            <option>Bookkeeper</option>
+            <option>Office manager</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="country">Country of operation</label>
+          <select class="input" id="country" name="country" required>
+            <option value="" disabled selected>Select a country</option>
+            <option>United States</option>
+            <option>Canada</option>
+            <option>United Kingdom</option>
+            <option>Portugal</option>
+            <option>Germany</option>
+            <option>Australia</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="industry">What kind of business is this?</label>
+        <input class="input" id="industry" name="industry" type="text" placeholder="e.g. Specialty coffee roaster, SaaS, design studio">
+        <div class="field-hint">We use this to pre-fill your chart of accounts.</div>
+      </div>
+
+      <div class="field" style="margin-bottom: 18px;">
+        <label style="margin-bottom:10px;">How big is the team that touches finance?</label>
+        <div class="choice-group" role="radiogroup" aria-label="Finance team size">
+          <label class="choice">
+            <input type="radio" name="team_size" value="solo" checked>
+            <span class="choice-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+            </span>
+            <span class="choice-body">
+              <span class="choice-title">Just me</span>
+              <span class="choice-meta">Founder doing the books between everything else</span>
+            </span>
+            <span class="choice-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg>
+            </span>
+          </label>
+
+          <label class="choice">
+            <input type="radio" name="team_size" value="small">
+            <span class="choice-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.6"/><path d="M2 20c1-3.5 4-5 7-5s6 1.5 7 5"/><path d="M16 20c.6-2.4 2.4-3.6 5-3.6"/></svg>
+            </span>
+            <span class="choice-body">
+              <span class="choice-title">2–3 of us</span>
+              <span class="choice-meta">A bookkeeper or ops partner handles part of it</span>
+            </span>
+            <span class="choice-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg>
+            </span>
+          </label>
+
+          <label class="choice">
+            <input type="radio" name="team_size" value="finance">
+            <span class="choice-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l9-6 9 6v11"/><path d="M9 21v-7h6v7"/></svg>
+            </span>
+            <span class="choice-body">
+              <span class="choice-title">A small finance team</span>
+              <span class="choice-meta">4+ people, with roles like AP, AR, controller</span>
+            </span>
+            <span class="choice-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg>
+            </span>
+          </label>
+
+          <label class="choice">
+            <input type="radio" name="team_size" value="firm">
+            <span class="choice-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v13H4z"/><path d="M8 7V4h8v3"/><path d="M4 13h16"/></svg>
+            </span>
+            <span class="choice-body">
+              <span class="choice-title">I run an accounting firm</span>
+              <span class="choice-meta">Managing the books for multiple client entities</span>
+            </span>
+            <span class="choice-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="divider">optional</div>
+
+      <div class="field" style="margin-bottom:0;">
+        <label for="referral">How did you hear about Mint Ledger?</label>
+        <input class="input" id="referral" name="referral" type="text" placeholder="A friend, a podcast, our changelog…">
+      </div>
+
+      <div class="actions-row">
+        <a class="btn btn-secondary" href="/">Save &amp; exit</a>
+        <button class="btn btn-primary" type="submit">
+          Continue
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+
+      <p class="micro-foot">Next up: connect your bank. Takes about 90 seconds. <a href="/security">How we keep this private</a>.</p>
+    </form>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <a class="brand" href="/">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12a4 4 0 0 1 0 8H8"/><path d="M4 12h10"/></svg>
+        </span>
+        Mint Ledger
+      </a>
+      <p>Close the books before lunch. Mint Ledger automates AP, AR, and reconciliation so small teams can stop chasing receipts.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="/product/ap">Accounts payable</a></li>
+        <li><a href="/product/ar">Accounts receivable</a></li>
+        <li><a href="/product/reconcile">Reconciliation</a></li>
+        <li><a href="/integrations">Integrations</a></li>
+        <li><a href="/pricing">Pricing</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="/docs">Documentation</a></li>
+        <li><a href="/guides">SMB finance guides</a></li>
+        <li><a href="/changelog">Changelog</a></li>
+        <li><a href="/status">System status</a></li>
+        <li><a href="/support">Help center</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="/about">About</a></li>
+        <li><a href="/customers">Customers</a></li>
+        <li><a href="/security">Security &amp; SOC 2</a></li>
+        <li><a href="/careers">Careers</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="site-footer__base">
+    <span>© 2025 Mint Ledger, Inc. Made for small teams in Brooklyn &amp; Lisbon.</span>
+    <span>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/dpa">DPA</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Press &amp; Media — Pliny</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific minimal rules */
+  .press-hero { padding: 160px 0 56px; }
+  .press-hero h1 { font-size: clamp(56px, 11vw, 168px); }
+  .press-hero .meta-row { display: flex; gap: 48px; flex-wrap: wrap; margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--rule); }
+  .press-hero .meta-row > div { min-width: 160px; }
+  .press-hero .meta-row .label-mono { display: block; margin-bottom: 8px; }
+  .press-hero .meta-row .val { font-family: var(--display); font-size: 22px; letter-spacing: -0.02em; color: var(--ink); font-feature-settings: 'tnum' 1; }
+
+  /* Logo cluster — asymmetric, edge-bleed */
+  .logo-cluster {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .logo-cell {
+    grid-column: span 3;
+    padding: 56px 32px;
+    border-right: 1px solid var(--rule);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 140px;
+    color: var(--ink-dim);
+    font-family: var(--display);
+    font-variation-settings: 'wght' 500;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    transition: color 200ms ease;
+  }
+  .logo-cell:hover { color: var(--ink); }
+  .logo-cell:nth-child(4n) { border-right: none; }
+  .logo-cell:nth-child(n+5) { border-top: 1px solid var(--rule); }
+  .logo-cell .em { font-style: italic; font-variation-settings: 'wght' 300, 'slnt' -6; color: var(--ink-faint); margin-left: 4px; font-size: 14px; }
+  @media (max-width: 820px) {
+    .logo-cell { grid-column: span 6; padding: 36px 18px; min-height: 100px; font-size: 18px; }
+    .logo-cell:nth-child(4n) { border-right: 1px solid var(--rule); }
+    .logo-cell:nth-child(2n) { border-right: none; }
+  }
+
+  /* Mentions list */
+  .mentions { border-top: 1px solid var(--rule); }
+  .mention {
+    display: grid;
+    grid-template-columns: 120px 200px 1fr 120px;
+    gap: 32px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .mention .date { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.04em; }
+  .mention .pub { font-family: var(--display); font-variation-settings: 'wght' 520; font-size: 15px; color: var(--ink); letter-spacing: -0.01em; }
+  .mention .headline { font-family: var(--display); font-size: clamp(20px, 2.2vw, 28px); letter-spacing: -0.025em; line-height: 1.1; color: var(--ink); }
+  .mention .headline em { font-style: normal; font-variation-settings: 'wght' 300, 'slnt' -6; color: var(--ink-dim); }
+  .mention .read { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); letter-spacing: 0.04em; text-align: right; white-space: nowrap; }
+  .mention .read:hover { color: var(--accent); }
+  .mention .read .arrow { display: inline-block; margin-left: 6px; transition: transform 200ms ease; }
+  .mention .read:hover .arrow { transform: translateX(3px); }
+  @media (max-width: 820px) {
+    .mention { grid-template-columns: 1fr; gap: 8px; padding: 24px 0; }
+    .mention .read { text-align: left; }
+  }
+
+  /* Press kit — asymmetric two-up */
+  .kit {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .kit-left { padding: 64px 56px 64px 0; border-right: 1px solid var(--rule); }
+  .kit-left h2 { font-size: clamp(40px, 5.5vw, 72px); letter-spacing: -0.035em; line-height: 0.96; margin-bottom: 20px; }
+  .kit-left p { color: var(--ink-dim); font-size: 15px; line-height: 1.6; max-width: 36ch; }
+  .kit-right { padding: 0 0 0 56px; }
+  .kit-item {
+    display: grid;
+    grid-template-columns: 60px 1fr 140px 80px;
+    gap: 24px;
+    align-items: center;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .kit-item:first-child { padding-top: 0; }
+  .kit-item:last-child { border-bottom: none; }
+  .kit-item .num { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.04em; }
+  .kit-item .name { font-family: var(--display); font-size: 18px; letter-spacing: -0.02em; color: var(--ink); }
+  .kit-item .name .sub { display: block; font-family: var(--body); font-size: 12px; color: var(--ink-dim); margin-top: 4px; letter-spacing: 0; }
+  .kit-item .size { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.04em; font-feature-settings: 'tnum' 1; }
+  .kit-item .dl { font-family: var(--mono); font-size: 11px; color: var(--ink); letter-spacing: 0.04em; text-transform: uppercase; text-align: right; }
+  .kit-item .dl:hover { color: var(--accent); }
+  @media (max-width: 820px) {
+    .kit { grid-template-columns: 1fr; }
+    .kit-left { padding: 0 0 48px; border-right: none; border-bottom: 1px solid var(--rule); }
+    .kit-right { padding: 48px 0 0; }
+    .kit-item { grid-template-columns: 40px 1fr 80px; }
+    .kit-item .size { display: none; }
+  }
+
+  /* Pull quote */
+  .pull {
+    padding: 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .pull-inner { padding: 96px 0; max-width: 980px; }
+  .pull blockquote { font-family: var(--display); font-size: clamp(32px, 5vw, 64px); letter-spacing: -0.035em; line-height: 1.02; color: var(--ink); }
+  .pull blockquote em { font-style: normal; font-variation-settings: 'wght' 300, 'slnt' -6; color: var(--ink-dim); }
+  .pull .attrib { margin-top: 32px; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.06em; text-transform: uppercase; }
+  .pull .attrib .accent { color: var(--accent); }
+
+  /* Contact block — asymmetric */
+  .contact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .contact-l { padding-right: 80px; }
+  .contact-l h2 { font-size: clamp(40px, 6vw, 88px); letter-spacing: -0.04em; line-height: 0.94; }
+  .contact-l h2 em { font-style: normal; font-variation-settings: 'wght' 300, 'slnt' -6; color: var(--ink-dim); }
+  .contact-r { padding-left: 80px; border-left: 1px solid var(--rule); }
+  .contact-card { padding: 32px 0; border-bottom: 1px solid var(--rule); }
+  .contact-card:first-child { padding-top: 0; }
+  .contact-card .role { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px; }
+  .contact-card .person { font-family: var(--display); font-size: 22px; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 6px; }
+  .contact-card .email { font-family: var(--mono); font-size: 13px; color: var(--ink-dim); letter-spacing: 0.02em; }
+  .contact-card .email:hover { color: var(--accent); }
+  .contact-card .note { font-size: 13px; color: var(--ink-faint); margin-top: 10px; line-height: 1.5; }
+  @media (max-width: 820px) {
+    .contact { grid-template-columns: 1fr; }
+    .contact-l { padding-right: 0; margin-bottom: 48px; }
+    .contact-r { padding-left: 0; border-left: none; border-top: 1px solid var(--rule); padding-top: 32px; }
+  }
+
+  /* Awards strip */
+  .awards { background: var(--bg-elev); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .awards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .award {
+    padding: 48px 40px;
+    border-right: 1px solid var(--rule);
+  }
+  .award:last-child { border-right: none; }
+  .award .yr { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.06em; margin-bottom: 16px; }
+  .award .ttl { font-family: var(--display); font-size: 19px; letter-spacing: -0.02em; color: var(--ink); line-height: 1.15; margin-bottom: 6px; }
+  .award .src { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.04em; }
+  @media (max-width: 720px) {
+    .awards-grid { grid-template-columns: 1fr; }
+    .award { border-right: none; border-bottom: 1px solid var(--rule); padding: 32px 24px; }
+    .award:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="index.html">
+    <span>Pliny</span><span class="dot" aria-hidden="true"></span>
+  </a>
+  <nav aria-label="Primary">
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="story.html">Story</a></li>
+      <li><a href="specs.html">Specs</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="press.html" class="is-active">Press</a></li>
+    </ul>
+  </nav>
+  <div class="end">
+    <span class="accent-dot" aria-hidden="true"></span>
+    <a href="preorder.html">Reserve&nbsp;→</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- Hero -->
+  <section class="press-hero">
+    <div class="wrap">
+      <p class="eyebrow"><span class="dot"></span>Press · Media · Inquiries</p>
+      <h1 class="display" style="margin-top: 28px;">Press<br><em>room.</em></h1>
+      <p class="lede" style="margin-top: 40px;">Everything you need to write about Pliny: assets, fact sheet, recent coverage, and a human who answers email within a working day. We're a small team — please be patient if it takes us a little longer.</p>
+
+      <div class="meta-row">
+        <div>
+          <span class="label-mono">FOUNDED</span>
+          <span class="val">May 2023</span>
+        </div>
+        <div>
+          <span class="label-mono">HEADQUARTERS</span>
+          <span class="val">Brooklyn · Lisbon</span>
+        </div>
+        <div>
+          <span class="label-mono">EMPLOYEES</span>
+          <span class="val">17</span>
+        </div>
+        <div>
+          <span class="label-mono">FUNDING</span>
+          <span class="val">$14.2M Series&nbsp;A</span>
+        </div>
+        <div>
+          <span class="label-mono">PR CONTACT</span>
+          <span class="val">press@pliny.dev</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logo cluster -->
+  <section class="s-short">
+    <div class="wrap">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 32px;">
+        <p class="eyebrow"><span class="dot"></span>As featured in</p>
+        <p class="label-mono">2023 — 2024</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="logo-cluster">
+        <div class="logo-cell">The Verge</div>
+        <div class="logo-cell">Wired</div>
+        <div class="logo-cell">TechCrunch</div>
+        <div class="logo-cell">Bloomberg</div>
+        <div class="logo-cell">Stratechery</div>
+        <div class="logo-cell">The Pragmatic Engineer</div>
+        <div class="logo-cell">Hacker News<span class="em">#1</span></div>
+        <div class="logo-cell">a16z Future</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pull quote -->
+  <section class="pull">
+    <div class="wrap">
+      <div class="pull-inner">
+        <blockquote class="display">
+          "Pliny doesn't try to <em>be your colleague</em> — it tries to be the diff your colleague would have left if she'd had another forty minutes. That distinction is the whole product."
+        </blockquote>
+        <p class="attrib">Gergely Orosz <span class="accent">·</span> The Pragmatic Engineer <span class="accent">·</span> March 2024</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent mentions -->
+  <section class="s-mid">
+    <div class="wrap">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 56px;">
+        <div>
+          <p class="eyebrow" style="margin-bottom: 24px;"><span class="dot"></span>Recent coverage</p>
+          <h2 class="display display-m">The notes<br><em>so far.</em></h2>
+        </div>
+        <a href="#" class="btn">Full archive <span class="arrow">→</span></a>
+      </div>
+
+      <div class="mentions">
+        <article class="mention">
+          <span class="date">2024 · 04 · 18</span>
+          <span class="pub">The Verge</span>
+          <h3 class="headline">Pliny wants to be the <em>second pair of eyes</em> every pull request was missing</h3>
+          <a href="#" class="read">Read<span class="arrow">→</span></a>
+        </article>
+        <article class="mention">
+          <span class="date">2024 · 04 · 02</span>
+          <span class="pub">Wired</span>
+          <h3 class="headline">Inside the small Brooklyn studio building a reviewer that <em>actually reads the diff</em></h3>
+          <a href="#" class="read">Read<span class="arrow">→</span></a>
+        </article>
+        <article class="mention">
+          <span class="date">2024 · 03 · 21</span>
+          <span class="pub">Bloomberg</span>
+          <h3 class="headline">Pliny Labs raises $14.2M Series A led by Index Ventures to <em>ship a hardware-grade software product</em></h3>
+          <a href="#" class="read">Read<span class="arrow">→</span></a>
+        </article>
+        <article class="mention">
+          <span class="date">2024 · 03 · 11</span>
+          <span class="pub">The Pragmatic Engineer</span>
+          <h3 class="headline">A long read on AI code review tools, and why <em>Pliny is the one engineers keep enabled</em></h3>
+          <a href="#" class="read">Read<span class="arrow">→</span></a>
+        </article>
+        <article class="mention">
+          <span class="date">2024 · 02 · 27</span>
+          <span class="pub">TechCrunch</span>
+          <h3 class="headline">Pliny exits private beta, opens reservations for <em>teams of 12 or fewer</em></h3>
+          <a href="#" class="read">Read<span class="arrow">→</span></a>
+        </article>
+        <article class="mention">
+          <span class="date">2024 · 01 · 09</span>
+          <span class="pub">Stratechery</span>
+          <h3 class="headline">Notes on Pliny: the case for <em>review-as-product</em> in the agent era</h3>
+          <a href="#" class="read">Read<span class="arrow">→</span></a>
+        </article>
+        <article class="mention">
+          <span class="date">2023 · 11 · 14</span>
+          <span class="pub">Hacker News</span>
+          <h3 class="headline">Show HN: Pliny — an AI reviewer that learns your codebase <em>(2,418 points · 612 comments)</em></h3>
+          <a href="#" class="read">Read<span class="arrow">→</span></a>
+        </article>
+        <article class="mention">
+          <span class="date">2023 · 10 · 02</span>
+          <span class="pub">a16z Future</span>
+          <h3 class="headline">The next interface for software engineering isn't a chat — <em>it's a diff</em></h3>
+          <a href="#" class="read">Read<span class="arrow">→</span></a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Awards strip -->
+  <section class="awards">
+    <div class="wrap">
+      <div class="awards-grid">
+        <div class="award">
+          <p class="yr">2024</p>
+          <p class="ttl">Product Hunt — Product of the Month</p>
+          <p class="src">February · Developer Tools</p>
+        </div>
+        <div class="award">
+          <p class="yr">2024</p>
+          <p class="ttl">GitHub Marketplace — Editor's Pick</p>
+          <p class="src">Code review category</p>
+        </div>
+        <div class="award">
+          <p class="yr">2023</p>
+          <p class="ttl">Y Combinator — W23 Demo Day Top 10</p>
+          <p class="src">Developer infrastructure track</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Press kit -->
+  <section class="s-mid">
+    <div class="wrap">
+      <p class="eyebrow" style="margin-bottom: 56px;"><span class="dot"></span>Press kit · v2024.04</p>
+      <div class="kit">
+        <div class="kit-left">
+          <h2 class="display">Take what<br>you need.</h2>
+          <p>High-resolution renders, vector marks, founder portraits, and a one-page fact sheet. All assets cleared for editorial use. If you need something specific — a particular angle, a darker background, a higher resolution — write to us and we'll send it back the same day.</p>
+          <div style="margin-top: 40px;">
+            <a href="#" class="btn btn-primary">Download full kit (38 MB) <span class="arrow">↓</span></a>
+          </div>
+        </div>
+        <div class="kit-right">
+          <div class="kit-item">
+            <span class="num">01</span>
+            <span class="name">Wordmark &amp; symbol<span class="sub">SVG, PNG @1x/@2x/@3x · light + dark</span></span>
+            <span class="size">2.4 MB</span>
+            <a href="#" class="dl">.zip ↓</a>
+          </div>
+          <div class="kit-item">
+            <span class="num">02</span>
+            <span class="name">Product renders<span class="sub">14 hero shots · 8000×6000 · CMYK + sRGB</span></span>
+            <span class="size">22.1 MB</span>
+            <a href="#" class="dl">.zip ↓</a>
+          </div>
+          <div class="kit-item">
+            <span class="num">03</span>
+            <span class="name">Interface screenshots<span class="sub">28 frames · PR review, settings, code map</span></span>
+            <span class="size">6.8 MB</span>
+            <a href="#" class="dl">.zip ↓</a>
+          </div>
+          <div class="kit-item">
+            <span class="num">04</span>
+            <span class="name">Founder portraits<span class="sub">Anya Kowalski &amp; Théo Bertrand · color + b/w</span></span>
+            <span class="size">4.7 MB</span>
+            <a href="#" class="dl">.zip ↓</a>
+          </div>
+          <div class="kit-item">
+            <span class="num">05</span>
+            <span class="name">Fact sheet &amp; boilerplate<span class="sub">One-page PDF · 240-word, 80-word, 30-word</span></span>
+            <span class="size">182 KB</span>
+            <a href="#" class="dl">.pdf ↓</a>
+          </div>
+          <div class="kit-item">
+            <span class="num">06</span>
+            <span class="name">Brand guidelines<span class="sub">Color, type, spacing, do's and don'ts · 24 pp</span></span>
+            <span class="size">3.1 MB</span>
+            <a href="#" class="dl">.pdf ↓</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="s-tall" style="border-top: 1px solid var(--rule);">
+    <div class="wrap">
+      <div class="contact">
+        <div class="contact-l">
+          <p class="eyebrow" style="margin-bottom: 32px;"><span class="dot"></span>Get in touch</p>
+          <h2 class="display">Write to a<br>real person, <em>not<br>a form.</em></h2>
+          <p class="lede" style="margin-top: 40px;">We answer every press email within one working day. For embargo requests, briefings, founder availability, or anything we haven't thought of — the addresses on the right go straight to the people who can help.</p>
+        </div>
+        <div class="contact-r">
+          <div class="contact-card">
+            <p class="role">General press &amp; media</p>
+            <p class="person">Maren Castellanos</p>
+            <a href="mailto:press@pliny.dev" class="email">press@pliny.dev</a>
+            <p class="note">Coverage, embargo lifts, asset requests, fact-checking.</p>
+          </div>
+          <div class="contact-card">
+            <p class="role">Founder availability</p>
+            <p class="person">Office of Anya Kowalski</p>
+            <a href="mailto:anya-office@pliny.dev" class="email">anya-office@pliny.dev</a>
+            <p class="note">Interviews, podcasts, panels, on-the-record technical conversation.</p>
+          </div>
+          <div class="contact-card">
+            <p class="role">Partnerships &amp; analyst relations</p>
+            <p class="person">Devon Park</p>
+            <a href="mailto:devon@pliny.dev" class="email">devon@pliny.dev</a>
+            <p class="note">Gartner, Forrester, IDC, RedMonk — all welcome.</p>
+          </div>
+          <div class="contact-card" style="border-bottom: none;">
+            <p class="role">Everything else</p>
+            <p class="person">hello@pliny.dev</p>
+            <a href="mailto:hello@pliny.dev" class="email">We read every message.</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="footer-top">
+      <div class="mark">Pliny<span class="dot" aria-hidden="true"></span></div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="specs.html">Technical specs</a></li>
+          <li><a href="story.html">The story</a></li>
+          <li><a href="preorder.html">Reserve a seat</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="press.html">Press &amp; media</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">Security &amp; SOC 2</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">Careers — 4 open</a></li>
+          <li><a href="mailto:hello@pliny.dev">hello@pliny.dev</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">Privacy &amp; terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© Pliny Labs, Inc. — Made in Brooklyn &amp; Lisbon</span>
+      <span class="status"><span class="live" aria-hidden="true"></span> All systems nominal · v0.9.3</span>
+      <span>Reviewing 41,208 PRs today</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

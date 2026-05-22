@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study · Maison Tassel — A perfume house in motion | Locomotive</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .cs-hero{padding:56px 0 0}
+  .cs-hero__title{font-size:clamp(56px,11vw,168px);font-weight:900;letter-spacing:-0.055em;line-height:0.86;margin:24px 0 36px}
+  .cs-hero__title em{font-style:italic;font-weight:500;font-stretch:75%}
+  .cs-hero__title .outline{-webkit-text-stroke:2px var(--ink);color:transparent}
+  .cs-hero__meta{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px;border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);padding:22px 0;align-items:baseline}
+  .cs-hero__meta .k{font-size:11px;text-transform:uppercase;letter-spacing:0.16em;color:var(--muted);display:block;margin-bottom:6px}
+  .cs-hero__meta .v{font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-0.02em}
+  .cs-stage{position:relative;border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);background:var(--accent-3);color:#fff;padding:80px 0 0;overflow:hidden}
+  .cs-stage__img{aspect-ratio:21/9;border:3px solid var(--ink);background:#1a1a1a;margin:0 28px;box-shadow:10px 10px 0 0 var(--ink);position:relative}
+  .cs-stage__caption{padding:24px 28px 28px;display:flex;justify-content:space-between;font-size:12px;text-transform:uppercase;letter-spacing:0.16em}
+  .stamp{position:absolute;top:36px;right:48px;z-index:3}
+  .two-col-prose{display:grid;grid-template-columns:1fr 1.4fr;gap:80px}
+  .two-col-prose .eyebrow{margin-bottom:12px;display:block}
+  .two-col-prose h2{margin-bottom:22px}
+  @media(max-width:900px){.two-col-prose{grid-template-columns:1fr;gap:32px}.cs-hero__meta{grid-template-columns:1fr 1fr}}
+  .pull{font-family:var(--font-display);font-weight:800;font-size:clamp(36px,5vw,72px);letter-spacing:-0.04em;line-height:0.95;max-width:18ch}
+  .pull em{font-style:italic;font-weight:500}
+  .approach-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+  .approach-grid .tile.span-7{grid-column:span 7}
+  .approach-grid .tile.span-5{grid-column:span 5}
+  .approach-grid .tile.span-4{grid-column:span 4}
+  .approach-grid .tile.span-8{grid-column:span 8}
+  @media(max-width:900px){.approach-grid .tile{grid-column:1/-1 !important}}
+  .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:3px solid var(--ink);border-bottom:3px solid var(--ink)}
+  .nums > div{padding:48px 28px;border-right:3px solid var(--ink)}
+  .nums > div:last-child{border-right:0}
+  .nums .big{font-family:var(--font-display);font-weight:900;font-size:clamp(54px,8vw,120px);letter-spacing:-0.05em;line-height:0.9;display:block}
+  .nums .lbl{font-size:11px;text-transform:uppercase;letter-spacing:0.16em;margin-top:14px;display:block;color:var(--muted)}
+  .nums--ink{background:var(--ink);color:#fff}
+  .nums--ink .lbl{color:#bdbdbd}
+  @media(max-width:900px){.nums{grid-template-columns:1fr 1fr}.nums > div:nth-child(2){border-right:0}.nums > div{border-bottom:3px solid var(--ink)}}
+  .gallery{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+  .gallery .frame{border:3px solid var(--ink);background:#EAEAEA;box-shadow:6px 6px 0 0 var(--ink);aspect-ratio:4/3}
+  .gallery .a{grid-column:1/span 7;aspect-ratio:16/10}
+  .gallery .b{grid-column:8/span 5;aspect-ratio:3/4}
+  .gallery .c{grid-column:1/span 4;aspect-ratio:1/1;background:var(--accent-2);display:flex;align-items:center;justify-content:center;padding:32px;font-family:var(--font-display);font-weight:800;font-size:28px;letter-spacing:-0.03em;line-height:1}
+  .gallery .d{grid-column:5/span 8;aspect-ratio:16/9}
+  @media(max-width:900px){.gallery > *{grid-column:1/-1 !important}}
+  .credits{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+  @media(max-width:900px){.credits{grid-template-columns:1fr}}
+  .next-cs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:32px;padding:64px 0}
+  .next-cs h3{font-size:clamp(40px,6vw,88px);letter-spacing:-0.045em;font-weight:900}
+  .next-cs .nav-arrow{font-family:var(--font-display);font-weight:800;font-size:14px;letter-spacing:0.14em;text-transform:uppercase}
+  .ticker__track .red{color:#fff;background:var(--accent-3);padding:2px 12px;margin:0 14px}
+  .timeline{border-top:3px solid var(--ink)}
+  .timeline > div{display:grid;grid-template-columns:120px 1fr 1fr;gap:32px;padding:28px 0;border-bottom:3px solid var(--ink);align-items:baseline}
+  .timeline .phase{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-0.02em}
+  .timeline .week{font-size:11px;text-transform:uppercase;letter-spacing:0.16em;color:var(--muted)}
+  .timeline p{margin:0;font-size:14px;max-width:52ch}
+  @media(max-width:900px){.timeline > div{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a href="index.html" class="brand" aria-label="Locomotive home">
+      <span class="brand__dot" aria-hidden="true"></span>
+      <span class="brand__mark">Locomotive<span class="text-accent">®</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="work-index.html" class="active">Work</a>
+      <a href="about.html">Studio</a>
+      <a href="about.html#services">Services</a>
+      <a href="about.html#journal">Journal</a>
+      <span class="nav__status mono">Booking Q3 ’25</span>
+      <a href="contact.html" class="btn btn--yellow nav__cta">Start a project <span class="arrow">→</span></a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="cs-hero">
+    <div class="wrap">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <span class="mono">Case 04 / 12 — Maison Tassel</span>
+        <a href="work-index.html" class="mono inline">← Back to selected work</a>
+      </div>
+      <h1 class="cs-hero__title tight">A perfume<br><em>house</em> learns<br>to <span class="outline">breathe</span>.</h1>
+      <div class="cs-hero__meta">
+        <div><span class="k">Client</span><span class="v">Maison Tassel, Grasse</span></div>
+        <div><span class="k">Year</span><span class="v">2024</span></div>
+        <div><span class="k">Role</span><span class="v">Site, motion, AD</span></div>
+        <div><span class="k">Timeline</span><span class="v">14 weeks</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAGE / KEY VISUAL -->
+  <section class="cs-stage section-tight">
+    <span class="badge-circle stamp" style="background:var(--accent-2);color:var(--ink);transform:rotate(8deg)">Awwwards<br>SOTD<br>Mar ’24</span>
+    <div class="cs-stage__img"></div>
+    <div class="cs-stage__caption">
+      <span>↳ Hero film — 18s loop, scroll-scrubbed</span>
+      <span>WebGL · 60fps · 4MB total</span>
+    </div>
+  </section>
+
+  <!-- OVERVIEW / PROBLEM -->
+  <section class="section">
+    <div class="wrap">
+      <div class="two-col-prose">
+        <div>
+          <span class="eyebrow">01 — The brief</span>
+          <h2 class="tight">The problem.</h2>
+        </div>
+        <div>
+          <p class="lede">Maison Tassel had been pouring perfume in Grasse since 1911 — and selling it through a website that smelled, frankly, of 2014.</p>
+          <p>Their fourth-generation creative director wanted to launch <em>Nuit&nbsp;d’Octobre</em>, a new oud-and-iris composition, with a digital experience that could carry the weight of the house. The existing site was a static Shopify theme: product grids, lifestyle photography, a footer full of legal text. It converted, but it did not <em>seduce</em>. Press kept describing the brand as “historic” — a polite word, in fragrance, for irrelevant.</p>
+          <p>The mandate was specific: build a launch site that behaves like a fragrance unfolds — top note, heart, base — and that loads in under 2.5 seconds on a phone in a Parisian Métro tunnel. No autoplay video. No 40MB of textures. And, please, no scroll-jacking that makes the trade press groan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PULL QUOTE BLOCK -->
+  <section class="block block--yellow section">
+    <div class="wrap">
+      <p class="mono" style="margin-bottom:24px">— Élodie Tassel, Creative Director</p>
+      <p class="pull">“We didn’t want a website. We wanted a <em>vestibule</em> — a place that makes you slow down before you enter the boutique.”</p>
+    </div>
+  </section>
+
+  <!-- APPROACH -->
+  <section class="section-loose">
+    <div class="wrap">
+      <div class="two-col-prose" style="margin-bottom:64px">
+        <div>
+          <span class="eyebrow">02 — The approach</span>
+          <h2 class="tight">Three notes,<br>one&nbsp;site.</h2>
+        </div>
+        <div>
+          <p>We structured the entire experience around the architecture of a fragrance. The homepage opens with the <strong>top note</strong>: a single bottle, a single line, ambient sound off by default. The product narrative is the <strong>heart</strong>: scroll-anchored chapters that reveal raw materials, distillation, and the perfumer’s journal. The shop is the <strong>base</strong>: quiet, dense, with the speed of a checkout that respects intent.</p>
+          <p>We rebuilt the front-end on Astro with islands of GSAP-driven motion, served textures as AVIF, and used a custom WebGL shader for the iris-petal hero that weighs less than a single Instagram story.</p>
+        </div>
+      </div>
+
+      <div class="approach-grid">
+        <div class="tile span-7">
+          <div class="tile__media tile__media--wide" style="background:linear-gradient(0,#0A0A0A,#0A0A0A)"></div>
+          <div class="tile__body">
+            <div class="tile__title">Heart — Chapter scroll</div>
+            <div class="tile__meta">GSAP ScrollTrigger</div>
+          </div>
+        </div>
+        <div class="tile span-5">
+          <div class="tile__media tile__media--tall" style="background:var(--accent)"></div>
+          <div class="tile__body">
+            <div class="tile__title">Top — WebGL iris</div>
+            <div class="tile__meta">Custom shader · 38kb</div>
+          </div>
+        </div>
+        <div class="tile span-4">
+          <div class="tile__media" style="background:var(--accent-2)"></div>
+          <div class="tile__body">
+            <div class="tile__title">Base — Boutique</div>
+            <div class="tile__meta">Shopify Hydrogen</div>
+          </div>
+        </div>
+        <div class="tile span-8">
+          <div class="tile__media tile__media--wide" style="background:#1a1a1a"></div>
+          <div class="tile__body">
+            <div class="tile__title">Perfumer’s journal — long-form editorial</div>
+            <div class="tile__meta">12 entries · Sanity CMS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <hr class="divider">
+  <section class="section">
+    <div class="wrap">
+      <div class="two-col-prose" style="margin-bottom:40px">
+        <div>
+          <span class="eyebrow">03 — How it shipped</span>
+          <h2 class="tight">14 weeks,<br>four phases.</h2>
+        </div>
+        <div>
+          <p>Tassel’s team in Grasse joined a Friday review every week. We kept the scope honest: one launch product, one editorial chapter framework, one shop. Everything else got a Notion ticket marked <em>“phase 2, peut-être.”</em></p>
+        </div>
+      </div>
+
+      <div class="timeline">
+        <div>
+          <div class="phase">Discovery</div>
+          <div class="week">Weeks 1 – 2</div>
+          <p>Two days on-site in Grasse. Smelled 41 raw materials. Re-wrote the brand voice from scratch — fewer adjectives, more nouns. Audit of the old stack, a heatmap of the boutique, and a competitive read across 12 niche houses.</p>
+        </div>
+        <div>
+          <div class="phase">Design language</div>
+          <div class="week">Weeks 3 – 6</div>
+          <p>Type system around Söhne &amp; a custom italic display. Built the iris shader in three iterations. Defined motion principles: nothing animates without a reason a perfumer would accept.</p>
+        </div>
+        <div>
+          <div class="phase">Build</div>
+          <div class="week">Weeks 6 – 12</div>
+          <p>Astro front-end, Sanity for editorial, Shopify Hydrogen for commerce. Weekly Friday demo in Grasse. Performance budget locked at 1.8s LCP — every PR ran a Lighthouse gate.</p>
+        </div>
+        <div>
+          <div class="phase">Launch</div>
+          <div class="week">Weeks 13 – 14</div>
+          <p>Soft launch to 400 press &amp; clients with a printed scratch-card invite. Public launch nine days later, coinciding with the Nuit d’Octobre press preview at Hôtel de Crillon.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <span>Top note</span><span class="star">✱</span>
+      <span>Heart</span><span class="star">✱</span>
+      <span>Base note</span><span class="star">✱</span>
+      <span>Nuit d’Octobre</span><span class="star">✱</span>
+      <span>Iris · Oud · Vétiver</span><span class="star">✱</span>
+      <span>Top note</span><span class="star">✱</span>
+      <span>Heart</span><span class="star">✱</span>
+      <span>Base note</span><span class="star">✱</span>
+      <span>Nuit d’Octobre</span><span class="star">✱</span>
+      <span>Iris · Oud · Vétiver</span><span class="star">✱</span>
+    </div>
+  </div>
+
+  <!-- OUTCOME / NUMBERS -->
+  <section class="section">
+    <div class="wrap">
+      <div class="two-col-prose" style="margin-bottom:48px">
+        <div>
+          <span class="eyebrow">04 — The outcome</span>
+          <h2 class="tight">It moved.</h2>
+        </div>
+        <div>
+          <p class="lede">Nuit d’Octobre sold out its first run of 1,400 bottles in 11 days. The site became, accidentally, a recruitment tool — Maison Tassel hired a junior perfumer who first wrote in because of the journal.</p>
+        </div>
+      </div>
+    </div>
+    <div class="nums nums--ink">
+      <div><span class="big">11d</span><span class="lbl">to sell out first run</span></div>
+      <div><span class="big">1.4s</span><span class="lbl">Largest Contentful Paint, mobile</span></div>
+      <div><span class="big">+318%</span><span class="lbl">Direct-to-consumer revenue YoY</span></div>
+      <div><span class="big">4:12</span><span class="lbl">Avg. time on perfumer’s journal</span></div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="section-tight">
+    <div class="wrap-wide">
+      <div class="gallery">
+        <div class="frame a"></div>
+        <div class="frame b"></div>
+        <div class="frame c">“On a parlé moins. On a senti plus.” — design review note, week 7</div>
+        <div class="frame d"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREDITS + PRESS -->
+  <hr class="divider">
+  <section class="section">
+    <div class="wrap">
+      <div class="credits">
+        <div>
+          <span class="eyebrow" style="display:block;margin-bottom:20px">Recognition &amp; press</span>
+          <ul style="list-style:none;padding:0;margin:0">
+            <li style="padding:16px 0;border-bottom:1.5px solid var(--ink)"><strong>Awwwards</strong> — Site of the Day, 14 March 2024</li>
+            <li style="padding:16px 0;border-bottom:1.5px solid var(--ink)"><strong>FWA</strong> — FWA of the Day, 22 March 2024</li>
+            <li style="padding:16px 0;border-bottom:1.5px solid var(--ink)"><strong>CSSDA</strong> — UI, UX &amp; Innovation</li>
+            <li style="padding:16px 0;border-bottom:1.5px solid var(--ink)"><strong>Le Monde Magazine</strong> — “Le digital qui sent enfin quelque chose,” April ’24</li>
+            <li style="padding:16px 0"><strong>Sidebar.io</strong> — Featured, week of 18 March</li>
+          </ul>
+        </div>
+        <div>
+          <span class="eyebrow" style="display:block;margin-bottom:20px">Credits</span>
+          <table class="meta-table">
+            <tr><th>Creative Direction</th><td>Margaux Lefebvre (Locomotive)</td></tr>
+            <tr><th>Design</th><td>Jules Tremblay, Asha Okafor</td></tr>
+            <tr><th>Motion / WebGL</th><td>Tom Beaudry</td></tr>
+            <tr><th>Engineering</th><td>Renaud Côté, Priya Shah</td></tr>
+            <tr><th>Editorial</th><td>Camille Roy</td></tr>
+            <tr><th>Client side</th><td>Élodie Tassel, Hugo Marsan</td></tr>
+            <tr><th>Photography</th><td>Studio Lambert, Grasse</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEXT CASE -->
+  <section class="block block--blue">
+    <div class="wrap">
+      <div class="next-cs">
+        <a href="case-study-A.html" class="nav-arrow">← Previous · Halcyon Bicycles</a>
+        <div style="text-align:center">
+          <span class="mono" style="display:block;margin-bottom:12px;opacity:0.8">Next case study</span>
+          <h3>Forge &amp; Anvil →<br><em>a coffee roaster</em><br>finds its tempo.</h3>
+          <a href="case-study-A.html" class="btn btn--yellow" style="margin-top:32px">Read the case <span class="arrow">→</span></a>
+        </div>
+        <a href="work-index.html" class="nav-arrow" style="text-align:right">All work →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__top">
+    <div class="site-footer__bigmark">Let’s make<br>something <span class="underline">move.</span></div>
+
+    <div class="site-footer__cols">
+      <div class="site-footer__col site-footer__contact">
+        <h5>New business</h5>
+        <a href="mailto:hello@locomotive.studio">hello@locomotive.studio</a>
+        <ul style="margin-top:22px">
+          <li>14 Rue Saint-Paul, Montréal QC</li>
+          <li>+1 (514) 555 0188</li>
+          <li>Studio hours · Mon–Fri 09:00–18:00 ET</li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Navigate</h5>
+        <ul>
+          <li><a href="work-index.html">Selected work</a></li>
+          <li><a href="about.html">The studio</a></li>
+          <li><a href="about.html#services">Capabilities</a></li>
+          <li><a href="about.html#journal">Journal</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Elsewhere</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Are.na</a></li>
+          <li><a href="#">Vimeo</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Read.cv</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Recognition</h5>
+        <ul>
+          <li>Awwwards · 12 SOTD</li>
+          <li>FWA · 8 wins</li>
+          <li>CSSDA · Best Studio ’24</li>
+          <li>Webby Honoree ’23</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="site-footer__bottom">
+    <span>© 2018–2025 Locomotive Studio Inc.</span>
+    <span>Built in Montréal · Running on espresso &amp; GSAP</span>
+    <span>v4.2.1 · Last deploy 3h ago</span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "auth_glassy-0000",
+    "archetype": "A12",
+    "vertical": "fintech",
+    "style": {
+      "density": "sparse",
+      "color_regime": "pastel",
+      "typography": "geometric-sans",
+      "border_language": "glassy-blurred",
+      "motif": "clean-iconographic"
+    },
+    "palette_seed": "#60A5FA",
+    "font_pair": [
+      "Inter",
+      "Inter",
+      null
+    ],
+    "difficulty": "easy",
+    "sitemap": [
+      "signup",
+      "dashboard-empty",
+      "onboarding-step-2",
+      "verify",
+      "onboarding-step-1",
+      "login"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Mint Ledger",
+      "tagline": "Close the books before lunch",
+      "value_prop": "Mint Ledger automates AP, AR, and reconciliation for SMBs. Connect your bank and accounting software; the books update themselves.",
+      "product_category": "accounting automation",
+      "target_audience": "founders and operators at small businesses"
+    },
+    "notes": "Design reference: clerk.dev, vercel.com/login, supabase.com/dashboard/sign-in. Backgrounds are soft gradient fields (palette anchor at 8-12% saturation, blending to a light neutral). Auth content lives in centered cards (~420px wide) with a frosted-glass effect: subtle backdrop-filter blur, semi-transparent white background (rgba(255,255,255,0.7)), 1px translucent border.\n\nEach form: brand mark on top, page title (e.g. 'Sign up for Mint Ledger'), 1-2 social-login buttons with provider icons, divider (\"or continue with email\"), 2-3 form fields with subtle backgrounds, primary CTA filled with the palette anchor, footer link to the other auth page.\n\nOnboarding-step pages: same card treatment + a 3-dot or progress-bar indicator showing 'step N of M'. Dashboard-empty: centered icon + headline + sub-copy + primary CTA, NO sidebar yet (user is fresh).\n\nAvoid: heavy shadows, busy backgrounds, opaque white cards (defeats glassy), oversaturated gradients (defeats pastel)."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "dashboard-empty",
+    "login",
+    "onboarding-step-1",
+    "onboarding-step-2",
+    "signup",
+    "verify"
+  ],
+  "files": [
+    "dashboard-empty.html",
+    "login.html",
+    "onboarding-step-1.html",
+    "onboarding-step-2.html",
+    "signup.html",
+    "styles.css",
+    "verify.html"
+  ],
+  "has_external_css": true,
+  "assets": []
+}

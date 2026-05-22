@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Riverbed</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .about-hero { padding-top: 120px; padding-bottom: 40px; }
+  .about-hero h1 { max-width: 14ch; }
+  .about-hero .lead { max-width: 56ch; margin-top: 28px; }
+  .label-row { display: flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 28px; }
+  .label-row::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+
+  .mission-grid { display: grid; grid-template-columns: 5fr 7fr; gap: 80px; align-items: start; }
+  .mission-grid h2 { letter-spacing: -0.03em; }
+  .mission-grid .body p { font-size: 17px; line-height: 1.6; color: var(--ink-2); }
+  .mission-grid .body p + p { margin-top: 18px; }
+  @media (max-width: 880px) { .mission-grid { grid-template-columns: 1fr; gap: 28px; } }
+
+  .story { display: grid; grid-template-columns: 7fr 5fr; gap: 64px; align-items: start; }
+  .story aside { border-left: 1px solid var(--rule); padding: 4px 0 4px 28px; }
+  .story aside dl { margin: 0; display: grid; grid-template-columns: 1fr; gap: 18px; }
+  .story aside dt { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-4); font-weight: 500; }
+  .story aside dd { margin: 4px 0 0; color: var(--ink); font-size: 15px; }
+  .story .prose p { font-size: 16px; line-height: 1.65; color: var(--ink-2); }
+  .story .prose p + p { margin-top: 18px; }
+  .story .prose .mono { display: block; color: var(--ink-4); margin-top: 24px; }
+  @media (max-width: 880px) { .story { grid-template-columns: 1fr; gap: 32px; } .story aside { border-left: 0; border-top: 1px solid var(--rule); padding: 24px 0 0; } }
+
+  .team-head { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 48px; }
+  .team-head h2 { max-width: 18ch; }
+  .team-head p { max-width: 38ch; color: var(--ink-3); }
+
+  .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: var(--radius-l); overflow: hidden; }
+  .person { background: var(--bg-elevated); padding: 28px; display: flex; flex-direction: column; gap: 16px; min-height: 220px; }
+  .person .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-pale); color: var(--accent-ink); display: inline-flex; align-items: center; justify-content: center; font-weight: 500; font-size: 14px; letter-spacing: -0.01em; border: 1px solid #BAE6FD; }
+  .person .avatar.mint { background: var(--mint); border-color: #A7E5CC; color: #086648; }
+  .person .avatar.peach { background: var(--peach); border-color: #F4C8AB; color: #7A3A14; }
+  .person .avatar.lilac { background: var(--lilac); border-color: #C9BDF1; color: #4634A0; }
+  .person .avatar.butter { background: var(--butter); border-color: #EDDD8E; color: #6A551A; }
+  .person h3 { font-size: 17px; letter-spacing: -0.015em; }
+  .person .role { font-size: 13px; color: var(--ink-3); margin-top: 2px; }
+  .person .bio { font-size: 13.5px; color: var(--ink-3); margin-top: auto; line-height: 1.55; }
+  @media (max-width: 1040px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .team-grid { grid-template-columns: 1fr; } }
+
+  .values { display: grid; grid-template-columns: 5fr 7fr; gap: 64px; align-items: start; }
+  .values h2 { letter-spacing: -0.03em; }
+  .values ol { list-style: none; counter-reset: v; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+  .values li { counter-increment: v; display: grid; grid-template-columns: 64px 1fr; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--rule); }
+  .values li::before { content: counter(v, decimal-leading-zero); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: var(--ink-4); padding-top: 4px; }
+  .values li h3 { font-size: 19px; margin-bottom: 6px; }
+  .values li p { font-size: 14.5px; color: var(--ink-3); }
+  @media (max-width: 880px) { .values { grid-template-columns: 1fr; gap: 28px; } }
+
+  .investors { display: flex; flex-wrap: wrap; gap: 48px; align-items: center; color: var(--ink-3); font-size: 14px; }
+  .investors strong { font-weight: 500; color: var(--ink); letter-spacing: -0.01em; font-size: 18px; }
+
+  .closing { display: grid; grid-template-columns: 7fr 5fr; gap: 64px; align-items: end; padding-top: 88px; padding-bottom: 120px; }
+  .closing h2 { font-size: clamp(34px, 4.4vw, 58px); max-width: 16ch; letter-spacing: -0.03em; }
+  .closing .cta-row { display: flex; gap: 12px; justify-content: flex-end; }
+  @media (max-width: 880px) { .closing { grid-template-columns: 1fr; gap: 32px; padding-bottom: 80px; } .closing .cta-row { justify-content: flex-start; } }
+
+  .trace-svg { width: 100%; height: auto; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wide nav">
+    <a href="index.html" class="brand" aria-label="Riverbed home">
+      <svg class="brand-mark" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <path d="M2 14 C 6 14, 6 6, 11 6 S 16 14, 20 14" stroke="#0EA5E9" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M2 18 C 6 18, 6 10, 11 10 S 16 18, 20 18" stroke="#0B1620" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>
+      </svg>
+      Riverbed
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html#product">Product</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="customers.html">Customers</a>
+      <a href="about.html" class="active">About</a>
+      <a href="https://docs.riverbed.dev" rel="noopener">Docs</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="https://github.com/riverbed/agent" class="github" rel="noopener" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4.08.55-.17.55-.38v-1.4c-2.2.48-2.67-1.06-2.67-1.06-.36-.92-.88-1.16-.88-1.16-.72-.49.05-.48.05-.48.8.06 1.22.82 1.22.82.71 1.2 1.86.86 2.31.66.07-.52.28-.86.5-1.06-1.76-.2-3.6-.88-3.6-3.9 0-.86.31-1.57.81-2.12-.08-.2-.35-1 .08-2.1 0 0 .67-.22 2.2.81a7.6 7.6 0 0 1 4 0c1.52-1.03 2.2-.81 2.2-.81.43 1.1.16 1.9.08 2.1.5.55.8 1.26.8 2.12 0 3.03-1.85 3.7-3.6 3.9.28.25.54.74.54 1.5v2.22c0 .21.15.47.55.38A8 8 0 0 0 8 .2Z"/></svg>
+        <span>4.2k</span>
+      </a>
+      <a href="https://app.riverbed.dev/login" class="btn btn-ghost">Sign in</a>
+      <a href="https://app.riverbed.dev/signup" class="btn btn-primary">Start free<span class="arrow">→</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="about-hero wide">
+    <div class="label-row"><span>About Riverbed</span></div>
+    <h1>We build the trace you wish your platform already had.</h1>
+    <p class="lead">Riverbed is a small, technical team obsessed with one question: when a request goes wrong, can you follow it? Across services, queues, retries, and the parts of your stack no one likes to think about. That answer should be yes — in seconds, not hours.</p>
+  </section>
+
+  <section class="section">
+    <div class="wide mission-grid">
+      <div>
+        <div class="label-row"><span>Mission</span></div>
+        <h2>Observability that follows the request, not the dashboard.</h2>
+      </div>
+      <div class="body">
+        <p>For fifteen years, observability has been sold as charts. We think that's backwards. The unit of debugging is the request — a single span of work that crosses every boundary your team has drawn around itself. Until you can pull on that thread and watch it unspool through every service, queue, database call and external API, you're guessing.</p>
+        <p>Our mission is to make that thread the default. Open-source agent at the edge. A hosted query plane that lets you ask the question you actually have. Tracing that survives a deploy on Tuesday afternoon when the on-call engineer has fourteen minutes before standup. No manual instrumentation, no rebuilds, no SDK religion.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wide">
+      <div class="label-row"><span>Founding story</span></div>
+      <div class="story">
+        <div class="prose">
+          <p>Riverbed started in late 2022, in a shared office above a bakery in Kreuzberg, with two engineers and a whiteboard full of flame graphs. Mira had spent four years on Stripe's platform team; Toby had been the second SRE at a fintech that grew faster than its tracing budget. Both had watched colleagues spend entire weekends grepping logs for a correlation ID that no one had agreed to propagate.</p>
+          <p>The first prototype was a single Go binary that sniffed eBPF events and reconstructed spans without a single line of SDK code. It worked. It also fell over the moment we pointed it at a real production workload. The next eighteen months were a long argument with kernel internals, sampling math, and the idea that a query language could be both expressive and fast.</p>
+          <p>We shipped the agent under Apache 2.0 in March 2024. Six weeks later the first paying team — a logistics platform routing two million events an hour — turned off their previous APM. We took that as a sign.</p>
+          <span class="mono">— Mira &amp; Toby, co-founders</span>
+        </div>
+        <aside>
+          <dl>
+            <dt>Founded</dt>
+            <dd>October 2022, Berlin</dd>
+            <dt>Headquarters</dt>
+            <dd>Berlin &amp; Brooklyn</dd>
+            <dt>Team</dt>
+            <dd>22 people across 9 timezones</dd>
+            <dt>Funding</dt>
+            <dd>Seed + Series A, $18M total</dd>
+            <dt>Open source</dt>
+            <dd>4.2k stars on github.com/riverbed/agent</dd>
+          </dl>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-lg">
+    <div class="wide">
+      <div class="team-head">
+        <div>
+          <div class="label-row" style="margin-bottom:18px;"><span>The team</span></div>
+          <h2>Engineers who&apos;ve been on the wrong side of a 3am page.</h2>
+        </div>
+        <p>Riverbed is intentionally small. Most of us have shipped infrastructure at companies you&apos;ve heard of — and learned what we never want to build again.</p>
+      </div>
+
+      <div class="team-grid">
+        <article class="person">
+          <span class="avatar">MS</span>
+          <div>
+            <h3>Mira Salomon</h3>
+            <div class="role">Co-founder, CEO</div>
+          </div>
+          <p class="bio">Previously platform infra at Stripe. Writes the changelog.</p>
+        </article>
+        <article class="person">
+          <span class="avatar mint">TR</span>
+          <div>
+            <h3>Toby Reinhardt</h3>
+            <div class="role">Co-founder, CTO</div>
+          </div>
+          <p class="bio">Ex-SRE at Mollie. Maintains the eBPF agent and most of the kernel patches it depends on.</p>
+        </article>
+        <article class="person">
+          <span class="avatar peach">AO</span>
+          <div>
+            <h3>Adaeze Okafor</h3>
+            <div class="role">Head of Engineering</div>
+          </div>
+          <p class="bio">Built distributed query at Snowflake. Believes in small PRs and large tests.</p>
+        </article>
+        <article class="person">
+          <span class="avatar lilac">JL</span>
+          <div>
+            <h3>Jonas Lindqvist</h3>
+            <div class="role">Principal Engineer, Query Plane</div>
+          </div>
+          <p class="bio">Wrote a column-store in his twenties. Now writes a faster one.</p>
+        </article>
+        <article class="person">
+          <span class="avatar butter">PN</span>
+          <div>
+            <h3>Priya Nair</h3>
+            <div class="role">Staff Engineer, Agent</div>
+          </div>
+          <p class="bio">Linux kernel contributor. The reason your overhead is under 1%.</p>
+        </article>
+        <article class="person">
+          <span class="avatar">DC</span>
+          <div>
+            <h3>Diego Castaño</h3>
+            <div class="role">Design Engineer</div>
+          </div>
+          <p class="bio">Designs the trace explorer and refuses to ship a tooltip without a keyboard shortcut.</p>
+        </article>
+        <article class="person">
+          <span class="avatar mint">HW</span>
+          <div>
+            <h3>Hannah Weiss</h3>
+            <div class="role">Developer Relations</div>
+          </div>
+          <p class="bio">Runs the community Slack and the open-source release cadence. Reads every GitHub issue.</p>
+        </article>
+        <article class="person">
+          <span class="avatar lilac">SK</span>
+          <div>
+            <h3>Samir Khoury</h3>
+            <div class="role">Head of Go-to-Market</div>
+          </div>
+          <p class="bio">Spent a decade at observability vendors. Joined because he wanted to sell something he&apos;d actually deploy.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wide values">
+      <div>
+        <div class="label-row"><span>What we believe</span></div>
+        <h2>Five opinions that shape what we ship.</h2>
+        <p class="muted" style="margin-top:18px; max-width:34ch;">These aren&apos;t posters on a wall. They&apos;re the arguments we&apos;ve already had, written down so the next hire doesn&apos;t have to have them again.</p>
+      </div>
+      <ol>
+        <li>
+          <div>
+            <h3>The request is the unit of truth.</h3>
+            <p>Dashboards aggregate the past. Traces explain the present. We design for the engineer who has a customer ticket open in another tab.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Instrumentation is a tax, not a feature.</h3>
+            <p>If a developer has to touch their code for telemetry to work, we&apos;ve failed. The agent goes where the request goes, automatically.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Open source is the contract.</h3>
+            <p>The agent is Apache 2.0 and will stay that way. Your data plane belongs to you. Your spans belong to you. We earn the hosted query plane on its merits.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Pricing should not punish curiosity.</h3>
+            <p>Per-host, per-seat, per-custom-metric — that math turns engineers into accountants. We charge for retained events, with a free tier that fits real workloads.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Small teams ship sharper products.</h3>
+            <p>We&apos;re 22 people and intend to stay under 60 through the next product surface. Every hire is a decision, not a quota.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="wide">
+      <div class="label-row"><span>Backed by</span></div>
+      <div class="investors">
+        <strong>Index Ventures</strong>
+        <strong>Heavybit</strong>
+        <strong>Essence VC</strong>
+        <strong>Cocoa</strong>
+        <span class="muted">&amp; engineers from Datadog, Vercel, Grafana Labs, GitHub and Render.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="wide">
+    <div class="closing">
+      <h2>If any of this resonates, the agent installs in one command.</h2>
+      <div class="cta-row">
+        <a href="https://app.riverbed.dev/signup" class="btn btn-primary">Start free<span class="arrow">→</span></a>
+        <a href="https://docs.riverbed.dev" class="btn btn-secondary">Read the docs</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wide">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <svg class="brand-mark" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <path d="M2 14 C 6 14, 6 6, 11 6 S 16 14, 20 14" stroke="#0EA5E9" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M2 18 C 6 18, 6 10, 11 10 S 16 18, 20 18" stroke="#0B1620" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>
+          </svg>
+          Riverbed
+        </a>
+        <p>Observability that follows the request — across every service, queue and database in your stack.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="index.html#tracing">Distributed tracing</a></li>
+          <li><a href="index.html#query">Query plane</a></li>
+          <li><a href="integrations.html">Integrations</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="https://status.riverbed.dev">Status</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Developers</h5>
+        <ul>
+          <li><a href="https://docs.riverbed.dev">Documentation</a></li>
+          <li><a href="https://docs.riverbed.dev/quickstart">Quickstart</a></li>
+          <li><a href="https://github.com/riverbed/agent">GitHub agent</a></li>
+          <li><a href="https://docs.riverbed.dev/api">API reference</a></li>
+          <li><a href="https://docs.riverbed.dev/changelog">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="customers.html">Customers</a></li>
+          <li><a href="https://riverbed.dev/blog">Blog</a></li>
+          <li><a href="https://riverbed.dev/careers">Careers</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="https://riverbed.dev/privacy">Privacy</a></li>
+          <li><a href="https://riverbed.dev/terms">Terms</a></li>
+          <li><a href="https://riverbed.dev/security">Security</a></li>
+          <li><a href="https://riverbed.dev/dpa">DPA</a></li>
+          <li><a href="https://trust.riverbed.dev">Trust center</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>© 2025 Riverbed Labs, Inc. — Made in Berlin &amp; Brooklyn.</span>
+      <a href="https://status.riverbed.dev" class="status-dot">All systems normal</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

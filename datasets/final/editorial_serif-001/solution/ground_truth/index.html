@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandfork &mdash; Issue No. 07, Autumn / Winter</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific: index hierarchy and editorial flourishes */
+  .issue-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 0 14px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 0;
+  }
+  .issue-line__label {
+    font-family: var(--serif-display);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+  .issue-line__title {
+    font-family: var(--serif-display);
+    font-weight: 500;
+    font-size: 1.05rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .issue-line__meta {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The lede cover override: bigger, more editorial */
+  .lede {
+    padding: 56px 0 84px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .lede__grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+  .lede__image { aspect-ratio: 5/4; overflow: hidden; }
+  .lede__image img { width: 100%; height: 100%; object-fit: cover; }
+  .lede__text { padding-top: 4px; }
+  .lede h1 {
+    font-size: clamp(2.6rem, 5.4vw, 4.4rem);
+    font-weight: 500;
+    margin: .35em 0 .35em;
+    letter-spacing: -0.018em;
+  }
+  .lede h1 a { color: var(--ink); border-bottom: 0; }
+  .lede h1 a:hover { color: var(--accent); }
+  .lede__dek { margin-bottom: 1.4em; font-size: 1.28rem; }
+  .lede__byline { margin-top: 1.4em; }
+  .lede__cta {
+    margin-top: 2em;
+    padding-top: 1.6em;
+    border-top: 1px solid var(--rule);
+    font-family: var(--serif-display);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .lede__cta a { border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+
+  @media (max-width: 820px) {
+    .lede__grid { grid-template-columns: 1fr; gap: 28px; }
+    .lede { padding: 32px 0 56px; }
+  }
+
+  /* Section heads */
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 12px;
+    margin-bottom: 0;
+  }
+  .section-head h2 {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.7rem;
+    margin: 0;
+    letter-spacing: -0.005em;
+  }
+  .section-head__count {
+    font-family: var(--serif-display);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* Three-up secondary stories: tighter padding */
+  .section-grid { padding: 36px 0 84px; border-bottom: 1px solid var(--rule); }
+
+  /* The "two-column" feature pair: asymmetric */
+  .pair {
+    padding: 84px 0 56px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .pair__grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .pair__main h3 {
+    font-size: 2.1rem;
+    line-height: 1.1;
+    margin-bottom: .45em;
+  }
+  .pair__main h3 a { color: var(--ink); border-bottom: 0; }
+  .pair__main h3 a:hover { color: var(--accent); }
+  .pair__image { aspect-ratio: 4/3; overflow: hidden; margin-bottom: 18px; }
+  .pair__image img { width: 100%; height: 100%; object-fit: cover; }
+  .pair__aside { padding-top: 4px; }
+  .pair__aside h4 {
+    font-family: var(--serif-display);
+    font-size: 1.25rem;
+    line-height: 1.2;
+    margin-bottom: .3em;
+    font-weight: 500;
+  }
+  .pair__aside h4 a { color: var(--ink); border-bottom: 0; }
+  .pair__aside h4 a:hover { color: var(--accent); }
+  .pair__aside .pair__item { padding: 18px 0; border-bottom: 1px solid var(--rule); }
+  .pair__aside .pair__item:first-child { padding-top: 0; }
+  .pair__aside .pair__item:last-child { border-bottom: 0; padding-bottom: 0; }
+  .pair__aside .pair__item p {
+    font-size: 0.98rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 0 0 .5em;
+  }
+  .pair__aside .pair__item .byline { font-size: 0.8rem; }
+
+  @media (max-width: 900px) {
+    .pair__grid { grid-template-columns: 1fr; gap: 40px; }
+    .pair { padding: 56px 0 32px; }
+  }
+
+  /* Pull quote interlude */
+  .interlude {
+    padding: 56px 0;
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg);
+  }
+  .interlude__quote {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 24px 0;
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+  }
+  .interlude__quote p {
+    font-family: var(--serif-display);
+    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+    line-height: 1.22;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0 0 .6em;
+    font-variation-settings: 'opsz' 96;
+  }
+  .interlude__attr {
+    font-family: var(--serif-display);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 1rem;
+  }
+  .interlude__attr a { color: var(--ink-soft); border-bottom: 1px solid var(--rule); }
+  .interlude__attr a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* From the pantry: list with thumbs */
+  .departments {
+    padding: 84px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .departments__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    margin-top: 36px;
+  }
+  .dept__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+  }
+  .dept__head h3 {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 1.35rem;
+    font-weight: 500;
+    margin: 0;
+  }
+  .dept__head .kicker--ink { font-style: normal; }
+  .dept__list { list-style: none; padding: 0; margin: 0; }
+  .dept__list li {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 18px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    align-items: start;
+  }
+  .dept__list li:last-child { border-bottom: 0; }
+  .dept__num {
+    font-family: var(--serif-display);
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+    padding-top: 2px;
+  }
+  .dept__list h4 {
+    font-family: var(--serif-display);
+    font-size: 1.1rem;
+    line-height: 1.25;
+    font-weight: 500;
+    margin: 0 0 .25em;
+  }
+  .dept__list h4 a { color: var(--ink); border-bottom: 0; }
+  .dept__list h4 a:hover { color: var(--accent); }
+  .dept__list p {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 820px) {
+    .departments__grid { grid-template-columns: 1fr; gap: 40px; }
+    .departments { padding: 56px 0; }
+  }
+
+  /* Subscribe block — only centered editorial block besides masthead */
+  .subscribe {
+    background: var(--bg-deep);
+    padding: 96px 0 96px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .subscribe__inner {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+  .subscribe__kicker {
+    font-family: var(--serif-display);
+    font-style: italic;
+    color: var(--accent);
+    font-size: 1rem;
+    margin-bottom: 16px;
+  }
+  .subscribe h2 {
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    line-height: 1.08;
+    margin-bottom: .45em;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+  .subscribe p {
+    font-size: 1.12rem;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 1.6em;
+    max-width: 36rem;
+  }
+  .subscribe__form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0;
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    align-items: stretch;
+  }
+  .subscribe__form input {
+    background: transparent;
+    border: 0;
+    padding: 18px 4px;
+    font-family: var(--serif-text);
+    font-size: 1.05rem;
+    color: var(--ink);
+    outline: none;
+    width: 100%;
+  }
+  .subscribe__form input::placeholder { color: var(--ink-muted); font-style: italic; }
+  .subscribe__form button {
+    background: transparent;
+    border: 0;
+    border-left: 1px solid var(--ink);
+    font-family: var(--serif-display);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding: 0 28px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .subscribe__form button:hover { color: var(--accent); }
+  .subscribe__fine {
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    font-style: italic;
+    margin-top: 14px;
+  }
+
+  /* Contributors strip */
+  .contributors {
+    padding: 56px 0 84px;
+  }
+  .contributors__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    margin-top: 32px;
+  }
+  .contrib h4 {
+    font-family: var(--serif-display);
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin: 0 0 .25em;
+  }
+  .contrib h4 a { color: var(--ink); border-bottom: 0; }
+  .contrib h4 a:hover { color: var(--accent); }
+  .contrib p {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    line-height: 1.45;
+    margin: 0;
+  }
+  .contrib__role {
+    font-family: var(--serif-display);
+    font-style: italic;
+    color: var(--accent);
+    font-size: 0.82rem;
+    margin-bottom: 6px;
+  }
+  @media (max-width: 820px) {
+    .contributors__grid { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+  }
+
+  /* Inline drop cap on lede dek (sentimental flourish) */
+  .lede__dek::first-letter {
+    font-family: var(--serif-display);
+    font-weight: 600;
+    font-style: normal;
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__top">
+    <div class="issue">Issue No. 07 &middot; Autumn / Winter</div>
+    <div class="date mono-num">Saturday, 16 November 2024</div>
+    <div class="sub-link"><a href="about.html">Subscribe</a></div>
+  </div>
+  <div class="masthead">
+    <h1 class="masthead__title"><a href="index.html">Sandfork</a></h1>
+    <div class="masthead__line">Notes from the cooking class &mdash; published twice a year, on paper.</div>
+  </div>
+  <nav class="site-nav" aria-label="Primary">
+    <div class="site-nav__inner">
+      <a href="index.html" aria-current="page">The Issue</a>
+      <a href="tag-page.html">Recipes</a>
+      <a href="tag-page.html">Technique</a>
+      <a href="tag-page.html">Field Notes</a>
+      <a href="tag-page.html">Pantry</a>
+      <a href="author-page.html">Contributors</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ISSUE BANNER LINE -->
+  <div class="wrap">
+    <div class="issue-line">
+      <div class="issue-line__title">In this issue</div>
+      <div class="issue-line__label">&mdash; the long dark &amp; what to cook in it</div>
+      <div class="issue-line__meta">112 pages &middot; printed 04 Nov 2024</div>
+    </div>
+  </div>
+
+  <!-- LEDE / COVER STORY -->
+  <section class="lede">
+    <div class="wrap">
+      <div class="lede__grid">
+        <div class="lede__image">
+          <img src="rick.jpg" alt="A cast-iron pan of braised lamb shoulder cooling on a wooden board, late autumn light from the side">
+        </div>
+        <div class="lede__text">
+          <span class="kicker">The cover story &middot; On Patience</span>
+          <h1><a href="article-page.html">A lamb shoulder is not a weeknight.</a></h1>
+          <p class="lede__dek">Seven hours, a closed oven, and the dignified silence of a cook who has finally stopped checking. Mira Halász on the politics of slow meat and why she stopped apologising for cooking it.</p>
+          <p class="byline"><span>By </span><strong>Mira Hal&aacute;sz</strong> <span class="dot">&middot;</span> Photographs by Joon Park <span class="dot">&middot;</span> 14 min read</p>
+          <div class="lede__cta">
+            <a href="article-page.html">Read the cover story &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUE PROP / INTRO BANNER -->
+  <section class="interlude">
+    <div class="wrap-narrow">
+      <blockquote class="interlude__quote">
+        <p>Sandfork is a paper journal for cooks who&rsquo;d rather understand the dish than collect it. Twice a year we send 112 unhurried pages: recipes that ask questions, technique that holds up to argument, and field notes from kitchens that are not ours.</p>
+        <div class="interlude__attr">&mdash; from the editor&rsquo;s letter, Issue 07. <a href="about.html">Read the full letter</a>.</div>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ASYMMETRIC FEATURE PAIR -->
+  <section class="pair">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>On technique</h2>
+        <div class="section-head__count">Three pieces &middot; pp. 24&ndash;57</div>
+      </div>
+      <div class="pair__grid" style="margin-top:36px;">
+        <div class="pair__main">
+          <div class="pair__image">
+            <img src="rick.jpg" alt="A baker dimpling focaccia dough with floured fingertips">
+          </div>
+          <span class="kicker">The long read</span>
+          <h3><a href="article-page.html">Salt, time, and the second proof: a defence of the slow loaf</a></h3>
+          <p style="font-size:1.05rem;color:var(--ink-soft);line-height:1.55;margin-bottom:1em;">Most home bakers under-ferment. We baked 41 loaves in a Ghent test kitchen across six weeks to figure out why &mdash; and to argue, gently, that your fridge is the most important tool you own.</p>
+          <p class="byline"><strong>Theo van Acker</strong> <span class="dot">&middot;</span> 22 min read <span class="dot">&middot;</span> with diagrams by Lien De Smet</p>
+        </div>
+        <aside class="pair__aside">
+          <div class="pair__item">
+            <span class="kicker">Knife work</span>
+            <h4><a href="article-page.html">The case against the rocking chop</a></h4>
+            <p>Forty years of cooking-school orthodoxy, and most of us are still bruising our parsley. A reluctant correction.</p>
+            <p class="byline"><strong>Ines Marchetti</strong> <span class="dot">&middot;</span> 8 min</p>
+          </div>
+          <div class="pair__item">
+            <span class="kicker">Heat</span>
+            <h4><a href="article-page.html">What carbon-steel actually does that cast-iron doesn&rsquo;t</a></h4>
+            <p>A pan-by-pan account from a kitchen that uses both, daily, for fifteen years. Notes on weight, recovery, and the seasoning that survives a dishwasher.</p>
+            <p class="byline"><strong>Joon Park</strong> <span class="dot">&middot;</span> 11 min</p>
+          </div>
+          <div class="pair__item">
+            <span class="kicker">Brining</span>
+            <h4><a href="article-page.html">Six per cent, by weight, for nearly everything</a></h4>
+            <p>One ratio, written on the wall above the sink, that has replaced a shelf of cookbooks. Why we keep coming back to it.</p>
+            <p class="byline"><strong>Mira Hal&aacute;sz</strong> <span class="dot">&middot;</span> 6 min</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECONDARY STORY GRID: from the issue -->
+  <section class="section-grid">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Field notes</h2>
+        <div class="section-head__count">Reporting &middot; pp. 58&ndash;91</div>
+      </div>
+      <div class="story-grid">
+        <article class="story">
+          <div class="story__image"><img src="rick.jpg" alt="Fish auction at dawn, Ostend"></div>
+          <span class="kicker story__kicker">Ostend, 04:40</span>
+          <h3><a href="article-page.html">The last shouters at the Ostend fish auction</a></h3>
+          <p class="story__dek">Twelve buyers, one auctioneer with a clipboard, and a hall of grey light. A dispatch from the Belgian coast, where the day&rsquo;s catch is sold in under nine minutes.</p>
+          <p class="story__byline">By Anika Vermeulen &middot; 13 min</p>
+        </article>
+        <article class="story">
+          <div class="story__image"><img src="rick.jpg" alt="Hands grading saffron threads on a white sheet"></div>
+          <span class="kicker story__kicker">Mund, Valais</span>
+          <h3><a href="article-page.html">The 1,200-stigma harvest</a></h3>
+          <p class="story__dek">In a single Swiss village, three families still grow saffron the slow way. We spent a week with them, a pair of tweezers, and a kitchen scale that reads to a hundredth of a gram.</p>
+          <p class="story__byline">By Cl&eacute;mence Roy &middot; 17 min</p>
+        </article>
+        <article class="story">
+          <div class="story__image"><img src="rick.jpg" alt="A pot of ki&scaron;k bubbling slowly on a low blue flame"></div>
+          <span class="kicker story__kicker">Aleppo / Berlin</span>
+          <h3><a href="article-page.html">Kishk, twice removed</a></h3>
+          <p class="story__dek">What survives a kitchen&rsquo;s second migration? Rasha Najjar on cooking her grandmother&rsquo;s fermented yoghurt-and-bulgur staple in a Neuk&ouml;lln flat that smells, finally, like home.</p>
+          <p class="story__byline">By Rasha Najjar &middot; 9 min</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPARTMENTS: two columns of small lists -->
+  <section class="departments">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>The rest of the issue</h2>
+        <div class="section-head__count">Departments &middot; pp. 92&ndash;112</div>
+      </div>
+      <div class="departments__grid">
+        <div class="dept">
+          <div class="dept__head">
+            <h3>Recipes for the long dark</h3>
+            <span class="kicker kicker--ink">Six dishes</span>
+          </div>
+          <ul class="dept__list">
+            <li>
+              <span class="dept__num">R.01</span>
+              <div>
+                <h4><a href="article-page.html">A white bean stew that keeps getting better</a></h4>
+                <p>Cooked Tuesday, eaten through Sunday. The dish that taught the editor to stop reheating in a microwave.</p>
+              </div>
+            </li>
+            <li>
+              <span class="dept__num">R.02</span>
+              <div>
+                <h4><a href="article-page.html">Cabbage, anchovy, butter &mdash; and almost nothing else</a></h4>
+                <p>Four ingredients, twenty minutes, and a small argument with the idea that winter cooking has to be elaborate.</p>
+              </div>
+            </li>
+            <li>
+              <span class="dept__num">R.03</span>
+              <div>
+                <h4><a href="article-page.html">A quince paste worth the November afternoon</a></h4>
+                <p>The kind of recipe you make once and then think about every year. Three hours, one copper pot, no shortcuts that worked.</p>
+              </div>
+            </li>
+            <li>
+              <span class="dept__num">R.04</span>
+              <div>
+                <h4><a href="article-page.html">Buckwheat dumplings, with a sauce that&rsquo;s mostly butter</a></h4>
+                <p>From a cookbook that doesn&rsquo;t exist, taught to us by a Slovenian grandmother who refused to write anything down.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="dept">
+          <div class="dept__head">
+            <h3>Pantry &amp; small things</h3>
+            <span class="kicker kicker--ink">Notes &amp; tests</span>
+          </div>
+          <ul class="dept__list">
+            <li>
+              <span class="dept__num">P.01</span>
+              <div>
+                <h4><a href="article-page.html">A blind tasting of seventeen anchovies</a></h4>
+                <p>Sicilian, Cantabrian, supermarket. The cheap tin that placed third &mdash; and the &euro;19 jar that did not place at all.</p>
+              </div>
+            </li>
+            <li>
+              <span class="dept__num">P.02</span>
+              <div>
+                <h4><a href="article-page.html">Five olive oils that taste like something</a></h4>
+                <p>We stopped buying &ldquo;extra virgin&rdquo; and started buying by harvest date. A short guide for anyone tired of green-tinted water.</p>
+              </div>
+            </li>
+            <li>
+              <span class="dept__num">P.03</span>
+              <div>
+                <h4><a href="article-page.html">The case for a second salt</a></h4>
+                <p>One coarse, one fine, both unrefined. What we keep in two unmarked jars within arm&rsquo;s reach of the stove.</p>
+              </div>
+            </li>
+            <li>
+              <span class="dept__num">P.04</span>
+              <div>
+                <h4><a href="article-page.html">Mailbag: vinegar, mostly</a></h4>
+                <p>Readers wrote in about mother-of-vinegar in their cupboards. We replied, in some cases at length, with what we&rsquo;d actually do.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBSCRIBE: the single CTA -->
+  <section class="subscribe">
+    <div class="subscribe__inner">
+      <div class="subscribe__kicker">Sandfork arrives twice a year, flat in a paper sleeve.</div>
+      <h2>Two issues a year, mailed to forty-one countries, never reprinted.</h2>
+      <p>A year&rsquo;s subscription is &euro;48 and includes the Spring and Autumn editions, posted the week they leave the press in Ghent. No app, no archive paywall, no &ldquo;content&rdquo; &mdash; just the journal, in your letterbox, twice. If you stop reading, we stop sending.</p>
+      <form class="subscribe__form" action="about.html" method="get" novalidate>
+        <input type="email" name="email" placeholder="your email, for the order confirmation" aria-label="Email address">
+        <button type="submit">Subscribe &rarr;</button>
+      </form>
+      <p class="subscribe__fine">Or read the <a href="about.html">full subscription terms</a>, browse <a href="about.html">back issues</a>, or find Sandfork at one of <a href="about.html">forty-three stockists</a>.</p>
+    </div>
+  </section>
+
+  <!-- CONTRIBUTORS -->
+  <section class="contributors">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>In this issue, writing</h2>
+        <div class="section-head__count">Eleven contributors</div>
+      </div>
+      <div class="contributors__grid">
+        <div class="contrib">
+          <div class="contrib__role">Cover essay</div>
+          <h4><a href="author-page.html">Mira Hal&aacute;sz</a></h4>
+          <p>Writes about slow cooking and Hungarian kitchens from a top-floor flat in Budapest. Author of <em>Paprika, Honestly</em>.</p>
+        </div>
+        <div class="contrib">
+          <div class="contrib__role">Bread &amp; ferment</div>
+          <h4><a href="author-page.html">Theo van Acker</a></h4>
+          <p>Runs a six-loaf-a-day bakery in Ghent and teaches one Saturday a month. Sandfork&rsquo;s technical editor since Issue 02.</p>
+        </div>
+        <div class="contrib">
+          <div class="contrib__role">Photographs</div>
+          <h4><a href="author-page.html">Joon Park</a></h4>
+          <p>Shoots only in daylight, only on film. Based in Rotterdam. Previous work for <em>Apartamento</em> and <em>The Gourmand</em>.</p>
+        </div>
+        <div class="contrib">
+          <div class="contrib__role">Field reporting</div>
+          <h4><a href="author-page.html">Anika Vermeulen</a></h4>
+          <p>Coastal reporter and former trawler cook. Files from the North Sea, mostly before sunrise, occasionally damp.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__top">
+    <div class="site-footer__brand">
+      <h3>Sandfork</h3>
+      <p>A cooking newsletter and journal &mdash; printed in Antwerp twice a year, mailed flat to subscribers in forty-one countries.</p>
+    </div>
+    <div class="site-footer__col">
+      <h4>Read</h4>
+      <ul>
+        <li><a href="index.html">Current issue</a></li>
+        <li><a href="tag-page.html">Recipes</a></li>
+        <li><a href="tag-page.html">Technique</a></li>
+        <li><a href="tag-page.html">Field notes</a></li>
+        <li><a href="tag-page.html">Archive</a></li>
+      </ul>
+    </div>
+    <div class="site-footer__col">
+      <h4>The Magazine</h4>
+      <ul>
+        <li><a href="about.html">About Sandfork</a></li>
+        <li><a href="author-page.html">Contributors</a></li>
+        <li><a href="about.html">Subscribe (print)</a></li>
+        <li><a href="about.html">Back issues</a></li>
+        <li><a href="about.html">Stockists</a></li>
+      </ul>
+    </div>
+    <div class="site-footer__col">
+      <h4>Elsewhere</h4>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Substack notes</a></li>
+        <li><a href="#">RSS feed</a></li>
+        <li><a href="about.html">Pitch a story</a></li>
+        <li><a href="about.html">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="site-footer__bottom">
+    <div>&copy; 2024 Sandfork Editions BV &middot; Lange Gasthuisstraat 29, Antwerp</div>
+    <div class="colophon">Set in Fraunces &amp; Source Serif 4. Printed by De Wilde, Ghent.</div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+schema_version = "1.1"
+
+[task]
+name = "web-design/auth_glassy-001"
+description = "Replicate a synthesised A12 website (Mint Ledger) from screenshots."
+authors = []
+keywords = ["web", "html", "css", "visual", "synth", "A12"]
+
+[metadata]
+source = "synthesised"
+archetype = "A12"
+vertical = "fintech"
+difficulty = "easy"
+category = "synth"
+
+[verifier]
+timeout_sec = 600.0
+
+[agent]
+timeout_sec = 1200.0
+
+[environment]
+build_timeout_sec = 1200.0
+cpus = 2
+memory_mb = 4096
+storage_mb = 10240
+gpus = 0
+allow_internet = true

@@ -1,0 +1,59 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "saas_minimal-0000",
+    "archetype": "A1",
+    "vertical": "devtools",
+    "style": {
+      "density": "sparse",
+      "color_regime": "pastel",
+      "typography": "geometric-sans",
+      "border_language": "hairline-1px",
+      "motif": "clean-iconographic"
+    },
+    "palette_seed": "#0EA5E9",
+    "font_pair": [
+      "Inter",
+      "Inter",
+      null
+    ],
+    "difficulty": "easy",
+    "sitemap": [
+      "index",
+      "contact",
+      "about",
+      "integrations",
+      "pricing",
+      "customers"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Riverbed",
+      "tagline": "Observability that follows the request",
+      "value_prop": "Riverbed traces every request across services without manual instrumentation. Open-source agent, hosted query plane, $0 to start.",
+      "product_category": "distributed tracing / observability",
+      "target_audience": "platform and SRE teams"
+    },
+    "notes": "Design reference: linear.app, attio.com, stripe.com. Lots of whitespace, 1px borders on cards (no shadows), single accent color from the palette, pale off-white backgrounds. Avoid centered-on-everything; use generous left-aligned hero typography. Hero takes ~70vh on first paint. Riverbed's tone: \"Observability that follows the request\" \u2014 keep copy crisp, benefit-led, no jargon."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "about",
+    "contact",
+    "customers",
+    "index",
+    "integrations",
+    "pricing"
+  ],
+  "files": [
+    "about.html",
+    "contact.html",
+    "customers.html",
+    "index.html",
+    "integrations.html",
+    "pricing.html",
+    "styles.css"
+  ],
+  "has_external_css": true,
+  "assets": []
+}

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selected Work — Locomotive®</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .work-hero{padding:64px 0 32px;position:relative}
+  .work-hero h1{font-size:clamp(56px,11vw,168px);line-height:0.86}
+  .work-hero .outline{-webkit-text-stroke:2px var(--ink);color:transparent}
+  .work-hero__meta{display:flex;flex-wrap:wrap;gap:18px 36px;align-items:flex-end;justify-content:space-between;margin-top:36px}
+  .work-hero__count{font-family:var(--font-display);font-weight:800;font-size:64px;letter-spacing:-0.04em;line-height:1}
+  .work-hero__count span{display:block;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;font-family:var(--font-body);font-weight:600;color:var(--muted);margin-top:6px}
+  .filterbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:22px 0;border-top:var(--border) solid var(--ink);border-bottom:var(--border) solid var(--ink);margin-top:32px}
+  .filterbar .chip{border:var(--border) solid var(--ink);padding:8px 14px;font-family:var(--font-display);font-weight:700;font-size:13px;background:var(--paper);cursor:pointer;letter-spacing:-0.01em}
+  .filterbar .chip.is-on{background:var(--ink);color:#fff}
+  .filterbar .chip--yellow{background:var(--accent-2)}
+  .filterbar .spacer{flex:1}
+  .filterbar .switch{font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);display:flex;gap:14px}
+  .filterbar .switch a.on{color:var(--ink);border-bottom:2px solid var(--ink);padding-bottom:2px}
+
+  .grid-work{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-top:48px}
+  .grid-work .tile{grid-column:span 6}
+  .grid-work .span-7{grid-column:span 7}
+  .grid-work .span-5{grid-column:span 5}
+  .grid-work .span-4{grid-column:span 4}
+  .grid-work .span-8{grid-column:span 8}
+  .grid-work .span-12{grid-column:span 12}
+  .grid-work .offset-1{grid-column:2 / span 5}
+  .grid-work .offset-right{grid-column:8 / span 5}
+  @media(max-width:1000px){.grid-work{grid-template-columns:1fr;gap:20px}.grid-work .tile,.grid-work .span-7,.grid-work .span-5,.grid-work .span-4,.grid-work .span-8,.grid-work .span-12,.grid-work .offset-1,.grid-work .offset-right{grid-column:1 / -1}}
+
+  .tile__media .swatch{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-start;padding:24px;font-family:var(--font-display);font-weight:900;font-size:clamp(36px,4.4vw,76px);letter-spacing:-0.05em;line-height:0.9}
+  .swatch--blue{background:var(--accent);color:#fff}
+  .swatch--yellow{background:var(--accent-2);color:var(--ink)}
+  .swatch--red{background:var(--accent-3);color:#fff}
+  .swatch--ink{background:var(--ink);color:#fff}
+  .swatch--paper{background:#EFEFEA;color:var(--ink)}
+  .swatch--cream{background:#F2E9D8;color:var(--ink)}
+  .swatch__sub{position:absolute;top:18px;right:18px;font-family:var(--font-body);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:600;opacity:.85}
+  .swatch .italic-slant{font-style:italic;font-weight:500}
+  .swatch .outline{-webkit-text-stroke:2px currentColor;color:transparent}
+
+  .pin{position:absolute;top:14px;right:14px;background:var(--accent-2);color:var(--ink);border:var(--border) solid var(--ink);padding:6px 10px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;transform:rotate(3deg);z-index:2}
+  .pin--red{background:var(--accent-3);color:#fff}
+
+  .interlude{display:grid;grid-template-columns:1.1fr .9fr;gap:0;border-top:var(--border) solid var(--ink);border-bottom:var(--border) solid var(--ink);margin-top:48px}
+  .interlude > div{padding:56px 40px}
+  .interlude > div + div{border-left:var(--border) solid var(--ink)}
+  .interlude h2{font-size:clamp(36px,5.4vw,84px)}
+  .interlude .badge-circle{position:absolute;right:32px;top:32px}
+  .interlude__right{background:var(--ink);color:#fff;position:relative}
+  .interlude__right .badge-circle{background:var(--accent-3);color:#fff;border-color:#fff;transform:rotate(6deg)}
+  @media(max-width:900px){.interlude{grid-template-columns:1fr}.interlude > div + div{border-left:0;border-top:var(--border) solid var(--ink)}}
+
+  .archive{margin-top:64px}
+  .archive h3{margin-bottom:20px}
+  .row-list .label em{font-style:italic;font-weight:500}
+
+  .cta-strip{margin:96px 0 0;padding:72px 40px;background:var(--accent);color:#fff;border-top:var(--border) solid var(--ink);border-bottom:var(--border) solid var(--ink);display:flex;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap}
+  .cta-strip h2{font-size:clamp(36px,5.2vw,84px);max-width:18ch}
+  .cta-strip .btn{background:var(--accent-2);color:var(--ink);box-shadow:var(--shadow-offset) var(--shadow-offset) 0 0 var(--ink)}
+
+  .site-header .nav a[href="work-index.html"]{background:var(--accent-2);padding:4px 8px;border:2px solid var(--ink)}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a href="index.html" class="brand" aria-label="Locomotive home">
+      <span class="brand__dot" aria-hidden="true"></span>
+      <span class="brand__mark">Locomotive<span class="text-accent">®</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="work-index.html" class="active">Work</a>
+      <a href="about.html">Studio</a>
+      <a href="about.html#services">Services</a>
+      <a href="about.html#journal">Journal</a>
+      <span class="nav__status mono">Booking Q3 ’25</span>
+      <a href="contact.html" class="btn btn--yellow nav__cta">Start a project <span class="arrow">→</span></a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="work-hero wrap">
+    <p class="eyebrow" style="margin-bottom:24px">Index — 2019 → 2025</p>
+    <h1 class="tight">Things that <span class="italic-slant">move</span>,<br>and the <span class="outline">brands</span> behind them.</h1>
+    <div class="work-hero__meta">
+      <p class="lede" style="max-width:42ch;margin:0">Forty-one shipped builds. A handful of NDAs. Zero stock easings. Filter by what you came here to look at — or scroll the whole thing, that's why we kept it long.</p>
+      <div style="display:flex;gap:48px;align-items:flex-end">
+        <div class="work-hero__count">41<span>Shipped projects</span></div>
+        <div class="work-hero__count">12<span>Awwwards SOTD</span></div>
+      </div>
+    </div>
+
+    <div class="filterbar">
+      <span class="mono" style="margin-right:6px">FILTER:</span>
+      <button class="chip is-on">All work</button>
+      <button class="chip">Brand sites</button>
+      <button class="chip">Editorial</button>
+      <button class="chip chip--yellow">WebGL / 3D</button>
+      <button class="chip">E-commerce</button>
+      <button class="chip">Product launch</button>
+      <button class="chip">Identity</button>
+      <span class="spacer"></span>
+      <span class="switch"><a href="#" class="on">Grid</a><a href="#">Index</a></span>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:32px">
+    <div class="grid-work">
+
+      <a href="case-study.html" class="tile span-8">
+        <span class="pin pin--red">Featured · 2025</span>
+        <div class="tile__media tile__media--wide">
+          <div class="swatch swatch--blue"><span class="swatch__sub">Maison Voyou · Brand site</span>The kitchen, <span class="italic-slant">unbuttoned.</span></div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Maison Voyou — A bistro that scrolls like a tasting menu</span>
+          <span class="tile__meta">F&amp;B · WebGL</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-4">
+        <div class="tile__media tile__media--tall">
+          <div class="swatch swatch--yellow"><span class="swatch__sub">Studio Klaxon</span>Honk, <br>but make it <span class="outline">type.</span></div>
+          <span class="tile__tag">Identity</span>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Studio Klaxon</span>
+          <span class="tile__meta">’25</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-5">
+        <div class="tile__media">
+          <div class="swatch swatch--ink"><span class="swatch__sub">Northbound Records · Label site</span>Side <span class="italic-slant">A.</span></div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Northbound Records — A label site that spins like a record</span>
+          <span class="tile__meta">Music · 2024</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-7">
+        <span class="pin">Webby winner</span>
+        <div class="tile__media tile__media--wide">
+          <div class="swatch swatch--red"><span class="swatch__sub">Atelier Forge · E-commerce</span>Hand-forged. <br>Cursor-aware.</div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Atelier Forge — Knives, leather, and a checkout that breathes</span>
+          <span class="tile__meta">Commerce · Shopify Hydrogen</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-4">
+        <div class="tile__media">
+          <div class="swatch swatch--cream"><span class="swatch__sub">Périphérique Coffee</span>Roast<br>notes,<br>scrolled.</div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Périphérique Coffee</span>
+          <span class="tile__meta">D2C · ’24</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-4">
+        <div class="tile__media">
+          <div class="swatch swatch--blue"><span class="swatch__sub">FRMT Magazine</span>Issue <span class="italic-slant">07</span></div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">FRMT Mag · Issue 07</span>
+          <span class="tile__meta">Editorial</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-4">
+        <div class="tile__media">
+          <div class="swatch swatch--paper"><span class="swatch__sub">Halcyon Skis</span>Powder.<br><span class="outline">Physics.</span></div>
+          <span class="tile__tag">WebGL</span>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Halcyon Skis — Product launch</span>
+          <span class="tile__meta">Sport · ’24</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="interlude wrap-wide" style="margin:0">
+    <div>
+      <p class="eyebrow" style="margin-bottom:18px">Mid-scroll interlude — Nº 02</p>
+      <h2>We don't do <span class="italic-slant">case studies.</span> We do <span class="outline" style="-webkit-text-stroke:2px var(--ink);color:transparent">receipts.</span></h2>
+      <p style="max-width:48ch;margin-top:24px;font-size:16px">Every project below ships with the engineering notes, the Lighthouse run, and the part where the client says "can we make it bouncier." Click any tile to see the build, not the brochure.</p>
+      <a href="contact.html" class="btn btn--red" style="margin-top:8px">Request a deck <span class="arrow">→</span></a>
+    </div>
+    <div class="interlude__right">
+      <span class="badge-circle">Built<br>in-house<br>· 100%</span>
+      <p class="eyebrow" style="color:var(--accent-2);margin-bottom:18px">By the numbers — last 18 months</p>
+      <table class="meta-table" style="color:#fff">
+        <tr><th style="color:#fff">Avg. Lighthouse perf</th><td>96 / 100</td></tr>
+        <tr><th style="color:#fff">Avg. time to first byte</th><td>184 ms</td></tr>
+        <tr><th style="color:#fff">WebGL builds shipped</th><td>14</td></tr>
+        <tr><th style="color:#fff">CMS of choice</th><td>Sanity · Storyblok · Prismic</td></tr>
+        <tr style="border-bottom:0"><th style="color:#fff;border-bottom:0">Repeat-client rate</th><td style="border-bottom:0">71%</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding:72px 28px 0">
+    <div class="grid-work">
+
+      <a href="case-study.html" class="tile span-7">
+        <div class="tile__media tile__media--wide">
+          <div class="swatch swatch--yellow"><span class="swatch__sub">Volute Architects</span>Buildings<br>that <span class="italic-slant">breathe.</span></div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Volute Architects — A practice portfolio that thinks in elevations</span>
+          <span class="tile__meta">Architecture · 2023</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-5">
+        <span class="pin">FWA of the day</span>
+        <div class="tile__media">
+          <div class="swatch swatch--red"><span class="swatch__sub">Mira Cosmetics</span>Lipstick,<br><span class="outline">animated.</span></div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Mira Cosmetics — DTC launch</span>
+          <span class="tile__meta">Beauty · 2023</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-4">
+        <div class="tile__media tile__media--tall">
+          <div class="swatch swatch--ink"><span class="swatch__sub">Brut Cinema</span>Trailers<br>that<br><span class="italic-slant">scroll.</span></div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Brut Cinema</span>
+          <span class="tile__meta">Film · ’23</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-8">
+        <div class="tile__media tile__media--wide">
+          <div class="swatch swatch--blue"><span class="swatch__sub">Pélagie Swim · Brand &amp; site</span>Tide-locked. Pixel-aware.</div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Pélagie Swim — A swimwear brand built around the lunar calendar</span>
+          <span class="tile__meta">Fashion · 2022</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-4">
+        <div class="tile__media">
+          <div class="swatch swatch--paper"><span class="swatch__sub">Kestrel Bicycles</span>Cadence<br><span class="outline">↓</span></div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Kestrel Bicycles</span>
+          <span class="tile__meta">Sport · ’22</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-4">
+        <div class="tile__media">
+          <div class="swatch swatch--cream"><span class="swatch__sub">La Sève Spa</span>Slow,<br>on <span class="italic-slant">purpose.</span></div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">La Sève Spa</span>
+          <span class="tile__meta">Hospitality · ’22</span>
+        </div>
+      </a>
+
+      <a href="case-study.html" class="tile span-4">
+        <span class="pin">CSSDA</span>
+        <div class="tile__media">
+          <div class="swatch swatch--yellow"><span class="swatch__sub">Onyx Festival ’22</span>Three<br>days, one<br><span class="outline">site.</span></div>
+        </div>
+        <div class="tile__body">
+          <span class="tile__title">Onyx Festival</span>
+          <span class="tile__meta">Event · ’22</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-top:32px">
+    <div class="ticker" style="margin-top:72px">
+      <div class="ticker__track">
+        <span>Selected work · 2019 → 2025</span><span class="star">✺</span>
+        <span>Forty-one ships</span><span class="star">✺</span>
+        <span>Twelve SOTD</span><span class="star">✺</span>
+        <span>Eight FWA</span><span class="star">✺</span>
+        <span>Zero stock easings</span><span class="star">✺</span>
+        <span>Selected work · 2019 → 2025</span><span class="star">✺</span>
+        <span>Forty-one ships</span><span class="star">✺</span>
+        <span>Twelve SOTD</span><span class="star">✺</span>
+        <span>Eight FWA</span><span class="star">✺</span>
+        <span>Zero stock easings</span><span class="star">✺</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap archive section-tight">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;gap:24px;flex-wrap:wrap">
+      <div>
+        <p class="eyebrow">Archive — 2019 → 2021</p>
+        <h3 style="margin-top:10px">The deep cuts.</h3>
+      </div>
+      <p style="max-width:42ch;font-size:14px;color:var(--muted);margin:0">Pre-pandemic and pandemic-era builds. Most still hold up. A couple we'd redo if the client called tomorrow.</p>
+    </div>
+
+    <ol class="row-list" start="15">
+      <li>
+        <span class="num">15 /</span>
+        <span class="label">Rabot &amp; Cie — Joinery <em>portfolio</em></span>
+        <span class="meta">2021 · Brand site</span>
+      </li>
+      <li>
+        <span class="num">16 /</span>
+        <span class="label">Hôtel Vermeil — Booking flow, reimagined</span>
+        <span class="meta">2021 · Hospitality</span>
+      </li>
+      <li>
+        <span class="num">17 /</span>
+        <span class="label">Studio Buchet — A photographer's <em>diary</em></span>
+        <span class="meta">2020 · Editorial</span>
+      </li>
+      <li>
+        <span class="num">18 /</span>
+        <span class="label">Coursier Co. — Last-mile delivery, first-class UI</span>
+        <span class="meta">2020 · Product</span>
+      </li>
+      <li>
+        <span class="num">19 /</span>
+        <span class="label">Bréf Books — Imprint launch &amp; reader</span>
+        <span class="meta">2020 · Publishing</span>
+      </li>
+      <li>
+        <span class="num">20 /</span>
+        <span class="label">Tonnerre Audio — Headphones that <em>look loud</em></span>
+        <span class="meta">2019 · Product launch</span>
+      </li>
+      <li>
+        <span class="num">21 /</span>
+        <span class="label">Marais Optique — Eyewear configurator</span>
+        <span class="meta">2019 · Commerce</span>
+      </li>
+      <li>
+        <span class="num">22 /</span>
+        <span class="label">Saison — Restaurant group, four sites, one CMS</span>
+        <span class="meta">2019 · F&amp;B</span>
+      </li>
+    </ol>
+
+    <p class="mono" style="margin-top:24px;color:var(--muted)">Showing 22 of 41 — older work available on request. A few projects sit under NDA; we'll walk you through them on a call.</p>
+  </section>
+
+  <section class="wrap">
+    <div class="cta-strip">
+      <h2 class="tight">Got something <span class="italic-slant">cinematic</span> in the pipeline?</h2>
+      <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+        <p class="mono" style="margin:0">BOOKING Q3 ’25 — TWO SLOTS LEFT</p>
+        <a href="contact.html" class="btn">Start a project <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__top">
+    <div class="site-footer__bigmark">Let’s make<br>something <span class="underline">move.</span></div>
+
+    <div class="site-footer__cols">
+      <div class="site-footer__col site-footer__contact">
+        <h5>New business</h5>
+        <a href="mailto:hello@locomotive.studio">hello@locomotive.studio</a>
+        <ul style="margin-top:22px">
+          <li>14 Rue Saint-Paul, Montréal QC</li>
+          <li>+1 (514) 555 0188</li>
+          <li>Studio hours · Mon–Fri 09:00–18:00 ET</li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Navigate</h5>
+        <ul>
+          <li><a href="work-index.html">Selected work</a></li>
+          <li><a href="about.html">The studio</a></li>
+          <li><a href="about.html#services">Capabilities</a></li>
+          <li><a href="about.html#journal">Journal</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Elsewhere</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Are.na</a></li>
+          <li><a href="#">Vimeo</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Read.cv</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__col">
+        <h5>Recognition</h5>
+        <ul>
+          <li>Awwwards · 12 SOTD</li>
+          <li>FWA · 8 wins</li>
+          <li>CSSDA · Best Studio ’24</li>
+          <li>Webby Honoree ’23</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="site-footer__bottom">
+    <span>© 2018–2025 Locomotive Studio Inc.</span>
+    <span>Built in Montréal · Running on espresso &amp; GSAP</span>
+    <span>v4.2.1 · Last deploy 3h ago</span>
+  </div>
+</footer>
+
+</body>
+</html>

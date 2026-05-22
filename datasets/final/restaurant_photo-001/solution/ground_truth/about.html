@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Salt &amp; Field</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .about-hero { padding: 96px 0 64px; border-bottom: 1px solid var(--rule); }
+  .about-hero-grid { display: grid; grid-template-columns: 4fr 8fr; gap: 80px; align-items: end; }
+  .about-hero-grid .eyebrow { margin-bottom: 18px; }
+  @media (max-width: 820px) { .about-hero-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+  .mission-block { padding: 80px 0; }
+  .mission-block p { font-family: var(--serif); font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1.3; max-width: 880px; color: var(--ink); }
+  .mission-block p .italic { color: var(--ink-soft); }
+
+  .story-figure figcaption { font-family: var(--serif); font-style: italic; font-size: 0.95rem; color: var(--ink-mute); margin-top: 12px; line-height: 1.45; }
+  .story-body p { font-size: 1.02rem; line-height: 1.75; color: var(--ink-soft); margin-bottom: 1.3em; }
+  .story-body p:first-of-type::first-letter { font-family: var(--serif); font-size: 4.6rem; line-height: 0.85; float: left; padding: 6px 14px 0 0; color: var(--accent); }
+
+  .pullquote { padding: 32px 0 64px; }
+  .pullquote blockquote { font-family: var(--serif); font-style: italic; font-size: clamp(1.7rem, 3.4vw, 2.8rem); line-height: 1.15; color: var(--ink); border-left: 1px solid var(--accent); padding-left: 28px; max-width: 880px; }
+  .pullquote cite { display: block; margin-top: 18px; font-style: normal; font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); }
+
+  .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px 32px; }
+  @media (max-width: 980px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .team-grid { grid-template-columns: 1fr; } }
+  .team-card .portrait { aspect-ratio: 4/5; background: var(--bg-deep); overflow: hidden; margin-bottom: 18px; }
+  .team-card .portrait img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.9) contrast(0.95); }
+  .team-card h3 { font-family: var(--serif); font-size: 1.5rem; line-height: 1.15; margin-bottom: 4px; font-weight: 400; }
+  .team-card .role { font-family: var(--serif); font-style: italic; font-size: 0.98rem; color: var(--accent); margin-bottom: 8px; }
+  .team-card p { font-size: 0.92rem; line-height: 1.55; color: var(--ink-soft); }
+
+  .values-section { padding: 120px 0; }
+  .values-head { display: grid; grid-template-columns: 5fr 7fr; gap: 56px; margin-bottom: 64px; align-items: end; }
+  @media (max-width: 820px) { .values-head { grid-template-columns: 1fr; gap: 24px; } }
+  .values-list { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+  .values-list li { display: grid; grid-template-columns: 80px 1fr 2fr; gap: 32px; padding: 32px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+  @media (max-width: 820px) { .values-list li { grid-template-columns: 1fr; gap: 8px; } }
+  .values-list .num { font-family: var(--serif); font-style: italic; font-size: 1.6rem; color: var(--accent); }
+  .values-list h3 { font-family: var(--serif); font-size: 1.6rem; font-weight: 400; line-height: 1.1; }
+  .values-list p { font-size: 0.98rem; line-height: 1.65; color: var(--ink-soft); }
+
+  .farm-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; background: var(--rule); }
+  .farm-strip figure { background: var(--bg-deep); aspect-ratio: 1/1; overflow: hidden; }
+  .farm-strip img { width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 640px) { .farm-strip { grid-template-columns: 1fr 1fr; } }
+
+  .closing { padding: 96px 0; text-align: left; }
+  .closing .display-l { max-width: 880px; margin-bottom: 32px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav" aria-label="Primary">
+    <div class="nav-left">
+      <a href="menu.html" class="nav-link">Menu</a>
+      <a href="about.html" class="nav-link current">About</a>
+      <a href="location.html" class="nav-link">Location</a>
+      <a href="press.html" class="nav-link">Press</a>
+    </div>
+    <a href="index.html" class="nav-brand">Salt <span class="amp">&amp;</span> Field</a>
+    <div class="nav-right">
+      <span class="nav-meta">Thu&ndash;Sun &middot; 5:30 &amp; 8:00</span>
+      <a href="reservations.html" class="nav-cta">Reserve</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="about-hero">
+    <div class="wrap">
+      <div class="about-hero-grid">
+        <div>
+          <p class="eyebrow eyebrow-accent">About the house</p>
+        </div>
+        <div>
+          <h1 class="display-l">A restaurant that begins<br>at the seed packet.</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mission-block">
+    <div class="wrap">
+      <p>Salt <span class="italic" style="color: var(--accent);">&amp;</span> Field exists to make the case that a meal can be a place &mdash; <span class="italic">that the soil, the cook, the table, and the guest are not separate things,</span> but four hours of one continuous argument.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="section-loose" id="story">
+    <div class="wrap">
+      <div class="asym-grid">
+        <figure class="story-figure">
+          <img src="rick.jpg" alt="The original packing shed, 2019">
+          <figcaption>The packing shed in winter, 2019 &mdash; six months before the first service.</figcaption>
+        </figure>
+        <div class="story-body">
+          <p class="eyebrow" style="margin-bottom: 18px;">The founding</p>
+          <h2 class="display-m" style="margin-bottom: 24px;">We bought twelve acres of a failing apple ranch in the spring of 2019.</h2>
+          <p>Maren had been cooking on the line at Atelier Crenn; Tomás had spent six seasons running the kitchen garden at Blue Hill at Stone Barns. They wanted to stop ferrying produce in coolers and start cooking ten feet from where it grew. Anderson Valley &mdash; cool nights, long days, an obstinate marine fog &mdash; turned out to be the place that would let them.</p>
+          <p>The first year was mostly fencing. The deer were prolific, the gophers were mythic, and the well needed re-drilling at depths the previous owners had stopped admitting to. We planted forty varieties of brassica, lost most of them, and learned which six wanted to live here. The restaurant opened in a converted hop kiln in October 2020, to fourteen people, on folding chairs, with one wood-fired oven and a borrowed sound system.</p>
+          <p>Four years on, the kiln seats forty. The garden is two acres of intensive market beds and another eight in perennials, grain, and pasture. We still grow most of what we serve, and we still fence against the deer every spring.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-deep pullquote">
+    <div class="wrap">
+      <blockquote>
+        &ldquo;We don&rsquo;t cook from the farm. We cook <span class="italic">because</span> of it &mdash; on its schedule, in its mood, with whatever it has decided to give us this week.&rdquo;
+        <cite>&mdash; Maren Holloway, chef &amp; co-owner</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="section-loose" id="chef">
+    <div class="wrap">
+      <div style="display: grid; grid-template-columns: 5fr 7fr; gap: 56px; margin-bottom: 64px; align-items: end;">
+        <div>
+          <p class="eyebrow eyebrow-accent">The people</p>
+        </div>
+        <div>
+          <h2 class="display-l">Eleven of us, most days. Twelve when the goat is in.</h2>
+        </div>
+      </div>
+
+      <div class="team-grid">
+        <article class="team-card">
+          <div class="portrait"><img src="rick.jpg" alt="Maren Holloway"></div>
+          <h3>Maren Holloway</h3>
+          <p class="role">Chef &amp; co-owner</p>
+          <p>Trained at Atelier Crenn and Saison. Writes the menu every Wednesday and changes her mind on Friday.</p>
+        </article>
+
+        <article class="team-card">
+          <div class="portrait"><img src="rick.jpg" alt="Tomás Berenguer"></div>
+          <h3>Tom&aacute;s Berenguer</h3>
+          <p class="role">Farm director &amp; co-owner</p>
+          <p>Came north from Stone Barns in 2019. Knows every square meter of the garden by smell.</p>
+        </article>
+
+        <article class="team-card">
+          <div class="portrait"><img src="rick.jpg" alt="Idris Okafor"></div>
+          <h3>Idris Okafor</h3>
+          <p class="role">Sous chef</p>
+          <p>Runs the wood oven and the bread program. Bakes the sourdough at four in the morning, six days a week.</p>
+        </article>
+
+        <article class="team-card">
+          <div class="portrait"><img src="rick.jpg" alt="June Adachi"></div>
+          <h3>June Adachi</h3>
+          <p class="role">Pastry &amp; ferments</p>
+          <p>Keeps the koji room, the miso closet, and most of the sweet courses. Formerly of Single Thread.</p>
+        </article>
+
+        <article class="team-card">
+          <div class="portrait"><img src="rick.jpg" alt="Caleb Maren"></div>
+          <h3>Caleb Maren</h3>
+          <p class="role">Wine director</p>
+          <p>Sources from forty growers within a hundred miles. Will pour you something orange if you let him.</p>
+        </article>
+
+        <article class="team-card">
+          <div class="portrait"><img src="rick.jpg" alt="Sofia Renteria"></div>
+          <h3>Sof&iacute;a Renter&iacute;a</h3>
+          <p class="role">Dining room manager</p>
+          <p>Twelve years at Chez Panisse before us. The reason the room feels like a kitchen table.</p>
+        </article>
+
+        <article class="team-card">
+          <div class="portrait"><img src="rick.jpg" alt="Pablo Whitfield"></div>
+          <h3>Pablo Whitfield</h3>
+          <p class="role">Field manager</p>
+          <p>Handles the perennials, the cover crops, and the apiary. Started as a wwoofer in 2020 and stayed.</p>
+        </article>
+
+        <article class="team-card">
+          <div class="portrait"><img src="rick.jpg" alt="Nora Linklater"></div>
+          <h3>Nora Linklater</h3>
+          <p class="role">Forager &amp; preserver</p>
+          <p>Walks the ridge most mornings. Stocks the larder with bay nuts, miner&rsquo;s lettuce, and elderflower vinegar.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-warm values-section" id="farm">
+    <div class="wrap">
+      <div class="values-head">
+        <div>
+          <p class="eyebrow eyebrow-accent">How we work</p>
+        </div>
+        <div>
+          <h2 class="display-l">Five things we&rsquo;ve decided to be stubborn about.</h2>
+          <p class="dek" style="margin-top: 20px;">Not rules, exactly &mdash; more like the arguments we&rsquo;ve already had with ourselves.</p>
+        </div>
+      </div>
+
+      <ol class="values-list">
+        <li>
+          <span class="num">01</span>
+          <h3>Grow most of it ourselves.</h3>
+          <p>Roughly seventy percent of what reaches the plate comes from our two acres of beds or our pasture. The rest is sourced inside a hundred-mile arc &mdash; fish from Fort Bragg, lamb from Boonville, olive oil from McEvoy.</p>
+        </li>
+        <li>
+          <span class="num">02</span>
+          <h3>Let the field write the menu.</h3>
+          <p>We don&rsquo;t plan dishes more than a week ahead. If the favas are early, the favas lead. If a storm flattens the brassicas, we eat root cellar for a fortnight and don&rsquo;t apologize.</p>
+        </li>
+        <li>
+          <span class="num">03</span>
+          <h3>Pay everyone a livable wage.</h3>
+          <p>No tipping. A flat 20% service charge is built into the menu price and distributed across the entire staff &mdash; farm, kitchen, dining room. Health insurance for full-time team members from day one.</p>
+        </li>
+        <li>
+          <span class="num">04</span>
+          <h3>Compost everything that can be composted.</h3>
+          <p>Scraps go back to the beds within forty-eight hours. We&rsquo;ve sent under two cubic yards of restaurant waste to the landfill in the last calendar year. The pigs handle the rest.</p>
+        </li>
+        <li>
+          <span class="num">05</span>
+          <h3>Keep the room to forty seats.</h3>
+          <p>We could double the dining room. We won&rsquo;t. Forty is the number at which the kitchen still recognizes every plate that leaves the pass, and at which the farm can keep up without buying its way out.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="farm-strip">
+      <figure><img src="rick.jpg" alt="Morning harvest"></figure>
+      <figure><img src="rick.jpg" alt="Wood oven"></figure>
+      <figure><img src="rick.jpg" alt="The dining room at dusk"></figure>
+    </div>
+  </section>
+
+  <section class="section-ink closing">
+    <div class="wrap">
+      <p class="eyebrow" style="margin-bottom: 24px;">Come for an evening</p>
+      <h2 class="display-l">Two seatings a night, Thursday through Sunday. <span class="italic" style="color: var(--bg-deep);">We&rsquo;d like to cook for you.</span></h2>
+      <div style="display: flex; gap: 32px; align-items: center; flex-wrap: wrap; margin-top: 8px;">
+        <a href="reservations.html" class="btn" style="background: var(--bg-warm); color: var(--ink); border-color: var(--bg-warm);">Reserve a table</a>
+        <a href="menu.html" class="btn-link" style="color: var(--bg-warm);">See this week&rsquo;s menu</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">Salt <span class="amp">&amp;</span> Field</div>
+        <p class="footer-tag">A forty-seat restaurant on a regenerative farm in the Anderson Valley. Tasting menus only, Thursday through Sunday.</p>
+        <p style="font-size: 0.88rem; line-height: 1.6;">2840 Greenwood Ridge Road<br>Philo, California 95466<br><a href="tel:+17078954400">(707) 895-4400</a></p>
+      </div>
+      <div class="footer-col">
+        <h4>Visit</h4>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="menu.html">Tasting menu</a></li>
+          <li><a href="location.html">Directions</a></li>
+          <li><a href="location.html#hours">Hours</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>The Farm</h4>
+        <ul>
+          <li><a href="about.html">Our story</a></li>
+          <li><a href="about.html#chef">Chef &amp; team</a></li>
+          <li><a href="about.html#farm">Growing practices</a></li>
+          <li><a href="press.html">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Stay close</h4>
+        <ul>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Private events</a></li>
+          <li><a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2024 Salt &amp; Field. All rights reserved.</span>
+      <span class="footer-meta">Grown, cooked, and served in Mendocino County.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

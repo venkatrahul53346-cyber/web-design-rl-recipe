@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reserve a seat — Pliny</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .reserve-hero { padding: 160px 0 40px; text-align: left; }
+  .reserve-hero .display-xl { max-width: 14ch; }
+  .reserve-hero .lede { margin-top: 36px; }
+  .reserve-meta {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    margin-top: 80px;
+  }
+  .reserve-meta > div {
+    padding: 28px 24px 28px 0; border-right: 1px solid var(--rule);
+  }
+  .reserve-meta > div:last-child { border-right: none; }
+  .reserve-meta .num {
+    font-family: var(--display); font-size: 40px; letter-spacing: -0.035em;
+    line-height: 1; font-variation-settings: 'wght' 480; font-variant-numeric: tabular-nums;
+    margin-bottom: 14px;
+  }
+  .reserve-meta .num .accent { color: var(--accent); }
+  .reserve-meta .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+
+  .form-shell {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 96px;
+    align-items: start;
+  }
+  .form-shell .col-aside {
+    position: sticky; top: 120px;
+    border-top: 1px solid var(--accent);
+    padding-top: 28px;
+  }
+  .form-shell .col-aside h3 {
+    font-size: 22px; letter-spacing: -0.03em; margin-bottom: 16px;
+  }
+  .form-shell .col-aside p { color: var(--ink-dim); font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+  .form-shell .col-aside .label-mono { display: block; margin-bottom: 8px; }
+
+  form.reserve {
+    display: grid; gap: 0;
+  }
+  .field {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    align-items: end;
+    gap: 32px;
+    padding: 36px 0 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .field label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink-faint); padding-bottom: 14px;
+  }
+  .field input, .field select, .field textarea {
+    background: transparent; border: none; outline: none;
+    color: var(--ink); width: 100%;
+    font-family: var(--display);
+    font-size: clamp(22px, 2.4vw, 34px);
+    letter-spacing: -0.03em; line-height: 1.1;
+    font-variation-settings: 'wght' 460;
+    padding: 8px 0;
+    border-bottom: 1px solid transparent;
+    transition: border-color 160ms ease;
+  }
+  .field input::placeholder, .field textarea::placeholder { color: var(--ink-faint); }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-bottom: 1px solid var(--accent);
+    box-shadow: 0 1px 0 var(--accent-glow);
+  }
+  .field select { appearance: none; -webkit-appearance: none; background-image: none; cursor: pointer; }
+  .field textarea { resize: vertical; min-height: 64px; font-family: var(--body); font-size: 16px; line-height: 1.5; letter-spacing: 0; }
+
+  .seat-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+    border: 1px solid var(--rule);
+    margin-top: 4px;
+  }
+  .seat-grid label {
+    display: block; cursor: pointer;
+    padding: 22px 22px 24px;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+  .seat-grid label:last-child { border-right: none; }
+  .seat-grid input { position: absolute; opacity: 0; pointer-events: none; }
+  .seat-grid .seat-name { font-family: var(--display); font-size: 18px; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .seat-grid .seat-price { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); letter-spacing: 0.06em; margin-bottom: 12px; }
+  .seat-grid .seat-desc { font-size: 12px; color: var(--ink-faint); line-height: 1.5; }
+  .seat-grid label:has(input:checked) { background: #0c0c0c; }
+  .seat-grid label:has(input:checked)::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--accent);
+    box-shadow: 0 0 14px var(--accent-glow);
+  }
+  .seat-grid label:has(input:checked) .seat-price { color: var(--accent); }
+
+  .field-row-stack { display: block; }
+  .field-row-stack label { padding-bottom: 0; margin-bottom: 18px; }
+
+  .form-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px; padding-top: 40px;
+  }
+  .form-foot .legal { font-size: 12px; color: var(--ink-faint); max-width: 48ch; }
+  .form-foot .legal a { color: var(--ink-dim); border-bottom: 1px solid var(--rule-strong); }
+
+  .strip {
+    background: var(--bg-elev);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 28px 0;
+    overflow: hidden;
+  }
+  .strip-inner {
+    display: flex; gap: 64px; align-items: center;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--ink-dim);
+    white-space: nowrap;
+  }
+  .strip-inner .accent { color: var(--accent); }
+
+  .faq-list { border-top: 1px solid var(--rule); }
+  .faq-item { border-bottom: 1px solid var(--rule); }
+  .faq-item summary {
+    cursor: pointer; list-style: none;
+    display: grid; grid-template-columns: 80px 1fr 40px;
+    align-items: baseline; gap: 32px;
+    padding: 32px 0;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item .q-num { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.1em; }
+  .faq-item .q-text { font-family: var(--display); font-size: clamp(20px, 2vw, 28px); letter-spacing: -0.025em; line-height: 1.15; }
+  .faq-item .q-plus { font-family: var(--mono); font-size: 18px; color: var(--ink-dim); text-align: right; transition: transform 200ms ease; }
+  .faq-item[open] .q-plus { transform: rotate(45deg); color: var(--accent); }
+  .faq-item .a {
+    padding: 0 0 36px 112px; max-width: 64ch;
+    color: var(--ink-dim); font-size: 15px; line-height: 1.65;
+  }
+
+  .preorder-section-head {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+    margin-bottom: 80px; align-items: end;
+  }
+  .preorder-section-head h2 {
+    font-size: clamp(40px, 6vw, 84px); letter-spacing: -0.04em; line-height: 0.94;
+  }
+  .preorder-section-head p { color: var(--ink-dim); font-size: 16px; line-height: 1.55; max-width: 44ch; }
+
+  .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--rule); }
+  .timeline > div { padding: 36px 24px 48px 0; border-right: 1px solid var(--rule); }
+  .timeline > div:last-child { border-right: none; }
+  .timeline .stage { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+  .timeline .when { font-family: var(--display); font-size: 22px; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .timeline .desc { color: var(--ink-dim); font-size: 13px; line-height: 1.55; }
+  .timeline > div.past .stage { color: var(--ink-faint); }
+
+  @media (max-width: 960px) {
+    .form-shell { grid-template-columns: 1fr; gap: 56px; }
+    .form-shell .col-aside { position: static; }
+    .field { grid-template-columns: 1fr; gap: 8px; }
+    .field label { padding-bottom: 0; }
+    .seat-grid { grid-template-columns: 1fr; }
+    .seat-grid label { border-right: none; border-bottom: 1px solid var(--rule); }
+    .seat-grid label:last-child { border-bottom: none; }
+    .reserve-meta { grid-template-columns: repeat(2, 1fr); }
+    .reserve-meta > div:nth-child(2) { border-right: none; }
+    .preorder-section-head { grid-template-columns: 1fr; gap: 24px; }
+    .timeline { grid-template-columns: 1fr 1fr; }
+    .timeline > div:nth-child(2) { border-right: none; }
+    .faq-item summary { grid-template-columns: 40px 1fr 24px; gap: 16px; }
+    .faq-item .a { padding-left: 56px; }
+    .form-foot { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="index.html">
+    <span>Pliny</span><span class="dot" aria-hidden="true"></span>
+  </a>
+  <nav aria-label="Primary">
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="story.html">Story</a></li>
+      <li><a href="specs.html">Specs</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="press.html">Press</a></li>
+    </ul>
+  </nav>
+  <div class="end">
+    <span class="accent-dot" aria-hidden="true"></span>
+    <a href="preorder.html" class="is-active">Reserve&nbsp;→</a>
+  </div>
+</header>
+
+<main>
+
+  <section class="reserve-hero wrap">
+    <div class="eyebrow"><span class="dot"></span>Batch 02 — opens Q1 2025</div>
+    <h1 class="display display-xl" style="margin-top:36px;">Reserve <em>your</em><br>second pair<br>of <span class="accent">eyes.</span></h1>
+    <p class="lede">We onboard teams in small batches so review quality stays sharp while the model fine-tunes on each codebase. Hold a seat today — no charge until your team's first PR is reviewed.</p>
+
+    <div class="reserve-meta" role="list">
+      <div role="listitem">
+        <div class="num">214<span class="accent">/300</span></div>
+        <div class="lbl">Batch 02 seats claimed</div>
+      </div>
+      <div role="listitem">
+        <div class="num">$0</div>
+        <div class="lbl">Due to reserve</div>
+      </div>
+      <div role="listitem">
+        <div class="num">14d</div>
+        <div class="lbl">Median activation</div>
+      </div>
+      <div role="listitem">
+        <div class="num">Feb 18</div>
+        <div class="lbl">Batch ships</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="strip">
+    <div class="wrap strip-inner">
+      <span><span class="accent">●</span>&nbsp; LIVE</span>
+      <span>Reviewing 41,208 PRs today</span>
+      <span>Median time-to-first-comment: 38s</span>
+      <span>Suggestions accepted: 71.4%</span>
+      <span>SOC 2 Type II · in audit</span>
+    </div>
+  </section>
+
+  <section class="s-mid wrap">
+    <div class="form-shell">
+      <aside class="col-aside">
+        <span class="label-mono">FORM / 01</span>
+        <h3>Hold a seat for your team.</h3>
+        <p>Tell us where your code lives and roughly how many PRs your team opens in a week. We'll reach out within two business days with a calibration call and a private repo to test against.</p>
+        <p>Reserving doesn't charge a card. You'll see one review on a real PR before any commitment.</p>
+        <div class="rule" style="margin: 28px 0 20px;"></div>
+        <span class="label-mono">PREFER A CALL?</span>
+        <p style="margin-top:10px;"><a href="mailto:hello@pliny.dev" style="border-bottom:1px solid var(--rule-strong); padding-bottom:2px;">hello@pliny.dev</a></p>
+      </aside>
+
+      <form class="reserve" action="#" method="post" novalidate>
+
+        <div class="field">
+          <label for="f-name">01 — Name</label>
+          <input type="text" id="f-name" name="name" placeholder="Sasha Petrova" autocomplete="name" required>
+        </div>
+
+        <div class="field">
+          <label for="f-email">02 — Work email</label>
+          <input type="email" id="f-email" name="email" placeholder="sasha@yourdomain.com" autocomplete="email" required>
+        </div>
+
+        <div class="field">
+          <label for="f-company">03 — Company</label>
+          <input type="text" id="f-company" name="company" placeholder="Where you ship from" autocomplete="organization">
+        </div>
+
+        <div class="field">
+          <label for="f-role">04 — Role</label>
+          <select id="f-role" name="role">
+            <option>Staff / principal engineer</option>
+            <option>Engineering manager</option>
+            <option>Tech lead</option>
+            <option>CTO or VP Engineering</option>
+            <option>Founder</option>
+            <option>Individual contributor</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="f-host">05 — Code host</label>
+          <select id="f-host" name="host">
+            <option>GitHub.com</option>
+            <option>GitHub Enterprise (cloud)</option>
+            <option>GitHub Enterprise (self-hosted)</option>
+            <option>GitLab</option>
+            <option>Bitbucket</option>
+            <option>Sourcegraph / other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="f-stack">06 — Primary stack</label>
+          <input type="text" id="f-stack" name="stack" placeholder="Rust + TypeScript, or whatever you live in">
+        </div>
+
+        <div class="field">
+          <label for="f-prs">07 — PRs / week</label>
+          <input type="text" id="f-prs" name="prs" placeholder="≈ 80" inputmode="numeric">
+        </div>
+
+        <div class="field field-row-stack">
+          <label>08 — Seat tier</label>
+          <div class="seat-grid" role="radiogroup" aria-label="Seat tier">
+            <label>
+              <input type="radio" name="tier" value="solo">
+              <div class="seat-name">Solo</div>
+              <div class="seat-price">$24 / month — 1 reviewer</div>
+              <div class="seat-desc">For one engineer or a side-project monorepo. Unlimited public + 3 private repos.</div>
+            </label>
+            <label>
+              <input type="radio" name="tier" value="team" checked>
+              <div class="seat-name">Team</div>
+              <div class="seat-price">$18 / contributor / month</div>
+              <div class="seat-desc">For teams of 3–40. Codebase fine-tuning, custom rules, regression memory across PRs.</div>
+            </label>
+            <label>
+              <input type="radio" name="tier" value="workshop">
+              <div class="seat-name">Workshop</div>
+              <div class="seat-price">Custom — invoiced annually</div>
+              <div class="seat-desc">Self-hosted weights, VPC deploy, SAML, a dedicated reviewing engineer on call.</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-notes">09 — Anything we should know?</label>
+          <textarea id="f-notes" name="notes" placeholder="Existing review tools, regulatory constraints, the bug that broke last week — context helps us calibrate."></textarea>
+        </div>
+
+        <div class="form-foot">
+          <p class="legal">By reserving you agree to a short calibration call and our <a href="#">privacy notice</a>. Pliny never trains shared models on your private code — fine-tuning happens in your tenant.</p>
+          <button type="submit" class="btn btn-primary btn-xl">Hold my seat <span class="arrow">→</span></button>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+  <section class="s-short wrap">
+    <div class="preorder-section-head">
+      <h2 class="display">What happens<br>after you <em>reserve</em>.</h2>
+      <p>No surprise charges, no procurement maze. The fastest team in Batch 01 had Pliny commenting on a production PR thirty-six hours after submitting this form. The median was two weeks.</p>
+    </div>
+
+    <div class="timeline">
+      <div>
+        <div class="stage">Day 0</div>
+        <div class="when">You submit this form</div>
+        <div class="desc">Auto-reply within five minutes with a calendar link and a one-page security brief for your CTO.</div>
+      </div>
+      <div>
+        <div class="stage">Day 1–3</div>
+        <div class="when">Calibration call</div>
+        <div class="desc">Thirty minutes with a founding engineer. We talk about your stack, review pain, and what "good" comments look like for your team.</div>
+      </div>
+      <div>
+        <div class="stage">Day 4–10</div>
+        <div class="when">Sandbox install</div>
+        <div class="desc">Read-only GitHub App on a single repo. Pliny reviews five historical PRs so you can compare against the humans who reviewed them.</div>
+      </div>
+      <div>
+        <div class="stage past">Day 14</div>
+        <div class="when">Live on real PRs</div>
+        <div class="desc">If the sandbox felt right, we flip the switch. First invoice goes out 30 days later — only if you stayed.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s-mid wrap-tight">
+    <div style="margin-bottom: 64px;">
+      <div class="eyebrow"><span class="dot"></span>Reservation FAQ</div>
+      <h2 class="display display-m" style="margin-top: 28px;">Things people ask<br>before <em>holding a seat</em>.</h2>
+    </div>
+
+    <div class="faq-list">
+
+      <details class="faq-item" open>
+        <summary>
+          <span class="q-num">Q.01</span>
+          <span class="q-text">Am I being charged when I reserve?</span>
+          <span class="q-plus">+</span>
+        </summary>
+        <div class="a">No card is required to reserve. You'll only be billed after the sandbox period, on the day Pliny posts its first review on a non-test PR. We email you twice before that happens.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="q-num">Q.02</span>
+          <span class="q-text">Why batches? Why not just sign up?</span>
+          <span class="q-plus">+</span>
+        </summary>
+        <div class="a">Each codebase gets its own fine-tune and its own evaluation harness against a sample of historical PRs. We cap onboarding at thirty teams a week so a founding engineer can shepherd each one. It's slower, and we like it that way.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="q-num">Q.03</span>
+          <span class="q-text">Where does my code go?</span>
+          <span class="q-plus">+</span>
+        </summary>
+        <div class="a">Into a single-tenant inference cluster in us-east-1 or eu-west-1, your choice. Code is encrypted at rest with keys you can rotate. Pliny never trains shared models on private repositories — fine-tunes live in your tenant and are deleted on offboard.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="q-num">Q.04</span>
+          <span class="q-text">Can I self-host?</span>
+          <span class="q-plus">+</span>
+        </summary>
+        <div class="a">Workshop tier ships a Helm chart and a sealed weights tarball for your VPC. You'll need one H100 or two L40S for teams up to 80 engineers. We help with the initial install.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="q-num">Q.05</span>
+          <span class="q-text">What if Pliny is wrong?</span>
+          <span class="q-plus">+</span>
+        </summary>
+        <div class="a">Mark the comment with 👎 or drop a reply starting with <code style="font-family:var(--mono);color:var(--ink);">/pliny disagree</code> and a sentence of context. The next fine-tune cycle (weekly) weights against that pattern. We publish per-team accuracy in your dashboard so you can hold us to it.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="q-num">Q.06</span>
+          <span class="q-text">My team uses Gerrit / Phabricator / a homegrown tool.</span>
+          <span class="q-plus">+</span>
+        </summary>
+        <div class="a">Tell us in the form. We have an experimental Gerrit adapter and a webhook bridge for custom tools. We'll be honest about what works today and what's still a roadmap item.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="q-num">Q.07</span>
+          <span class="q-text">Can I cancel?</span>
+          <span class="q-plus">+</span>
+        </summary>
+        <div class="a">Any time, in one click, from the dashboard. We pro-rate the month. The fine-tune weights for your tenant are deleted within seven days; you get an email confirming the hash.</div>
+      </details>
+
+    </div>
+  </section>
+
+  <section class="s-short">
+    <div class="wrap" style="text-align:center; border-top: 1px solid var(--rule); padding-top: 96px;">
+      <div class="eyebrow" style="justify-content:center;"><span class="dot"></span>Batch 02 closes when 300 seats are claimed</div>
+      <h2 class="display display-l" style="margin: 32px auto 40px; max-width: 18ch;">Stop reviewing<br>the <em>same diff</em> twice.</h2>
+      <a href="#" class="btn btn-primary btn-xl" onclick="document.getElementById('f-name').focus(); return false;">Hold a seat <span class="arrow">→</span></a>
+      <p class="body-sm" style="margin-top: 28px;">No card. No demo loop. One email and a calibration call.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="footer-top">
+      <div class="mark">Pliny<span class="dot" aria-hidden="true"></span></div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="specs.html">Technical specs</a></li>
+          <li><a href="story.html">The story</a></li>
+          <li><a href="preorder.html">Reserve a seat</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="press.html">Press &amp; media</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">Security &amp; SOC 2</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">Careers — 4 open</a></li>
+          <li><a href="mailto:hello@pliny.dev">hello@pliny.dev</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">Privacy &amp; terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© Pliny Labs, Inc. — Made in Brooklyn &amp; Lisbon</span>
+      <span class="status"><span class="live" aria-hidden="true"></span> All systems nominal · v0.9.3</span>
+      <span>Reviewing 41,208 PRs today</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

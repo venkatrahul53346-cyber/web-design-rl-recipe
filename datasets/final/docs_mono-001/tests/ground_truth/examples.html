@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examples — Glyph</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .examples-head { padding: 56px 0 28px 0; border-bottom: 1px solid var(--rule); }
+  .examples-head .eyebrow { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 14px; }
+  .examples-head h1 { margin-bottom: 12px; max-width: 28ch; }
+  .examples-head p.lead { max-width: 60ch; }
+  .examples-meta { display: flex; gap: 28px; margin-top: 22px; font-size: 12px; color: var(--ink-3); }
+  .examples-meta span strong { color: var(--ink); font-weight: 500; }
+
+  .example-index { padding: 22px 0; border-bottom: 1px solid var(--rule); font-size: 12.5px; }
+  .example-index ol { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 32px; }
+  .example-index li { display: flex; gap: 14px; align-items: baseline; border-bottom: 1px dotted var(--rule); padding: 5px 0; }
+  .example-index li::marker { content: none; }
+  .example-index .num { color: var(--ink-3); font-size: 11px; min-width: 22px; }
+  .example-index .lang { margin-left: auto; color: var(--ink-3); font-size: 11px; text-transform: lowercase; }
+  .example-index a { border: 0; color: var(--ink); }
+  .example-index a:hover { color: var(--accent); }
+
+  .example { padding: 64px 0 12px 0; border-bottom: 1px solid var(--rule); }
+  .example:last-of-type { border-bottom: 0; }
+  .example-head { display: grid; grid-template-columns: 80px 1fr; gap: 28px; align-items: baseline; margin-bottom: 18px; }
+  .example-head .index { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.12em; padding-top: 6px; }
+  .example-head h2 { margin: 0; padding: 0; border: 0; font-size: 22px; }
+  .example-tags { margin-top: 6px; font-size: 11.5px; color: var(--ink-3); }
+  .example-tags span { margin-right: 14px; }
+  .example-tags strong { color: var(--accent); font-weight: 500; }
+  .example-body { display: grid; grid-template-columns: 280px 1fr; gap: 36px; align-items: start; margin-top: 18px; }
+  .example-body .prose { font-size: 13px; color: var(--ink-2); }
+  .example-body .prose p:last-child { margin-bottom: 0; }
+  .example-body .prose h4 { margin-top: 0; }
+  .example-code { min-width: 0; }
+  .example-code .code-frame { margin: 0; }
+
+  .callout { border-left: 2px solid var(--accent); padding: 4px 0 4px 14px; margin: 18px 0 6px 0; color: var(--ink-2); font-size: 12.5px; }
+  .callout strong { color: var(--ink); }
+
+  .container-examples { max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+
+  .next-block { padding: 56px 0 8px 0; }
+  .next-block h3 { margin-top: 0; }
+  .next-block .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .next-block .cards a { display: block; padding: 20px 22px; border: 0; border-right: 1px solid var(--rule); }
+  .next-block .cards a:last-child { border-right: 0; }
+  .next-block .cards a:hover { background: var(--bg-tint); }
+  .next-block .cards .eyebrow { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+  .next-block .cards strong { display: block; color: var(--ink); font-size: 14px; margin-bottom: 4px; }
+  .next-block .cards span { color: var(--ink-3); font-size: 12px; }
+
+  @media (max-width: 880px) {
+    .example-body { grid-template-columns: 1fr; }
+    .example-head { grid-template-columns: 1fr; gap: 6px; }
+    .example-index ol { grid-template-columns: 1fr; }
+    .next-block .cards { grid-template-columns: 1fr; }
+    .next-block .cards a { border-right: 0; border-bottom: 1px solid var(--rule); }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="row">
+      <a href="index.html" class="brand plain" aria-label="Glyph home">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="name">glyph</span>
+        <span class="ver">v0.14.2</span>
+      </a>
+      <nav class="primary-nav" aria-label="Primary">
+        <a href="getting-started.html">Getting started</a>
+        <a href="guides.html">Guides</a>
+        <a href="api-reference.html">Reference</a>
+        <a href="examples.html" class="active">Examples</a>
+        <a href="changelog.html">Changelog</a>
+      </nav>
+      <div class="header-utils">
+        <span class="search-stub" role="search">
+          <span>search docs</span>
+          <span class="kbd">⌘K</span>
+        </span>
+        <a class="gh-link" href="https://github.com/glyph-dev/glyph">github ↗</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container-examples">
+    <section class="examples-head">
+      <div class="eyebrow">examples · runnable snippets</div>
+      <h1>Five end-to-end recipes for shipping Glyph in real codebases.</h1>
+      <p class="lead">Each example is a single concern — generate a client, fake a backend, fail a build, drift-check production, talk to the daemon. Copy, paste, adapt. All snippets target Glyph <code>0.14.x</code>.</p>
+      <div class="examples-meta">
+        <span><strong>5</strong> recipes</span>
+        <span>last verified <strong>2024-11-04</strong></span>
+        <span>repo · <a href="https://github.com/glyph-dev/glyph/tree/main/examples">glyph-dev/glyph/examples</a></span>
+      </div>
+    </section>
+
+    <nav class="example-index" aria-label="Examples">
+      <ol>
+        <li><span class="num">01</span><a href="#typescript-client">Typed TypeScript client from spec</a><span class="lang">typescript</span></li>
+        <li><span class="num">02</span><a href="#go-mock">Stand up a mock server in Go tests</a><span class="lang">go</span></li>
+        <li><span class="num">03</span><a href="#ci-contract">Fail CI on breaking contract diffs</a><span class="lang">yaml</span></li>
+        <li><span class="num">04</span><a href="#python-drift">Detect schema drift against production</a><span class="lang">python</span></li>
+        <li><span class="num">05</span><a href="#daemon-rpc">Talk to the Glyph daemon over JSON-RPC</a><span class="lang">rust</span></li>
+      </ol>
+    </nav>
+
+    <article class="example" id="typescript-client">
+      <header class="example-head">
+        <div class="index">Example 01</div>
+        <div>
+          <h2>Typed TypeScript client from spec</h2>
+          <div class="example-tags">
+            <span>use-case · <strong>consumer</strong></span>
+            <span>output · <strong>fetch + zod</strong></span>
+            <span>runtime · <strong>node 20, bun, deno</strong></span>
+          </div>
+        </div>
+      </header>
+      <div class="example-body">
+        <div class="prose">
+          <h4>What this does</h4>
+          <p>Generates a fully-typed client from <code>openapi.yaml</code> with request validation, response parsing, and discriminated error unions. Schemas land in <code>./src/gen/</code>; nothing is written outside that directory.</p>
+          <p>The <code>--runtime fetch</code> flag produces zero-dependency code. Pass <code>--validator zod</code> when you want runtime checks at the boundary.</p>
+          <div class="callout"><strong>Tip.</strong> Commit the generated output. Glyph's diff command compares it to the next regeneration and refuses to overwrite untracked edits.</div>
+        </div>
+        <div class="example-code">
+          <div class="code-frame">
+            <div class="code-head"><span class="file">src/billing.ts</span><span class="lang">typescript</span></div>
+<pre><code><span class="cmt">// generated facade re-exports the typed client</span>
+<span class="kw">import</span> { createClient, <span class="ty">ApiError</span> } <span class="kw">from</span> <span class="str">"./gen/billing"</span>;
+
+<span class="kw">const</span> billing = <span class="fn">createClient</span>({
+  baseUrl: <span class="str">"https://api.acme.io/v3"</span>,
+  headers: { authorization: <span class="str">`Bearer ${process.env.ACME_KEY}`</span> },
+  validator: <span class="str">"zod"</span>,        <span class="cmt">// parse responses, throw on shape mismatch</span>
+});
+
+<span class="kw">export async function</span> <span class="fn">chargeCustomer</span>(id: <span class="ty">string</span>, cents: <span class="ty">number</span>) {
+  <span class="kw">const</span> res = <span class="kw">await</span> billing.invoices.<span class="fn">create</span>({
+    body: { customer_id: id, amount_cents: cents, currency: <span class="str">"USD"</span> },
+  });
+
+  <span class="kw">if</span> (res.ok) <span class="kw">return</span> res.data;       <span class="cmt">// Invoice — fully typed</span>
+
+  <span class="kw">switch</span> (res.error.kind) {
+    <span class="kw">case</span> <span class="str">"insufficient_funds"</span>:
+      <span class="kw">return</span> { retry: <span class="kw">true</span>, after: res.error.retry_after_ms };
+    <span class="kw">case</span> <span class="str">"customer_archived"</span>:
+      <span class="kw">throw new</span> <span class="ty">ApiError</span>(<span class="str">"archived"</span>, res.error);
+    <span class="kw">default</span>:
+      <span class="kw">throw new</span> <span class="ty">ApiError</span>(<span class="str">"unexpected"</span>, res.error);
+  }
+}</code></pre>
+          </div>
+<pre><code><span class="prompt">$</span> glyph generate client \
+    --spec ./openapi.yaml \
+    --lang typescript --runtime fetch --validator zod \
+    --out ./src/gen/billing
+<span class="cmt">→ 47 operations · 132 schemas · wrote 18 files · 0 unsafe casts</span></code></pre>
+        </div>
+      </div>
+    </article>
+
+    <article class="example" id="go-mock">
+      <header class="example-head">
+        <div class="index">Example 02</div>
+        <div>
+          <h2>Stand up a mock server in Go tests</h2>
+          <div class="example-tags">
+            <span>use-case · <strong>consumer tests</strong></span>
+            <span>output · <strong>httptest handler</strong></span>
+            <span>runtime · <strong>go 1.22+</strong></span>
+          </div>
+        </div>
+      </header>
+      <div class="example-body">
+        <div class="prose">
+          <h4>What this does</h4>
+          <p>Spawns a hermetic mock backend from the spec for the duration of a test. Responses are sampled from examples in the OpenAPI file; missing examples fall back to schema-driven fakers seeded for determinism.</p>
+          <p>The mock validates outgoing requests against the spec, so if your code sends a malformed payload the test fails with a precise pointer like <code>#/components/schemas/Invoice/properties/currency</code>.</p>
+        </div>
+        <div class="example-code">
+          <div class="code-frame">
+            <div class="code-head"><span class="file">billing_test.go</span><span class="lang">go</span></div>
+<pre><code><span class="kw">package</span> billing_test
+
+<span class="kw">import</span> (
+    <span class="str">"net/http/httptest"</span>
+    <span class="str">"testing"</span>
+
+    <span class="str">"github.com/glyph-dev/glyph-go/mock"</span>
+    <span class="str">"acme.io/billing"</span>
+)
+
+<span class="kw">func</span> <span class="fn">TestChargeCustomer_RetriesOnInsufficientFunds</span>(t *<span class="ty">testing.T</span>) {
+    srv := httptest.<span class="fn">NewServer</span>(mock.<span class="fn">FromSpec</span>(t, <span class="str">"openapi.yaml"</span>,
+        mock.<span class="fn">Override</span>(<span class="str">"POST /invoices"</span>, mock.<span class="ty">Response</span>{
+            Status: <span class="num">402</span>,
+            Body:   <span class="kw">map</span>[<span class="ty">string</span>]<span class="kw">any</span>{<span class="str">"kind"</span>: <span class="str">"insufficient_funds"</span>, <span class="str">"retry_after_ms"</span>: <span class="num">1500</span>},
+        }),
+        mock.<span class="fn">ValidateRequests</span>(<span class="kw">true</span>),
+    ))
+    <span class="kw">defer</span> srv.<span class="fn">Close</span>()
+
+    client := billing.<span class="fn">New</span>(srv.URL)
+    got, err := client.<span class="fn">Charge</span>(<span class="str">"cus_42"</span>, <span class="num">2500</span>)
+
+    <span class="kw">if</span> err != <span class="kw">nil</span> {
+        t.<span class="fn">Fatalf</span>(<span class="str">"unexpected: %v"</span>, err)
+    }
+    <span class="kw">if</span> !got.Retry || got.AfterMs != <span class="num">1500</span> {
+        t.<span class="fn">Errorf</span>(<span class="str">"expected retry=true after=1500, got %+v"</span>, got)
+    }
+}</code></pre>
+          </div>
+          <div class="callout"><strong>Why not a recorded fixture?</strong> Fixtures rot the moment the spec changes. The mock here is rebuilt from the spec on every test run — if the field renames, the test fails at the assertion, not three weeks later in staging.</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="example" id="ci-contract">
+      <header class="example-head">
+        <div class="index">Example 03</div>
+        <div>
+          <h2>Fail CI on breaking contract diffs</h2>
+          <div class="example-tags">
+            <span>use-case · <strong>producer guardrails</strong></span>
+            <span>output · <strong>github actions check</strong></span>
+            <span>runtime · <strong>any</strong></span>
+          </div>
+        </div>
+      </header>
+      <div class="example-body">
+        <div class="prose">
+          <h4>What this does</h4>
+          <p>On every pull request, Glyph compares the head spec against <code>main</code> and classifies the diff. Removing a field, narrowing a type, or tightening a required-list is <strong>breaking</strong> and exits non-zero. Adding an optional field is <strong>additive</strong> and passes.</p>
+          <p>The annotations show up inline on the PR — the engineer sees exactly which line in <code>openapi.yaml</code> broke which downstream consumer.</p>
+        </div>
+        <div class="example-code">
+          <div class="code-frame">
+            <div class="code-head"><span class="file">.github/workflows/contract.yml</span><span class="lang">yaml</span></div>
+<pre><code><span class="kw">name</span>: contract
+<span class="kw">on</span>: { pull_request: { paths: [<span class="str">"openapi.yaml"</span>] } }
+
+<span class="kw">jobs</span>:
+  diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: <span class="num">0</span> }
+
+      - uses: glyph-dev/setup-glyph@v1
+        with: { version: <span class="str">"0.14.2"</span> }
+
+      - <span class="kw">name</span>: diff against main
+        <span class="kw">run</span>: |
+          glyph diff \
+            --base origin/main:openapi.yaml \
+            --head openapi.yaml \
+            --policy strict \
+            --report github-annotations \
+            --consumers ./glyph.consumers.toml
+
+      - <span class="kw">name</span>: post summary
+        <span class="kw">if</span>: always()
+        <span class="kw">run</span>: glyph diff --format markdown >> $GITHUB_STEP_SUMMARY</code></pre>
+          </div>
+<pre><code><span class="prompt">$</span> glyph diff --base main --head HEAD --policy strict
+<span class="cmt">BREAKING  openapi.yaml:412  required field removed</span>
+  paths./invoices.post.requestBody.schema.required
+  − <span class="str">"currency"</span>
+  affects consumers: <span class="ty">web-checkout</span>, <span class="ty">mobile-ios</span>, <span class="ty">partner-stripe</span>
+<span class="warn">exit 1 · 1 breaking · 2 additive</span></code></pre>
+        </div>
+      </div>
+    </article>
+
+    <article class="example" id="python-drift">
+      <header class="example-head">
+        <div class="index">Example 04</div>
+        <div>
+          <h2>Detect schema drift against production</h2>
+          <div class="example-tags">
+            <span>use-case · <strong>observability</strong></span>
+            <span>output · <strong>drift report</strong></span>
+            <span>runtime · <strong>python 3.11+</strong></span>
+          </div>
+        </div>
+      </header>
+      <div class="example-body">
+        <div class="prose">
+          <h4>What this does</h4>
+          <p>Samples real responses from a deployed environment for a configurable window, validates each one against the published spec, and emits a drift report grouped by endpoint and field. Useful when you suspect a service is returning fields that aren't documented — or missing fields that are.</p>
+          <p>Validation is streaming; you can point it at a Kafka topic of captured responses with <code>--source kafka://...</code> instead of replaying traffic.</p>
+        </div>
+        <div class="example-code">
+          <div class="code-frame">
+            <div class="code-head"><span class="file">tools/drift_audit.py</span><span class="lang">python</span></div>
+<pre><code><span class="kw">from</span> glyph <span class="kw">import</span> Spec, Sampler, DriftReport
+
+spec = Spec.<span class="fn">load</span>(<span class="str">"openapi.yaml"</span>)
+
+sampler = Sampler(
+    target=<span class="str">"https://api.acme.io"</span>,
+    auth=(<span class="str">"bearer"</span>, os.environ[<span class="str">"OPS_TOKEN"</span>]),
+    sample_rate=<span class="num">0.02</span>,         <span class="cmt"># 2% of live responses</span>
+    duration=<span class="str">"15m"</span>,
+    redact=[<span class="str">"$.customer.email"</span>, <span class="str">"$..ssn"</span>],
+)
+
+report = DriftReport()
+<span class="kw">async for</span> hit <span class="kw">in</span> sampler.<span class="fn">stream</span>():
+    result = spec.<span class="fn">validate_response</span>(
+        path=hit.path, method=hit.method,
+        status=hit.status, body=hit.body,
+    )
+    <span class="kw">if not</span> result.ok:
+        report.<span class="fn">add</span>(hit, result.errors)
+
+report.<span class="fn">write</span>(<span class="str">"drift.html"</span>)
+<span class="fn">print</span>(<span class="str">f"drift: {report.endpoints_affected} endpoints, {report.total_errors} mismatches"</span>)</code></pre>
+          </div>
+          <div class="callout"><strong>Common finding.</strong> Optional fields the spec marks as <code>string</code> but the service occasionally returns as <code>null</code>. Glyph flags these as <em>nullable drift</em> and proposes the one-line spec patch in the report.</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="example" id="daemon-rpc">
+      <header class="example-head">
+        <div class="index">Example 05</div>
+        <div>
+          <h2>Talk to the Glyph daemon over JSON-RPC</h2>
+          <div class="example-tags">
+            <span>use-case · <strong>editor / tooling</strong></span>
+            <span>output · <strong>RPC client</strong></span>
+            <span>runtime · <strong>rust 1.74+</strong></span>
+          </div>
+        </div>
+      </header>
+      <div class="example-body">
+        <div class="prose">
+          <h4>What this does</h4>
+          <p>The Glyph daemon (<code>glyphd</code>) holds parsed specs in memory and exposes incremental operations over a local JSON-RPC socket. Editors and pre-commit hooks use this instead of invoking the CLI per-call — a watched 4k-operation spec validates in under 8ms.</p>
+          <p>Below: a Rust snippet that asks the daemon which operations in <code>openapi.yaml</code> changed semantically since the last commit. Useful for selective test runs.</p>
+        </div>
+        <div class="example-code">
+          <div class="code-frame">
+            <div class="code-head"><span class="file">crates/affected/src/main.rs</span><span class="lang">rust</span></div>
+<pre><code><span class="kw">use</span> glyphd_client::{<span class="ty">Client</span>, <span class="ty">DiffSince</span>};
+<span class="kw">use</span> std::path::<span class="ty">PathBuf</span>;
+
+<span class="kw">#[tokio::main]</span>
+<span class="kw">async fn</span> <span class="fn">main</span>() -&gt; <span class="ty">anyhow::Result</span>&lt;()&gt; {
+    <span class="kw">let</span> client = <span class="ty">Client</span>::<span class="fn">connect</span>(<span class="str">"unix:///run/user/1000/glyphd.sock"</span>).<span class="kw">await</span>?;
+
+    <span class="kw">let</span> spec = client
+        .<span class="fn">load_spec</span>(<span class="ty">PathBuf</span>::<span class="fn">from</span>(<span class="str">"openapi.yaml"</span>))
+        .<span class="kw">await</span>?;
+
+    <span class="kw">let</span> diff = client
+        .<span class="fn">diff_since</span>(<span class="ty">DiffSince</span> {
+            spec_id: spec.id,
+            git_ref: <span class="str">"HEAD~1"</span>.<span class="fn">into</span>(),
+            include_additive: <span class="kw">false</span>,
+        })
+        .<span class="kw">await</span>?;
+
+    <span class="kw">for</span> op <span class="kw">in</span> diff.affected_operations {
+        <span class="fn">println!</span>(<span class="str">"{:8} {} {}"</span>, op.severity, op.method, op.path);
+    }
+    <span class="ty">Ok</span>(())
+}</code></pre>
+          </div>
+<pre><code><span class="prompt">$</span> cargo run --quiet | sort
+<span class="cmt">additive  GET     /invoices/{id}/lines</span>
+<span class="cmt">breaking  POST    /invoices</span>
+<span class="cmt">breaking  PATCH   /customers/{id}</span>
+<span class="cmt">internal  GET     /healthz</span></code></pre>
+        </div>
+      </div>
+    </article>
+
+    <section class="next-block">
+      <h3>Where next</h3>
+      <div class="cards">
+        <a href="guides.html">
+          <div class="eyebrow">guides</div>
+          <strong>Producer &amp; consumer workflows</strong>
+          <span>Step-by-step setups beyond a single snippet.</span>
+        </a>
+        <a href="api-reference.html">
+          <div class="eyebrow">reference</div>
+          <strong>Full CLI flag matrix</strong>
+          <span>Every subcommand, every option, exit codes included.</span>
+        </a>
+        <a href="https://github.com/glyph-dev/glyph/tree/main/examples">
+          <div class="eyebrow">repo</div>
+          <strong>Runnable example projects</strong>
+          <span>Clone, <code>make</code>, and watch the workflow end-to-end.</span>
+        </a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row">
+      <div class="tagline-block">
+        <a href="index.html" class="brand plain"><span class="mark" aria-hidden="true"></span><span class="name">glyph</span></a>
+        <p>API contracts that stay honest. One command from OpenAPI to typed clients, mocks, and contract tests.</p>
+      </div>
+      <div>
+        <h5>Docs</h5>
+        <ul>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="guides.html">Guides</a></li>
+          <li><a href="api-reference.html">CLI reference</a></li>
+          <li><a href="examples.html">Examples</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Project</h5>
+        <ul>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph">Source (GitHub)</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/issues">Issue tracker</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/discussions">Discussions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">RFCs</a></li>
+          <li><a href="#">Contributing</a></li>
+          <li><a href="#">Code of conduct</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">License — Apache 2.0</a></li>
+          <li><a href="#">Security policy</a></li>
+          <li><a href="#">Trademark</a></li>
+          <li><a href="#">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="colophon">
+      <div><span class="status-dot" aria-hidden="true"></span>all systems nominal · build 2024.11.4-a31cf2</div>
+      <div>© 2021–2024 Glyph contributors · Set in JetBrains Mono</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Getting started — Glyph</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .gs-meta { display: flex; gap: 24px; font-size: 11.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 28px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+  .gs-meta span strong { color: var(--ink-2); font-weight: 500; margin-left: 6px; }
+  .step-num { display: inline-block; font-size: 11px; color: var(--ink-3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
+  .callout { border-left: 2px solid var(--accent); padding: 10px 14px; background: var(--bg-tint); margin: 1.6em 0; font-size: 12.5px; color: var(--ink-2); }
+  .callout strong { color: var(--ink); }
+  .next-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--rule); border-left: 1px solid var(--rule); margin-top: 1.4em; }
+  .next-grid a { display: block; padding: 16px 18px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); color: var(--ink); }
+  .next-grid a:hover { background: var(--bg-tint); color: var(--accent); }
+  .next-grid .lbl { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 6px; }
+  .next-grid .ttl { font-size: 14px; font-weight: 600; display: block; margin-bottom: 4px; }
+  .next-grid .dsc { font-size: 12px; color: var(--ink-3); display: block; }
+  .platform-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--rule); margin: 1.4em 0 0 0; font-size: 12px; }
+  .platform-tabs span { padding: 6px 14px; border: 1px solid var(--rule); border-bottom: 0; margin-right: -1px; color: var(--ink-3); background: var(--bg); }
+  .platform-tabs span.on { color: var(--ink); background: var(--bg-tint); border-bottom: 1px solid var(--bg-tint); position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="row">
+      <a href="index.html" class="brand plain" aria-label="Glyph home">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="name">glyph</span>
+        <span class="ver">v0.14.2</span>
+      </a>
+      <nav class="primary-nav" aria-label="Primary">
+        <a href="getting-started.html" class="active">Getting started</a>
+        <a href="guides.html">Guides</a>
+        <a href="api-reference.html">Reference</a>
+        <a href="examples.html">Examples</a>
+        <a href="changelog.html">Changelog</a>
+      </nav>
+      <div class="header-utils">
+        <span class="search-stub" role="search">
+          <span>search docs</span>
+          <span class="kbd">⌘K</span>
+        </span>
+        <a class="gh-link" href="https://github.com/glyph-dev/glyph">github ↗</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="doc-shell">
+
+  <aside class="doc-rail" aria-label="Section navigation">
+    <nav>
+      <div class="rail-section">
+        <h6>Getting started</h6>
+        <ul>
+          <li><a href="#install" class="active">Install</a></li>
+          <li><a href="#first-spec">Your first spec</a></li>
+          <li><a href="#generate">Generate a client</a></li>
+          <li><a href="#mock">Run the mock server</a></li>
+          <li><a href="#contract">Contract tests</a></li>
+          <li><a href="#next-steps">Next steps</a></li>
+        </ul>
+      </div>
+      <div class="rail-section">
+        <h6>Reference</h6>
+        <ul>
+          <li><a href="api-reference.html">CLI overview</a></li>
+          <li><a href="api-reference.html#config">glyph.toml</a></li>
+          <li><a href="api-reference.html#exit-codes">Exit codes</a></li>
+        </ul>
+      </div>
+      <div class="rail-section">
+        <h6>Recipes</h6>
+        <ul>
+          <li><a href="guides.html#ci">CI integration</a></li>
+          <li><a href="guides.html#breaking">Breaking-change gates</a></li>
+          <li><a href="guides.html#monorepo">Monorepo layouts</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="doc-main">
+    <div class="eyebrow">Getting started</div>
+    <h1>From <code>openapi.yaml</code> to a typed client in under five minutes.</h1>
+    <p class="sub">This walkthrough installs the CLI, generates a TypeScript client from a real spec, boots the conformant mock server, and runs the producer side of a contract test. Roughly 90 seconds of typing, plus whatever your package manager decides to do.</p>
+
+    <div class="gs-meta">
+      <span>read time<strong>4 min</strong></span>
+      <span>node<strong>≥ 18.17</strong></span>
+      <span>cli<strong>v0.14.2</strong></span>
+    </div>
+
+    <h2 id="install">Install the CLI</h2>
+    <p>Glyph ships as a single static binary with no runtime dependencies. The recommended install uses the official script — it picks the right archive for your platform and verifies the checksum against the release manifest before unpacking into <code>~/.glyph/bin</code>.</p>
+
+    <div class="platform-tabs" role="tablist">
+      <span class="on">macOS / linux</span>
+      <span>windows (powershell)</span>
+      <span>homebrew</span>
+      <span>npm</span>
+    </div>
+
+    <div class="code-frame">
+      <div class="code-head"><span class="file">install.sh</span><span class="lang">shell</span></div>
+<pre><span class="prompt">$</span> curl -fsSL https://glyph.dev/install.sh | sh
+<span class="cmt"># resolving release manifest for darwin-arm64 ........ ok</span>
+<span class="cmt"># verifying sha256 (a31cf2…) .......................... ok</span>
+<span class="cmt"># installing to ~/.glyph/bin/glyph .................... ok</span>
+
+<span class="prompt">$</span> glyph --version
+glyph <span class="num">0.14.2</span> <span class="pun">(</span>darwin-arm64, built 2024-11-04<span class="pun">)</span></pre>
+    </div>
+
+    <p>Prefer a package manager? Glyph is published to Homebrew (<code>brew install glyph-dev/tap/glyph</code>) and npm (<code>npm i -g @glyph/cli</code>). The npm package wraps the same binary, so version pinning works across both channels.</p>
+
+    <div class="callout">
+      <strong>Air-gapped environment?</strong> Download the release tarball from GitHub, drop the binary anywhere on <code>$PATH</code>, and skip the script. Glyph never phones home outside of <code>glyph update</code>.
+    </div>
+
+    <h2 id="first-spec">Your first spec</h2>
+    <p>If you already have an OpenAPI 3.x document, point Glyph at it. Otherwise, scaffold a minimal spec to follow along — <code>glyph init</code> writes a workspace config and a tiny <code>petstore.yaml</code> next to it.</p>
+
+    <div class="code-frame">
+      <div class="code-head"><span class="file">terminal</span><span class="lang">shell</span></div>
+<pre><span class="prompt">$</span> mkdir petstore &amp;&amp; cd petstore
+<span class="prompt">$</span> glyph init --template=minimal
+  <span class="str">created</span>  glyph.toml
+  <span class="str">created</span>  openapi/petstore.yaml
+  <span class="str">created</span>  .gitignore
+
+<span class="prompt">$</span> glyph check
+  ✓ openapi/petstore.yaml — 3.1.0, 2 paths, 3 schemas
+  ✓ no breaking changes vs. baseline (none recorded)
+  ✓ ready</pre>
+    </div>
+
+    <p><code>glyph check</code> is the single command worth memorizing. It validates the spec, lints style rules, and — if a baseline exists — diffs the current version against the last committed contract. The exit code is non-zero on any failure, which is why CI loves it.</p>
+
+    <h2 id="generate">Generate a typed client</h2>
+    <p>Targets are configured in <code>glyph.toml</code>. The init template registers one TypeScript client out of the box; here we add a Rust client beside it. Every target writes to a deterministic path so generated code stays diff-friendly across runs.</p>
+
+    <div class="code-frame">
+      <div class="code-head"><span class="file">glyph.toml</span><span class="lang">toml</span></div>
+<pre><span class="pun">[</span><span class="kw">spec</span><span class="pun">]</span>
+<span class="fn">source</span>  = <span class="str">"openapi/petstore.yaml"</span>
+<span class="fn">baseline</span> = <span class="str">".glyph/baseline.lock"</span>
+
+<span class="pun">[[</span><span class="kw">target</span><span class="pun">]]</span>
+<span class="fn">kind</span>     = <span class="str">"client-ts"</span>
+<span class="fn">out</span>      = <span class="str">"clients/ts"</span>
+<span class="fn">runtime</span>  = <span class="str">"fetch"</span>     <span class="cmt"># or "axios", "undici"</span>
+
+<span class="pun">[[</span><span class="kw">target</span><span class="pun">]]</span>
+<span class="fn">kind</span>     = <span class="str">"client-rs"</span>
+<span class="fn">out</span>      = <span class="str">"clients/rs"</span>
+<span class="fn">runtime</span>  = <span class="str">"reqwest"</span></pre>
+    </div>
+
+    <p>Then run the generator. Glyph is idempotent — re-running with no spec change is a no-op and a no-write.</p>
+
+<pre><span class="prompt">$</span> glyph generate
+  ✓ clients/ts  — 12 files, 8 operations, 0 unchanged
+  ✓ clients/rs  — 9 files,  8 operations, 0 unchanged
+  done in 412ms</pre>
+
+    <p>The TypeScript client is plain ESM, zero runtime dependencies beyond <code>fetch</code>, and every operation is typed end-to-end including discriminated error responses. Here's the hello-world consumer:</p>
+
+    <div class="code-frame">
+      <div class="code-head"><span class="file">examples/hello.ts</span><span class="lang">typescript</span></div>
+<pre><span class="kw">import</span> <span class="pun">{</span> <span class="fn">createClient</span> <span class="pun">}</span> <span class="kw">from</span> <span class="str">"../clients/ts"</span><span class="pun">;</span>
+
+<span class="kw">const</span> api = <span class="fn">createClient</span><span class="pun">({</span> baseUrl<span class="pun">:</span> <span class="str">"http://localhost:4010"</span> <span class="pun">});</span>
+
+<span class="kw">const</span> result = <span class="kw">await</span> api.pets.<span class="fn">list</span><span class="pun">({</span> limit<span class="pun">:</span> <span class="num">10</span> <span class="pun">});</span>
+
+<span class="kw">if</span> <span class="pun">(</span>result.ok<span class="pun">)</span> <span class="pun">{</span>
+  <span class="cmt">// result.data is typed as Pet[], not any.</span>
+  console.<span class="fn">log</span><span class="pun">(</span>result.data.<span class="fn">map</span><span class="pun">(</span>p =&gt; p.name<span class="pun">));</span>
+<span class="pun">}</span> <span class="kw">else</span> <span class="pun">{</span>
+  <span.cmt class="cmt">// result.error is the discriminated error union.</span>
+  console.<span class="fn">error</span><span class="pun">(</span>result.error.code<span class="pun">,</span> result.error.message<span class="pun">);</span>
+<span class="pun">}</span></pre>
+    </div>
+
+    <h2 id="mock">Run the mock server</h2>
+    <p>The same spec drives a conformant mock. Glyph's mock honours examples, <code>x-glyph-stateful</code> hints, and response selection via the <code>Prefer</code> header — so consumer tests can exercise the unhappy paths without producer changes.</p>
+
+<pre><span class="prompt">$</span> glyph mock --port 4010
+  serving openapi/petstore.yaml on http://localhost:4010
+  ▸ GET    /pets         → 200 (example: "two-pets")
+  ▸ POST   /pets         → 201
+  ▸ GET    /pets/{id}    → 200, 404
+  ready · ctrl-c to stop</pre>
+
+    <p>Hit it with the generated client above and you have a working consumer against an authoritative fake — no producer required, no hand-rolled fixtures to drift.</p>
+
+    <h2 id="contract">A contract test on the producer side</h2>
+    <p>On the producer, point Glyph at the running service and ask it to replay every operation in the spec, including negative cases. The exit code is the contract.</p>
+
+<pre><span class="prompt">$</span> glyph verify --target http://localhost:8080
+  running 14 cases against openapi/petstore.yaml
+  ✓ GET    /pets                    200      18ms
+  ✓ GET    /pets?limit=10           200      12ms
+  ✓ POST   /pets {valid}            201      24ms
+  ✗ POST   /pets {missing name}     500 ≠ 400  9ms
+  ✓ GET    /pets/42                 200      11ms
+  ✓ GET    /pets/does-not-exist     404       8ms
+
+  <span class="warn">1 failed · contract breach on POST /pets</span>
+  exit 2</pre>
+
+    <div class="callout">
+      <strong>Wire this into CI early.</strong> Run <code>glyph check</code> on every PR and <code>glyph verify</code> in your service's integration job. The pair catches the vast majority of "we shipped a breaking change and nobody noticed" incidents at review time.
+    </div>
+
+    <h2 id="next-steps">Where to go next</h2>
+    <p>You now have the four moving parts: a spec, a generated client, a mock, and a verifier. The rest of the docs go deeper on each.</p>
+
+    <div class="next-grid">
+      <a href="guides.html#ci">
+        <span class="lbl">Guide</span>
+        <span class="ttl">Wire Glyph into CI →</span>
+        <span class="dsc">GitHub Actions, GitLab, Buildkite. Block PRs on breaking diffs without blocking refactors.</span>
+      </a>
+      <a href="guides.html#breaking">
+        <span class="lbl">Guide</span>
+        <span class="ttl">The breaking-change gate →</span>
+        <span class="dsc">How Glyph classifies changes as safe, risky, or breaking — and how to override the default policy.</span>
+      </a>
+      <a href="api-reference.html">
+        <span class="lbl">Reference</span>
+        <span class="ttl">Every CLI command →</span>
+        <span class="dsc">Flags, exit codes, environment variables, and the full <code>glyph.toml</code> schema.</span>
+      </a>
+      <a href="examples.html">
+        <span class="lbl">Examples</span>
+        <span class="ttl">Working repos →</span>
+        <span class="dsc">Petstore in TypeScript, a Go producer with verify, and a monorepo with five consumers.</span>
+      </a>
+    </div>
+
+    <p style="margin-top: 2.4em; color: var(--ink-3); font-size: 12px;">Stuck on something the docs didn't answer? Ask in <a href="https://github.com/glyph-dev/glyph/discussions">Discussions</a> — the maintainers read every thread, usually within a working day.</p>
+
+  </main>
+
+  <aside class="doc-toc" aria-label="On this page">
+    <div style="position: sticky; top: 80px; font-size: 12px; border-left: 1px solid var(--rule); padding-left: 14px;">
+      <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3); margin-bottom: 10px;">On this page</div>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="margin-bottom: 6px;"><a href="#install" style="border: 0; color: var(--ink-2);">Install the CLI</a></li>
+        <li style="margin-bottom: 6px;"><a href="#first-spec" style="border: 0; color: var(--ink-2);">Your first spec</a></li>
+        <li style="margin-bottom: 6px;"><a href="#generate" style="border: 0; color: var(--ink-2);">Generate a client</a></li>
+        <li style="margin-bottom: 6px;"><a href="#mock" style="border: 0; color: var(--ink-2);">Run the mock</a></li>
+        <li style="margin-bottom: 6px;"><a href="#contract" style="border: 0; color: var(--ink-2);">Contract tests</a></li>
+        <li style="margin-bottom: 6px;"><a href="#next-steps" style="border: 0; color: var(--ink-2);">Next steps</a></li>
+      </ul>
+      <div style="margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 11px; color: var(--ink-3);">
+        <a href="https://github.com/glyph-dev/glyph/edit/main/docs/getting-started.md" style="border: 0; color: var(--ink-3);">edit this page ↗</a>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="row">
+      <div class="tagline-block">
+        <a href="index.html" class="brand plain"><span class="mark" aria-hidden="true"></span><span class="name">glyph</span></a>
+        <p>API contracts that stay honest. One command from OpenAPI to typed clients, mocks, and contract tests.</p>
+      </div>
+      <div>
+        <h5>Docs</h5>
+        <ul>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="guides.html">Guides</a></li>
+          <li><a href="api-reference.html">CLI reference</a></li>
+          <li><a href="examples.html">Examples</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Project</h5>
+        <ul>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph">Source (GitHub)</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/issues">Issue tracker</a></li>
+          <li><a href="https://github.com/glyph-dev/glyph/discussions">Discussions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">RFCs</a></li>
+          <li><a href="#">Contributing</a></li>
+          <li><a href="#">Code of conduct</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">License — Apache 2.0</a></li>
+          <li><a href="#">Security policy</a></li>
+          <li><a href="#">Trademark</a></li>
+          <li><a href="#">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="colophon">
+      <div><span class="status-dot" aria-hidden="true"></span>all systems nominal · build 2024.11.4-a31cf2</div>
+      <div>© 2021–2024 Glyph contributors · Set in JetBrains Mono</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
