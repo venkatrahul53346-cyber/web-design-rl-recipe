@@ -2,94 +2,97 @@
 
 A scalable pipeline that produces RL environments for evaluating coding
 agents at **multi-page web-design replication**: the agent is shown
-screenshots of a 5–6 page website and must reproduce the design in HTML
+screenshots of a 5–7 page website and must reproduce the design in HTML
 + CSS. Tasks run on the [Harbor framework](https://harborframework.com/);
 visual fidelity (not functionality) is graded.
 
 This repo is a deliverable for Anthropic's recipe-design trial.
 
-## Start here
+## Read this first
 
-- **[REPORT.md](REPORT.md)** — the full report: pipeline architecture,
-  design decisions with research backing, the 10 final tasks, the
-  grader, and empirical results. Read this first.
-- **[GRADER.md](GRADER.md)** — the v3.4 grader's reasoning trail (every
-  signal, every weight, every alternative considered + rejected, plus
-  the 4-step calibration on 10 Design2Code tasks).
-- **[TAXONOMY.md](TAXONOMY.md)** — the design space we sample: 12
-  archetypes × 5 style axes, the 10-task slate, exclusions, AI tells.
-- **[CLAUDE.md](CLAUDE.md)** — operating context for the Claude Code
-  session that built this. Useful as a session resume.
+**→ [REPORT.md](REPORT.md)** — the full Part 1 report.
+
+The report covers, in order:
+
+1. **The grader** — Block-Match architecture, 9 signals, weights,
+   anti-gaming.
+2. **The pipeline** — spec-driven LLM compile, decoupled vertical/style
+   architecture.
+3. **The 11 final tasks** — distribution across (vertical × style).
+4. **Empirical results** — 106 of 110 trials, per-task / per-signal
+   distributions.
+5. **Grader shortcomings** — what we know we can't catch.
+6. **What we learned about Opus 4.7** — observed failure patterns.
+
+Open `report_figures/v51_pairs.html` in a browser for the visual
+GT-vs-agent gallery that anchors the correlation evidence in §4.2.
+
+## Other docs
+
+| File | Purpose |
+|---|---|
+| [PIPELINE.md](PIPELINE.md) | Deeper architecture reference for the synthesis pipeline |
+| [GRADER.md](GRADER.md) | Grader reasoning trail — why these signals, why these weights |
+| [TAXONOMY.md](TAXONOMY.md) | The design space: 12 archetypes × 5 style axes |
 
 ## Quick run
 
+Generate one task:
+
 ```bash
-# Generate a task
 ANTHROPIC_API_KEY="$(tr -d '\n\r' < ~/.trial-anthropic-key)" \
-  .venv/bin/python -m src.synthesize --template saas_minimal --seed 0 \
-    --out datasets/final/saas_minimal-001 --force
-
-# Or pick at random
-ANTHROPIC_API_KEY=... .venv/bin/python -m src.synthesize \
-  --random-template --seed 42 --out datasets/final/random-042 --force
-
-# Run an oracle trial (sanity)
-harbor trial start -p datasets/final/saas_minimal-001 -a oracle
+  .venv/bin/python -m src.synthesize \
+    --vertical saas_landing --style mono_warm --seed 0 \
+    --out datasets/final/saas-001 --force
 ```
 
-## Repo map
+Or sample a random valid (vertical × style) pair:
+
+```bash
+.venv/bin/python -m src.synthesize --random --seed 42 \
+  --out datasets/final/random-042 --force
+```
+
+Run the full Opus eval on all 11 tasks (Modal-backed, ~$80–300 / ~45-90 min):
+
+```bash
+env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
+  ANTHROPIC_API_KEY="$(tr -d '\n\r' < ~/.trial-anthropic-key)" \
+  harbor run -c configs/final_eval_opus.yaml -y \
+  --ae ANTHROPIC_API_KEY="$(tr -d '\n\r' < ~/.trial-anthropic-key)"
+```
+
+## Repo layout
 
 ```
 src/
-  synthesize.py          per-page LLM compiler (the recipe)
-  _container_grade.py    grader v3.4 (template baked into every task)
-  render.py              host-side playwright screenshotter
-  generate.py            Harbor task layout
-  report_aggregate.py    reads jobs/<run>/ → markdown table
-  report_plots.py        score box plots + signal breakdown bars
-  report_pairs.py        side-by-side GT vs agent screenshots
+  synthesize.py              per-page LLM compiler (the recipe)
+  _blockmatch_grade.py       v5.1 Block-Match grader (primary)
+  _container_grade.py        helpers (CIE-Lab + tree-BLEU); shipped beside grade.py
+  render.py                  host-side playwright screenshotter
+  generate.py                Harbor task layout (bakes the grader)
 
 templates/
-  _base.py               TemplateMeta dataclass + sampling helpers
-  _brands.py             26 brand personas across 8 verticals
-  _palettes.py           palettes grouped by color regime
-  _fonts.py              font pairs grouped by typography axis
-  saas_minimal.py        A1 SaaS × pastel × hairline-1px (saturated)
-  pricing_dark.py        A8 pricing × dark-native (saturated)
-  auth_glassy.py         A12 auth × glassy-blurred (saturated)
-  docs_mono.py           A3 docs × mono-everywhere (high-signal)
-  editorial_serif.py     A6 editorial × serif × narrow (high-signal)
-  dashboard_dense.py     A4 dashboard × dense × dark (high-signal)
-  portfolio_neobrut.py   A7 portfolio × thick-borders (high-signal)
-  ecom_pastel.py         A5 ecom × pastel × photographic (high-signal)
-  splash_3d.py           A9 splash × abstract-3d × cinematic (high-signal)
-  restaurant_photo.py    A11 hospitality × photographic (high-signal)
-
-tests/
-  test_templates.py      330 invariants (META vs sampler consistency)
-
-configs/
-  final_eval_opus.yaml   Opus 4.7 × 10 trials per task on Modal
-  calibration_*.yaml     historical (4-step grader calibration)
+  verticals/                 15 verticals (topic + sitemap + brand pool)
+  styles/                    13 styles (palette + typography + motif)
+  compatibility.py           56 valid (vertical × style) pairs
 
 datasets/
-  final/                 the 10 final tasks (the deliverable)
-  calibration/           10 D2C tasks used for grader calibration only
+  final/                     the 11 deliverable Harbor tasks
+
+configs/
+  final_eval_opus.yaml       Opus 4.7 × 10 trials per task on Modal
+
+report_figures/
+  v51_results.csv            106 graded trials (the data behind §4)
+  v51_pairs.html             GT-vs-agent visual gallery
+  v51_contact_sheet.png      single-image overview of all best/worst pairs
+  pairs_v51/                 22 individual best/worst stitched PNGs
 ```
 
 ## What's deliberately out of scope
 
-- **Crawling existing sites.** Forbidden by the brief. All websites
-  are generated from scratch.
-- **Animations and interaction.** Out of scope per brief Part 1.
-  Architecture supports adding it later.
-- **React / Tailwind / Solid frameworks.** Out of scope per brief Part 1.
-  The pipeline is framework-agnostic at the spec level; a different
-  compiler stage could target React or Solid instead of plain HTML/CSS.
-
-## Reproducibility
-
-Every artifact is keyed by `(template, seed)` and is bit-for-bit
-deterministic given the same `random.Random(seed)` (the LLM compile
-itself is non-deterministic, so the final task is per-run unique;
-the *spec* feeding the compile is reproducible).
+- **Crawling existing sites.** Forbidden by the brief.
+- **Animations** (Part 2 of the brief). Architecture supports it later.
+- **React / Tailwind / Solid** (Part 3). The pipeline is framework-
+  agnostic at the spec level.

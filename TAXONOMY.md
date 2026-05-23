@@ -107,28 +107,33 @@ look meaningfully different):
 | 7 | A2 product × balanced × gradient-mesh × geometric-sans | stripe-style — saturated baseline as control |
 | 8 | A5 ecom × pastel × hairline-1px × photographic-product | allbirds style |
 
-## Initial 10-task slate
+## Original 10-task slate (historical)
 
-Cover both the AI-saturated archetypes (so we can see what easy looks
-like) and the high-signal cells (so we can see what hard looks like):
+The first slate had 10 cells covering AI-saturated archetypes (so we
+can see what easy looks like) and high-signal cells (so we can see
+what hard looks like):
 
-| # | Archetype × style | Why included |
-|---|---|---|
-| 1 | A1 SaaS minimal × pastel × hairline-1px × clean-iconographic | Saturated control — every model should ace it |
-| 2 | A8 pricing × dark-native × hairline-1px × clean-iconographic | Saturated control — pricing matrices are easy |
-| 3 | A12 auth × pastel × glassy-blurred × clean-iconographic | Saturated control — sparse, modern, easy |
-| 4 | A3 docs × mono-everywhere × hairline-1px × clean-iconographic | High-signal: typography + 3-pane layout |
-| 5 | A6 editorial × humanist-serif × editorial-narrow × photographic | High-signal: typography + serif body + measure |
-| 6 | A4 dashboard × dense × dark-native × data-viz-decor | High-signal: density + dark mode + tables |
-| 7 | A7 portfolio × display-mixed × neobrutalist-thick × variable-display | High-signal: oversized type + asymmetry |
-| 8 | A11 restaurant × photographic-product × display-mixed × muted-editorial | High-signal: hospitality aesthetic |
-| 9 | A9 splash × abstract-3d × dark-native × variable-display | High-signal: cinematic single-product |
-| 10 | A5 ecom × pastel × hairline-1px × photographic-product | High-signal: product grid + filtering |
+| # | Archetype × style | Why included | Status |
+|---|---|---|---|
+| 1 | A1 SaaS minimal × pastel × hairline-1px × clean-iconographic | Saturated control — every model should ace it | shipping |
+| 2 | A8 pricing × dark-native × hairline-1px × clean-iconographic | Saturated control — pricing matrices are easy | shipping |
+| 3 | A12 auth × pastel × glassy-blurred × clean-iconographic | Saturated control — sparse, modern, easy | shipping |
+| 4 | A3 docs × mono-everywhere × hairline-1px × clean-iconographic | High-signal: typography + 3-pane layout | shipping |
+| 5 | A6 editorial × humanist-serif × editorial-narrow × photographic | High-signal: typography + serif body + measure | retired (broken images) |
+| 6 | A4 dashboard × dense × dark-native × data-viz-decor | High-signal: density + dark mode + tables | shipping |
+| 7 | A7 portfolio × display-mixed × neobrutalist-thick × variable-display | High-signal: oversized type + asymmetry | shipping |
+| 8 | A11 restaurant × photographic-product × display-mixed × muted-editorial | High-signal: hospitality aesthetic | retired (broken images) |
+| 9 | A9 splash × abstract-3d × dark-native × variable-display | High-signal: cinematic single-product | retired (broken images) |
+| 10 | A5 ecom × pastel × hairline-1px × photographic-product | High-signal: product grid + filtering | retired (broken images) |
 
-This split (3 saturated + 7 hard) gives us a controlled difficulty
-distribution: when we run Claude Code Opus 4.7 on these and grade,
-we should see scores cluster in two bands — easy ~0.7-0.9, hard
-~0.3-0.6 — with the spread being the actual signal.
+This split (3 saturated + 7 hard) gave us a controlled difficulty
+distribution. After the first eval, 4 image-heavy tasks were retired
+(they referenced an unshipped `rick.jpg` placeholder; both GT and
+agent rendered with broken-image icons). Five replacement tasks were
+generated under the decoupled (vertical × style) architecture
+(government, hotel, news, healthcare, splash_crypto) — see
+[REPORT.md §3](REPORT.md#3-the-tasks) for the current 11-task slate
+and selection rationale.
 
 ## Schema (used by the pipeline)
 

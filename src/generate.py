@@ -24,7 +24,8 @@ Each task directory follows Harbor's expected layout::
     │   └── ground_truth/      source HTML/CSS the oracle copies
     └── tests/
         ├── test.sh            verifier entry point
-        ├── grade.py           multi-signal grader (copied from _container_grade.py)
+        ├── grade.py           Block-Match grader (copied from _blockmatch_grade.py)
+        ├── _container_grade.py  helper module imported by grade.py
         └── ground_truth/      HTML/CSS for grader compare; GT screenshots
                                are rendered in-container at trial time
 
@@ -327,13 +328,24 @@ def build_task_dir(
     test_sh.write_text(TEST_SH)
     test_sh.chmod(0o755)
 
-    grader_src = Path(__file__).resolve().parent / "_container_grade.py"
-    if not grader_src.exists():
+    grader_dir = Path(__file__).resolve().parent
+    blockmatch_src = grader_dir / "_blockmatch_grade.py"
+    container_src = grader_dir / "_container_grade.py"
+    if not blockmatch_src.exists():
         raise FileNotFoundError(
-            f"Container grader template missing at {grader_src}. "
+            f"Block-Match grader missing at {blockmatch_src}. "
+            "Did you delete src/_blockmatch_grade.py?"
+        )
+    if not container_src.exists():
+        raise FileNotFoundError(
+            f"Container grader helpers missing at {container_src}. "
             "Did you delete src/_container_grade.py?"
         )
-    shutil.copy2(grader_src, tests_dir / "grade.py")
+    # Block-Match (v5.1) is the primary grader. _container_grade.py ships
+    # alongside as a sibling because grade.py imports its CIE-Lab + tree-bleu
+    # helpers via `from _container_grade import ...`.
+    shutil.copy2(blockmatch_src, tests_dir / "grade.py")
+    shutil.copy2(container_src, tests_dir / "_container_grade.py")
 
     # 4. instruction.md — derived from actual pages + CSS strategy + assets.
     placeholder_names = sorted(assets.keys()) if assets else None

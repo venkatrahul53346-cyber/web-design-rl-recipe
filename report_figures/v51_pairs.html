@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>v5.1 Block-Match — Opus 4.7 best/worst pairs</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fafafa;
+      --card: #fff;
+      --line: #e5e5e5;
+      --ink: #1a1a1a;
+      --muted: #666;
+      --best: #1e8449;
+      --worst: #922b21;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 32px 28px 64px;
+      font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      color: var(--ink); background: var(--bg);
+    }
+    header {
+      max-width: 1500px; margin: 0 auto 32px;
+    }
+    header h1 { margin: 0 0 6px; font-size: 26px; }
+    header p { margin: 0; color: var(--muted); font-size: 14px; }
+    header .stats {
+      margin-top: 14px; display: flex; gap: 28px;
+      padding: 14px 18px; background: var(--card);
+      border: 1px solid var(--line); border-radius: 8px;
+    }
+    header .stats div { font-size: 13px; }
+    header .stats b { font-size: 17px; display: block; color: var(--ink); }
+    .legend { font-size: 12px; color: var(--muted); margin-top: 12px; }
+    .legend b.best { color: var(--best); }
+    .legend b.worst { color: var(--worst); }
+
+    main { max-width: 1500px; margin: 0 auto; }
+    .task {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 20px;
+      margin-bottom: 28px;
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .meta h2 { margin: 0 0 10px; font-size: 19px; }
+    .meta .stat { font-size: 13px; margin: 4px 0; color: var(--muted); }
+    .meta .stat b { color: var(--ink); }
+    .meta .task-id {
+      margin-top: 12px; font-size: 11px; color: #999;
+      font-family: ui-monospace, "SF Mono", monospace; word-break: break-all;
+    }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .card-header {
+      padding: 8px 12px; font-size: 13px; font-weight: 600;
+      letter-spacing: 0.3px;
+      border-bottom: 1px solid var(--line);
+    }
+    .card.best .card-header { color: var(--best); background: #eafaf1; }
+    .card.worst .card-header { color: var(--worst); background: #fdedec; }
+    .card img { display: block; width: 100%; height: auto; }
+    @media (max-width: 1100px) {
+      .task { grid-template-columns: 1fr; }
+      .pair { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>v5.1 Block-Match grader — best vs worst Opus 4.7 run per task</h1>
+  <p>11 tasks &times; 10 trials = 106 graded runs (4 lost agent-side). Tasks ordered by mean score.</p>
+  <div class="stats">
+    <div><b>0.656</b>overall mean</div>
+    <div><b>0.000</b>min</div>
+    <div><b>0.868</b>max</div>
+    <div><b>106</b>trials</div>
+  </div>
+  <div class="legend">
+    On each row: GT (left) vs agent (right) for the index page.
+    <b class="best">Best</b> = highest-scoring run for that task,
+    <b class="worst">Worst</b> = lowest-scoring run.
+  </div>
+</header>
+<main>
+
+    <section class="task">
+      <div class="meta">
+        <h2>auth_glassy</h2>
+        <div class="stat">mean = <b>0.819</b></div>
+        <div class="stat">n = 10</div>
+        <div class="stat">spread = <b>0.089</b></div>
+        <div class="task-id">auth_glassy-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.868</div>
+          <img src="pairs_v51/auth_glassy-001__best__score_0.868.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.779</div>
+          <img src="pairs_v51/auth_glassy-001__worst__score_0.779.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>docs_mono</h2>
+        <div class="stat">mean = <b>0.726</b></div>
+        <div class="stat">n = 10</div>
+        <div class="stat">spread = <b>0.228</b></div>
+        <div class="task-id">docs_mono-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.795</div>
+          <img src="pairs_v51/docs_mono-001__best__score_0.795.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.567</div>
+          <img src="pairs_v51/docs_mono-001__worst__score_0.567.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>dashboard_dense</h2>
+        <div class="stat">mean = <b>0.717</b></div>
+        <div class="stat">n = 10</div>
+        <div class="stat">spread = <b>0.103</b></div>
+        <div class="task-id">dashboard_dense-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.771</div>
+          <img src="pairs_v51/dashboard_dense-001__best__score_0.771.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.668</div>
+          <img src="pairs_v51/dashboard_dense-001__worst__score_0.668.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>pricing_dark</h2>
+        <div class="stat">mean = <b>0.669</b></div>
+        <div class="stat">n = 9</div>
+        <div class="stat">spread = <b>0.051</b></div>
+        <div class="task-id">pricing_dark-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.690</div>
+          <img src="pairs_v51/pricing_dark-001__best__score_0.690.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.639</div>
+          <img src="pairs_v51/pricing_dark-001__worst__score_0.639.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>healthcare</h2>
+        <div class="stat">mean = <b>0.640</b></div>
+        <div class="stat">n = 10</div>
+        <div class="stat">spread = <b>0.101</b></div>
+        <div class="task-id">healthcare_clinic__glassy_pastel-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.698</div>
+          <img src="pairs_v51/healthcare_clinic__glassy_pastel-001__best__score_0.698.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.597</div>
+          <img src="pairs_v51/healthcare_clinic__glassy_pastel-001__worst__score_0.597.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>government</h2>
+        <div class="stat">mean = <b>0.635</b></div>
+        <div class="stat">n = 9</div>
+        <div class="stat">spread = <b>0.201</b></div>
+        <div class="task-id">government__dark_native_clean-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.780</div>
+          <img src="pairs_v51/government__dark_native_clean-001__best__score_0.780.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.579</div>
+          <img src="pairs_v51/government__dark_native_clean-001__worst__score_0.579.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>splash_crypto</h2>
+        <div class="stat">mean = <b>0.632</b></div>
+        <div class="stat">n = 9</div>
+        <div class="stat">spread = <b>0.136</b></div>
+        <div class="task-id">product_splash__crypto_neon-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.710</div>
+          <img src="pairs_v51/product_splash__crypto_neon-001__best__score_0.710.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.574</div>
+          <img src="pairs_v51/product_splash__crypto_neon-001__worst__score_0.574.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>hotel</h2>
+        <div class="stat">mean = <b>0.618</b></div>
+        <div class="stat">n = 10</div>
+        <div class="stat">spread = <b>0.142</b></div>
+        <div class="task-id">hotel_booking__photo_warm_display-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.689</div>
+          <img src="pairs_v51/hotel_booking__photo_warm_display-001__best__score_0.689.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.547</div>
+          <img src="pairs_v51/hotel_booking__photo_warm_display-001__worst__score_0.547.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>saas_minimal</h2>
+        <div class="stat">mean = <b>0.605</b></div>
+        <div class="stat">n = 10</div>
+        <div class="stat">spread = <b>0.795</b></div>
+        <div class="task-id">saas_minimal-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.795</div>
+          <img src="pairs_v51/saas_minimal-001__best__score_0.795.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.000</div>
+          <img src="pairs_v51/saas_minimal-001__worst__score_0.000.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>portfolio_neobrut</h2>
+        <div class="stat">mean = <b>0.585</b></div>
+        <div class="stat">n = 10</div>
+        <div class="stat">spread = <b>0.234</b></div>
+        <div class="task-id">portfolio_neobrut-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.706</div>
+          <img src="pairs_v51/portfolio_neobrut-001__best__score_0.706.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.472</div>
+          <img src="pairs_v51/portfolio_neobrut-001__worst__score_0.472.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+    <section class="task">
+      <div class="meta">
+        <h2>news_portal</h2>
+        <div class="stat">mean = <b>0.559</b></div>
+        <div class="stat">n = 9</div>
+        <div class="stat">spread = <b>0.145</b></div>
+        <div class="task-id">news_portal__editorial_dark-001</div>
+      </div>
+      <div class="pair">
+        <div class="card best">
+          <div class="card-header">BEST &middot; score = 0.656</div>
+          <img src="pairs_v51/news_portal__editorial_dark-001__best__score_0.656.png" loading="lazy" alt="best">
+        </div>
+        <div class="card worst">
+          <div class="card-header">WORST &middot; score = 0.511</div>
+          <img src="pairs_v51/news_portal__editorial_dark-001__worst__score_0.511.png" loading="lazy" alt="worst">
+        </div>
+      </div>
+    </section>
+    
+</main>
+</body>
+</html>

@@ -28,3 +28,12 @@ Thumbs.db
 *.key
 .env
 .env.local
+
+# Eval run output — moved to _archive/ after each run
+jobs/
+
+# Claude session metadata
+.claude/
+
+# Eval log
+/tmp/v51-eval.log

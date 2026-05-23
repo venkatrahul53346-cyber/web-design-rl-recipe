@@ -49,14 +49,26 @@ from scipy.optimize import linear_sum_assignment
 from skimage.metrics import structural_similarity as ssim
 
 
-# Reuse CIEDE2000 + tree_bleu + coverage gate from the v4 grader.
-from src._container_grade import (
-    _srgb_to_lab,
-    _ciede2000,
-    _tree_bleu,
-    _coverage_gate,
-    _content_coverage,
-)
+# Reuse CIEDE2000 + tree_bleu + coverage gate from the v4 grader. Try the
+# package-qualified path first (eval scripts that run from the repo root);
+# fall back to a sibling import (when this file ships as `tests/grade.py`
+# inside a Harbor task with `_container_grade.py` next to it).
+try:
+    from src._container_grade import (
+        _srgb_to_lab,
+        _ciede2000,
+        _tree_bleu,
+        _coverage_gate,
+        _content_coverage,
+    )
+except ImportError:
+    from _container_grade import (
+        _srgb_to_lab,
+        _ciede2000,
+        _tree_bleu,
+        _coverage_gate,
+        _content_coverage,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -546,3 +558,102 @@ def grade_page(gt_render: RichRendered, ag_render: Optional[RichRendered],
         bm_recall=bm_rec, tree_bleu=tb, visual_ssim=vis,
         combined=combined,
     )
+
+
+# ---------------------------------------------------------------------------
+# Container entry point — used when this file is baked as `tests/grade.py`
+# inside a Harbor task. Reads agent files from /app/ and GT files from
+# /tests/ground_truth/, renders both with the same chromium, scores each
+# page with grade_page, and writes /logs/verifier/reward.json (flat
+# scalars only, per Harbor schema) plus diagnostics.json.
+# ---------------------------------------------------------------------------
+
+import json as _json
+import sys as _sys
+import tempfile as _tempfile
+import traceback as _traceback
+
+APP_DIR = Path("/app")
+TESTS_GT_DIR = Path("/tests/ground_truth")
+REWARD_DIR = Path("/logs/verifier")
+
+
+def _container_grade() -> Dict:
+    """Render agent + GT, score every page, return a flat-scalar payload."""
+    if not TESTS_GT_DIR.exists():
+        raise FileNotFoundError(f"GT dir missing: {TESTS_GT_DIR}")
+    if not APP_DIR.exists():
+        raise FileNotFoundError(f"Agent dir missing: {APP_DIR}")
+
+    with _tempfile.TemporaryDirectory(prefix="bm-grade-") as td:
+        td_path = Path(td)
+        gt_screens = td_path / "gt_screens"
+        ag_screens = td_path / "ag_screens"
+
+        gt_renders = render_pages_rich(TESTS_GT_DIR, gt_screens, VIEWPORT)
+        ag_renders = render_pages_rich(APP_DIR, ag_screens, VIEWPORT)
+
+        per_page: List[V5PageScore] = []
+        for page_name in sorted(gt_renders):
+            gt_r = gt_renders[page_name]
+            ag_r = ag_renders.get(page_name)
+            gt_html = (TESTS_GT_DIR / f"{page_name}.html").read_text()
+            ag_html_path = APP_DIR / f"{page_name}.html"
+            ag_html = ag_html_path.read_text() if ag_html_path.exists() else ""
+            per_page.append(grade_page(
+                gt_r, ag_r, gt_html, ag_html,
+                vw=VIEWPORT["width"], vh=VIEWPORT["height"],
+            ))
+
+    if not per_page:
+        return {"score": 0.0, "n_pages": 0, "error": "no pages graded"}
+
+    overall = float(np.mean([p.combined for p in per_page]))
+    payload: Dict[str, float] = {
+        "score": overall,
+        "n_pages": float(len(per_page)),
+    }
+    for sig in WEIGHTS.keys():
+        payload[f"sig_{sig}"] = float(np.mean([getattr(p, sig) for p in per_page]))
+    payload["n_matched_avg"] = float(np.mean([p.n_matched for p in per_page]))
+
+    diagnostics = {
+        "score": overall,
+        "weights": WEIGHTS,
+        "per_page": [
+            {
+                "name": p.name,
+                "combined": p.combined,
+                "n_gt_anchors": p.n_gt_anchors,
+                "n_ag_anchors": p.n_ag_anchors,
+                "n_matched": p.n_matched,
+                **{sig: getattr(p, sig) for sig in WEIGHTS.keys()},
+            }
+            for p in per_page
+        ],
+    }
+    return {"payload": payload, "diagnostics": diagnostics}
+
+
+def main() -> int:
+    REWARD_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        result = _container_grade()
+    except Exception:
+        err = _traceback.format_exc()
+        print(err, file=_sys.stderr)
+        (REWARD_DIR / "reward.json").write_text(_json.dumps(
+            {"score": 0.0, "error": err.splitlines()[-1]}, indent=2,
+        ))
+        return 1
+
+    payload = result.get("payload") or {"score": 0.0, "error": result.get("error", "")}
+    diagnostics = result.get("diagnostics", payload)
+    print(_json.dumps(diagnostics, indent=2))
+    (REWARD_DIR / "reward.json").write_text(_json.dumps(payload, indent=2))
+    (REWARD_DIR / "diagnostics.json").write_text(_json.dumps(diagnostics, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    _sys.exit(main())

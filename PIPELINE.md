@@ -346,22 +346,29 @@ more likely to avoid them.
 ## 11. The grader (cross-reference)
 
 The grader is shipped inside every task as `tests/grade.py`, baked
-from `src/_container_grade.py` v3.4. Five signals:
+from `src/_blockmatch_grade.py` (v5.1 Block-Match) with
+`src/_container_grade.py` shipped alongside as a sibling helper
+module. Nine signals:
 
 | Signal | Weight | Asks |
 |---|---:|---|
-| Layout | 0.30 | Are elements in the right places? |
-| Visual SSIM | 0.25 | Do screenshots look the same? |
-| Component recall | 0.20 | Are the right elements present? |
-| Text | 0.15 | Did meaningful copy survive? |
-| Style HSV | 0.10 | Are the brand colors right? |
+| bm_position | 0.15 | Are matched elements in the right place? |
+| bm_text | 0.10 | Did matched-pair copy survive? |
+| bm_color | 0.15 | Right colour per element + right page bg regime? |
+| bm_font | 0.10 | Right typography? |
+| bm_border | 0.05 | Right border treatment? |
+| bm_size | 0.05 | Right physical size? |
+| bm_recall | 0.10 | Did the agent match enough of GT's elements? |
+| tree_bleu | 0.20 | Right DOM nesting (1-height subtree multiset recall)? |
+| visual_ssim | 0.10 | Do screenshots look alike? |
 
-Each signal computed at desktop AND mobile, weighted 0.7/0.3.
-Adversarial gates (content-coverage, weight-aware text intersection)
-prevent blank-page exploits.
+Per-pair signals (bm_*) score matched (gt, agent) element pairs
+found via Hungarian assignment on Sørensen-Dice text similarity.
+Page-level signals (bm_recall, tree_bleu, visual_ssim) catch failures
+the per-pair signals can't see.
 
-For the full reasoning trail (4-step calibration on 10 D2C tasks,
-why each weight), read [GRADER.md](GRADER.md).
+For the full reasoning trail (signals chosen, weights set, calibration,
+anti-gaming) see [GRADER.md](GRADER.md).
 
 ## 12. Adding a new vertical
 
@@ -476,4 +483,4 @@ that maximise coverage of both axes. Constraints to apply:
 
 This is a set-cover problem, but small enough to solve by hand. The
 [REPORT.md](REPORT.md) §3 documents the selection rationale for the
-current 10 final tasks.
+current 11 final tasks.
