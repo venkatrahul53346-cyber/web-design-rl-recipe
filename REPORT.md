@@ -12,7 +12,7 @@ The deliverables required by the brief and where they live:
 | Deliverable | Where |
 |---|---|
 | **(a)** A grading function where higher reward ↔ better visual replication | [§1](#1-the-grader), implementation: `src/_blockmatch_grade.py` |
-| **(b)** A scalable pipeline producing multi-page (≥5) websites from scratch | [§2](#2-the-pipeline), implementation: `src/synthesize.py` + `templates/` |
+| **(b)** A scalable pipeline producing multi-page (≥5) websites from scratch | [§2](#2-the-pipeline) (incl. [the within-pair diversity subsection](#within-pair-diversity-pattern-injection--phash-dedup)), implementation: `src/synthesize.py` + `templates/` |
 | **(c)** ≥10 final tasks, each with Opus 4.7 × 10 attempts | [§3](#3-the-tasks), [§4](#4-empirical-results), data: `report_figures/v51_results.csv` |
 | **(d)** Visual evidence that higher score → better replication | [§4.2](#42-correlation-evidence-best-vs-worst-pairs), gallery: `report_figures/v51_pairs.html` |
 | **(e)** What models struggle with | [§6](#6-what-we-learned-about-opus-47) |
@@ -224,7 +224,7 @@ graded by the v5.1 Block-Match grader.
 .venv/bin/python -m src.synthesize --random --seed <int> --out <dir>
 ```
 
-**Three load-bearing design choices:**
+**Four load-bearing design choices:**
 
 1. **Spec-driven LLM compile, not direct LLM-to-HTML.** A two-stage
    compile (design pass → per-page passes) keeps CSS classes, nav
@@ -240,9 +240,79 @@ graded by the v5.1 Block-Match grader.
    independent registries combined by a positive-list compatibility
    matrix. 15 verticals × 13 styles → 56 valid pairs, far more than
    the ten the deliverable needs.
+4. **Within-pair variance via pattern injection + perceptual-hash
+   dedup.** Each vertical declares pattern axes
+   (`hero_patterns`, `nav_patterns`, `section_arcs`,
+   `density_modifiers`) that the sampler picks from per seed and the
+   design prompt forces the LLM to follow exactly. A pHash check at
+   render time rejects residual near-duplicates. Together this lifts
+   effective visual variance per pair from ~3-5x to >10x — the path
+   to hundreds of distinct sites without the "modern Inter pastel"
+   monoculture. See the within-pair diversity subsection below.
 
 For the deeper architecture walkthrough — sampler, validation loop,
 image handling, brand pool — see [PIPELINE.md](PIPELINE.md).
+
+### Within-pair diversity: pattern injection + pHash dedup
+
+Without explicit guidance, an LLM compiling 5 different SaaS
+landing pages from the same `(vertical, style)` cell converges on a
+shared default — `hero-text-left + product-shot-right` + `topbar-
+horizontal nav` + `hero → 3-feature-grid → testimonials → pricing →
+cta` arc. Brand persona and font choice shift the surface but not the
+shape. Effective variance per pair sits at ~3-5x, dominated by the
+"shadcn template" attractor.
+
+The pipeline counters this two ways:
+
+**Pattern injection.** Each `VerticalMeta` carries four axes of
+explicit layout patterns. For `saas_landing`:
+
+```python
+hero_patterns       = [centered-text-only, text-left-product-shot-right,
+                       text-center-product-shot-below,
+                       text-left-illustration-right,
+                       asymmetric-stagger, hero-with-inline-demo]
+nav_patterns        = [topbar-horizontal-links, topbar-with-mega-dropdown,
+                       floating-pill-nav, minimal-with-cmd-k, dual-bar]
+section_arcs        = [<6 section orderings, e.g. integration-grid-led,
+                       comparison-led, walkthrough-led, ...>]
+density_modifiers   = [airy, tight, mixed-rhythm]
+```
+
+`sample_spec(seed)` picks one entry per axis. The design-pass prompt
+renders these as **REQUIRED PATTERN DIRECTIVES** the LLM must follow
+exactly — not soft suggestions. The page pass re-states them so the
+index-page LLM doesn't have to remember the design-pass turn.
+
+For `saas_landing × saas_clean` alone this multiplies the spec space
+by 6 × 5 × 6 × 3 = **540 pattern combinations** before brand / font /
+palette variance, against the ~60 in the pre-injection sampler.
+
+**Perceptual-hash dedup.** Even with pattern injection, two compiles
+will occasionally converge on near-identical pages. `src/dedup.py`
+implements a 64-bit DCT pHash (resize 32×32 → DCT-II → 8×8 low-
+frequency block → median threshold). Hamming distance ≤ 8 bits
+(~12%) flags near-duplicates; the batch generator can reject and
+re-roll with a fresh seed.
+
+**Empirical confirmation.** Five seeds of `saas_landing × saas_clean`
+were rendered as single-page sites and pHash-compared:
+
+| | min hamming | mean hamming | max hamming | duplicates |
+|---|---:|---:|---:|---:|
+| 5 seeds, single-page | **22** (34%) | **28.2** (44%) | **38** (59%) | **0** |
+
+For reference, oracle reproductions of the same site hash 0–3 bits
+apart, and unrelated screenshots are typically 25–35 bits apart. The
+five variants land squarely in the "unrelated screenshots" range —
+pattern injection drives variance well above the dedup threshold by
+construction. The closest pair (s1↔s2 = 22 bits) shared
+`topbar-horizontal-links` nav but differed on every other axis; the
+furthest (s0↔s3 = 38 bits) shared no patterns at all.
+
+Pattern lists populate per `VerticalMeta`. Pattern coverage on the
+remaining 14 verticals is tracked in §8 limitations.
 
 ---
 
@@ -558,9 +628,20 @@ Stuck Modal verifier sandboxes can be recovered locally:
   HTML+CSS files; the spec → compiler split is framework-agnostic and
   could swap the compiler stage without changing the grader (which
   operates on the rendered DOM).
+- **Pattern coverage on every vertical.** Pattern axes (see §2's
+  within-pair diversity subsection) are populated for `saas_landing`
+  as proof. Extending each remaining vertical takes ~2 hours of
+  careful per-vertical authorship; the schema is in place, only the
+  content is missing. Required to scale the dataset from ~tens to
+  hundreds without quality drift.
+- **Stratified batch sampling.** `--random` today is uniform over
+  the 56 valid pairs; some pairs (`saas_clean` covers 11 verticals)
+  get over-sampled at large batch sizes. A `sample_batch(N)` that
+  enforces coverage across the (regime × typography × density) grid
+  is needed for production batches >50.
 
-Both were deferred per the brief's "high-taste Part 1 beats rushed
-all-three" guidance.
+Both Parts 2 and 3 were deferred per the brief's "high-taste Part 1
+beats rushed all-three" guidance.
 
 ---
 
@@ -572,10 +653,11 @@ trial/
 │   ├── synthesize.py          # the per-page LLM compiler
 │   ├── _blockmatch_grade.py   # the v5.1 grader (primary)
 │   ├── _container_grade.py    # helpers (CIE-Lab, tree-BLEU); shipped alongside grade.py
+│   ├── dedup.py               # 64-bit DCT pHash for diversity dedup
 │   ├── render.py              # playwright screenshotter
 │   └── generate.py            # Harbor task layout
 ├── templates/
-│   ├── verticals/             # 15 verticals (topic + sitemap + brand pool)
+│   ├── verticals/             # 15 verticals (topic + sitemap + brand pool + pattern axes)
 │   ├── styles/                # 13 styles (palette + typography + motif)
 │   └── compatibility.py       # 56 valid (vertical × style) pairs
 ├── tests/

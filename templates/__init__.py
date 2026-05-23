@@ -80,6 +80,13 @@ def sample_spec(vertical_name: str, style_name: str, seed: int) -> WebsiteSpec:
         first=v.sitemap_first,
     )
 
+    # Pattern injection — pick one of each axis if the vertical defines them.
+    # Empty axis lists mean "no pattern enforced" (the pre-injection default).
+    hero_pattern = rng.choice(v.hero_patterns) if v.hero_patterns else ""
+    nav_pattern = rng.choice(v.nav_patterns) if v.nav_patterns else ""
+    section_arc = rng.choice(v.section_arcs) if v.section_arcs else ""
+    density_modifier = rng.choice(v.density_modifiers) if v.density_modifiers else ""
+
     style_axes = StyleSpec(
         density=v.density_override or s.density_default,
         color_regime=s.color_regime,
@@ -101,6 +108,10 @@ def sample_spec(vertical_name: str, style_name: str, seed: int) -> WebsiteSpec:
         content_seed=seed,
         brand=BrandSpec(**brand.to_brandspec_kwargs()),
         notes=notes,
+        hero_pattern=hero_pattern,
+        nav_pattern=nav_pattern,
+        section_arc=section_arc,
+        density_modifier=density_modifier,
     )
 
 

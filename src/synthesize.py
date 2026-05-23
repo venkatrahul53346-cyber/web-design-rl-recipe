@@ -135,6 +135,29 @@ def _build_design_user_prompt(spec: WebsiteSpec) -> str:
         if spec.notes else ""
     )
     sitemap_str = ", ".join(f"{p}.html" for p in spec.sitemap)
+
+    # Pattern injection — REQUIRED directives the LLM cannot interpret away.
+    # Each line is the verbatim text the vertical author wrote in
+    # VerticalMeta.{hero,nav,section_arc,density}_patterns. Empty patterns
+    # are suppressed so the LLM is free to choose for verticals that haven't
+    # opted into pattern injection yet.
+    pattern_lines = []
+    if spec.hero_pattern:
+        pattern_lines.append(f"HERO LAYOUT (REQUIRED): {spec.hero_pattern}")
+    if spec.nav_pattern:
+        pattern_lines.append(f"NAVIGATION (REQUIRED): {spec.nav_pattern}")
+    if spec.section_arc:
+        pattern_lines.append(f"SECTION ARC FOR THE INDEX PAGE (REQUIRED — "
+                             f"after the hero, place sections in this order): "
+                             f"{spec.section_arc}")
+    if spec.density_modifier:
+        pattern_lines.append(f"DENSITY CHARACTER (REQUIRED): {spec.density_modifier}")
+    pattern_block = (
+        "\n\nREQUIRED PATTERN DIRECTIVES (these override any default tendencies "
+        "and must be followed exactly):\n  - " + "\n  - ".join(pattern_lines)
+        if pattern_lines else ""
+    )
+
     return textwrap.dedent(f"""\
         WEBSITE SPEC
 
@@ -159,7 +182,7 @@ def _build_design_user_prompt(spec: WebsiteSpec) -> str:
 
         The full sitemap will be: {sitemap_str}, plus styles.css.
         Pages will be generated in subsequent passes; this pass produces
-        ONLY the shared design system + nav + footer.{notes_block}
+        ONLY the shared design system + nav + footer.{pattern_block}{notes_block}
 
         Now produce the design-pass JSON described in the system prompt.
         """)
@@ -268,6 +291,24 @@ def _build_page_user_prompt(spec: WebsiteSpec, design: Dict[str, str],
         f"Build content appropriate for a page named '{page_name}' in a "
         f"{spec.archetype} {spec.vertical} site."
     )
+    # Pattern injection at the page level — re-state the patterns so the
+    # page LLM doesn't have to remember the design-pass instructions.
+    # Hero pattern only applies to the index page; section-arc only applies
+    # to the index page (other pages don't have a hero or a section arc).
+    page_patterns: List[str] = []
+    if page_name == "index":
+        if spec.hero_pattern:
+            page_patterns.append(f"HERO LAYOUT (REQUIRED — match the design-"
+                                 f"pass directive exactly): {spec.hero_pattern}")
+        if spec.section_arc:
+            page_patterns.append(f"SECTION ARC (REQUIRED, in this order): "
+                                 f"{spec.section_arc}")
+    if spec.density_modifier:
+        page_patterns.append(f"DENSITY CHARACTER: {spec.density_modifier}")
+    pattern_block = (
+        "\n\nPAGE-LEVEL PATTERN DIRECTIVES:\n  - " + "\n  - ".join(page_patterns)
+        if page_patterns else ""
+    )
     return textwrap.dedent(f"""\
         WEBSITE CONTEXT
 
@@ -299,7 +340,7 @@ def _build_page_user_prompt(spec: WebsiteSpec, design: Dict[str, str],
 
         NOW PRODUCE THE PAGE: {page_name}.html
 
-        Page purpose: {purpose}
+        Page purpose: {purpose}{pattern_block}
 
         The HTML must be a complete <!DOCTYPE html5> document with
         <link rel="stylesheet" href="styles.css">, <title> appropriate to

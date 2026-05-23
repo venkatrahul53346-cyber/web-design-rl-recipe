@@ -31,6 +31,16 @@ class VerticalMeta:
     references: List[str] = field(default_factory=list)
     density_override: Optional[str] = None   # if set, overrides style.density_default
 
+    # Pattern axes — drive within-pair visual variance. When empty, the LLM
+    # picks freely (the pre-pattern-injection behaviour). When populated,
+    # sample_spec picks one entry per seed and the design prompt forces the
+    # LLM to use that exact pattern. Keep entries short, vivid, and
+    # genuinely distinct — two near-equivalents waste a slot.
+    hero_patterns: List[str] = field(default_factory=list)
+    nav_patterns: List[str] = field(default_factory=list)
+    section_arcs: List[str] = field(default_factory=list)
+    density_modifiers: List[str] = field(default_factory=list)
+
     def __post_init__(self) -> None:
         assert self.archetype in VALID_ARCHETYPES, f"bad archetype {self.archetype}"
         assert self.difficulty in {"easy", "medium", "hard"}, f"bad difficulty {self.difficulty}"

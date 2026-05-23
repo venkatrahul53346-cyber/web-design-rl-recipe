@@ -37,3 +37,10 @@ jobs/
 
 # Eval log
 /tmp/v51-eval.log
+
+# Local-only diversity demos (proof artifacts, regenerable)
+demos/
+
+# Local-only one-off helper scripts (kept around, not part of the deliverable)
+scripts/demo_patterns.py
+scripts/rerender_demo.py

@@ -48,6 +48,12 @@ class WebsiteSpec:
     content_seed: int               # for reproducibility
     brand: BrandSpec
     notes: str = ""                 # free-form extra guidance for the LLM
+    # Pattern axes — driven by VerticalMeta.{hero,nav,section_arc,density}_patterns.
+    # Empty string = no pattern enforced (LLM picks freely).
+    hero_pattern: str = ""
+    nav_pattern: str = ""
+    section_arc: str = ""
+    density_modifier: str = ""
 
     def to_dict(self) -> dict:
         d = asdict(self)
