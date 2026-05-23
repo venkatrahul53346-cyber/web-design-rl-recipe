@@ -1,0 +1,68 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "government__dark_native_clean-0000",
+    "archetype": "A2",
+    "vertical": "government",
+    "style": {
+      "density": "balanced",
+      "color_regime": "dark-native",
+      "typography": "geometric-sans",
+      "border_language": "hairline-1px",
+      "motif": "clean-iconographic"
+    },
+    "palette_seed": "#EF4444",
+    "font_pair": [
+      "Inter",
+      "Inter",
+      null
+    ],
+    "difficulty": "hard",
+    "sitemap": [
+      "index",
+      "contact",
+      "forms",
+      "about",
+      "departments",
+      "news",
+      "services"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "National Archive",
+      "tagline": "The public record, made accessible",
+      "value_prop": "Search, browse, and request records held by the National Archive. Open public datasets, digitised historical documents, and online request forms for restricted materials.",
+      "product_category": "national archive / records authority",
+      "target_audience": "researchers, journalists, and the general public"
+    },
+    "notes": "WHAT WE'RE BUILDING (government):\nAn official site for a government agency or municipality. Visual conventions are distinctly civic: dense forms, navy-blue + accent palette, accessibility-led, breadcrumbs on every page, plain-language copy, formal typography. The site exists to help residents complete tasks (pay a bill, request a record, find a department) \u2014 NOT to sell. Tone is neutral, formal, helpful. NO marketing language, NO 'free trial', NO testimonials. Pages have a lot of body text and structured forms. Headers include a search bar, language toggle, and accessibility settings link.\n\nBRAND: National Archive \u2014 \"The public record, made accessible\"\nSearch, browse, and request records held by the National Archive. Open public datasets, digitised historical documents, and online request forms for restricted materials.\n\nVISUAL LANGUAGE (dark_native_clean):\nBackground near-black (#0A0A0B / #111114), text near-white (#F5F5F7) at high contrast, panel surface slightly lighter (#15151A). Single accent color from the palette used sparingly: highlighted CTA, hover state, active link. Body weight ~500 \u2014 slightly heavier than typical for legibility on dark. Hairline 1px borders (#26262C) separate everything; no shadows, no rounded corners over 8px. Avoid: saturated gradients, default-Tailwind gray accents.\n\nDESIGN REFERENCES (style + topic): gov.uk, usa.gov, canada.ca, linear.app, vercel.com, stripe.com/dark\n\nPER-PAGE GUIDANCE:\n- index: Civic hero \u2014 name of the agency/city + brief mission. Below: top-tasks grid ('Pay a bill', 'Request a record', 'Find a department'), news/announcements section, contact strip.\n- contact: Multi-channel contact info: phone, email, mailing address, in-person hours, accessibility/language support contacts.\n- forms: List of downloadable forms or online form starts. Categorised. Each entry: form name, brief description, link to start / download.\n- about: Brief about-the-agency page \u2014 mission, leadership, history. Formal tone.\n- departments: Directory of departments. Each entry: department name, head's name + photo placeholder, contact, link to detail page.\n- news: Reverse-chronological list of news/announcements. Date, headline, 1-line summary, read-more link.\n- services: Categorised list of services. Cards or a deep table with category labels, plain-language descriptions of each service.\n\nIMAGE POLICY (HARD CONSTRAINT):\n- For purely decorative content (hero illustrations, abstract section   dividers, decorative blobs): use NO `<img>` tags. Use CSS gradients,   inline SVG, or styled `<div>` blocks with `background-color` /   `aspect-ratio` instead.\n- For content-essential photography (product photos, dish photos, hotel   rooms, portrait avatars, editorial leads), use `<img src=\"X\">` where   X is EXCLUSIVELY one of these five filenames:\n    photo-product-1.jpg     (generic product / object \u2014 warm tones)\n    photo-product-2.jpg     (cooler product variant \u2014 for grids)\n    photo-portrait-1.jpg    (generic person \u2014 for avatars / team / bylines)\n    photo-landscape-1.jpg   (generic scene \u2014 for hero / hospitality leads)\n    illustration-abstract.jpg (mesh-gradient \u2014 for splash / decorative hero)\n- Repeating a filename across multiple `<img>` tags is fine.\n- ANY OTHER `src=` value will be rejected at validation time. No external\n  URLs, no other filenames, no svg files."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "about",
+    "contact",
+    "departments",
+    "forms",
+    "index",
+    "news",
+    "services"
+  ],
+  "files": [
+    "about.html",
+    "contact.html",
+    "departments.html",
+    "forms.html",
+    "index.html",
+    "news.html",
+    "services.html",
+    "styles.css"
+  ],
+  "has_external_css": true,
+  "assets": [
+    "illustration-abstract.jpg",
+    "photo-landscape-1.jpg",
+    "photo-portrait-1.jpg",
+    "photo-product-1.jpg",
+    "photo-product-2.jpg"
+  ]
+}

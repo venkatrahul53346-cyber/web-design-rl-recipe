@@ -697,3 +697,154 @@ Same staleness rule as every prior grader change. After updating
 `src/_container_grade.py`, copy it into every `<task>/tests/grade.py`
 before re-running trials. See §11 for the cliff that bit us when v3.2
 hadn't been propagated.
+
+
+## §7 v4 — CIEDE2000 + TreeBLEU, evidence-based reweighting (2026-05-22)
+
+### Why v4
+
+Two failures of v3.4 surfaced from looking at the actual 90-trial
+final-eval-opus-v34 dataset (10 tasks × 9-10 Opus runs each):
+
+1. **HSV histogram cosine is a noise generator on near-monochrome
+   regimes.** On dark-themed tasks the GT pixels concentrate in the
+   `value=0` bucket, but their hue is numerically meaningful (and
+   noisy). A pure-black `#000000` lands in hue bin 0; a near-black
+   `#0c0c0e` (R=12, G=12, B=14, B fractionally largest) lands in hue
+   bin 5 because PIL computes H≈170° for it. When 95% of pixels in
+   each image hash to a different histogram cell, cosine collapses to
+   ~0 — even though to a human the two pages are indistinguishable.
+   Confirmed bimodality on splash_3d (7/9 false-zero `style` scores
+   despite all 9 dark renders) and dashboard_dense (8/10 false-zero
+   despite all 10 dark renders).
+
+   Spearman correlation on the 90-trial set between v3.4 `style_hsv`
+   and v4 `style_de2000` is **0.06**. If HSV were measuring color
+   correctly, it would correlate strongly with CIEDE2000. It doesn't.
+   HSV was contributing artifactual ±0.10 swings to total scores.
+
+2. **The grader had no DOM-structure signal at all.** Every signal in
+   v3.4 came from rendered output — visible_items (post-render bboxes),
+   text_segments (post-render visible text), or pixel-level statistics.
+   Two agents that produced the same screenshots from very different
+   DOM trees scored identically. Agents that built skeletal DOMs while
+   matching the screenshot got the same credit as agents that wrote
+   structurally faithful HTML.
+
+   This was visible in the v3.4 saturation pattern: on `ecom_pastel`,
+   all 10 agents scored 0.638-0.684 (spread 0.046) — the grader
+   couldn't differentiate among them. This wasn't because the agents
+   were equivalent; it was because all of v3.4's signals had saturated
+   on a task with broken-image placeholders dominating the rendered
+   surface area.
+
+### v4 changes
+
+| Signal | v3.4 | v4 | Why |
+|---|---:|---:|---|
+| layout | 0.30 | 0.25 | independent (Spearman ≤0.46 with everything); slight downweight to fund tree_bleu |
+| visual (SSIM) | 0.25 | 0.20 | good spread (std 0.11), unchanged behavior |
+| component | 0.20 | **0.05** | Spearman **0.82** with new tree_bleu — heavily redundant. Lowest within-set std (0.049) of any signal. Kept at nominal 0.05 for "agent omitted entire <nav>" diagnostic value |
+| text | 0.15 | 0.15 | unchanged. Highest std (0.17), Spearman 0.71 with baseline total — does real work |
+| style | 0.10 (HSV cosine) | 0.10 (CIEDE2000) | implementation swap, weight unchanged |
+| **tree_bleu** | — | **0.25** | new. WebCode2M-style 1-height-subtree recall. Only signal with meaningful spread on saturated tasks |
+
+Total = 1.00. Drop in `component` weight (0.20 → 0.05) and the
+introduction of `tree_bleu` (0.00 → 0.25) effectively trade a
+degenerate signal for a uniquely-discriminative one.
+
+### Per-task within-set spread evidence (key motivator)
+
+stdev across 9-10 Opus runs per task for each signal individually.
+Higher = the signal discriminates among agents on that task.
+
+| Task | v3.4 baseline std | tree_bleu std | × |
+|---|---:|---:|---:|
+| ecom_pastel-001 | 0.012 | 0.062 | **5.2×** |
+| pricing_dark-001 | 0.024 | 0.060 | 2.5× |
+| restaurant_photo-001 | 0.043 | 0.069 | 1.6× |
+
+On the three lowest-spread tasks under v3.4, `tree_bleu` is the
+*only* signal whose within-task std exceeds the baseline total's. It
+isn't randomly noise; on `pricing_dark` its #1 and #10 align with
+v3.4's #1 and #10 (same direction, more discriminating).
+
+### Signal definitions, v4
+
+`_style_score` (CIEDE2000):
+
+1. Resize each screenshot to 128×128, quantize to 5 bits/channel.
+2. Top-5 most-common colors per image, with pixel-coverage weights.
+3. Convert to CIE Lab (D65 white, sRGB→XYZ→Lab pipeline).
+4. Pair top-1 GT with top-1 agent (rank-aligned, NOT Hungarian-matched
+   — Hungarian destroys dominance ranking, would let a white-bg agent
+   match GT's black via the agent's #2 color).
+5. Average ΔE weighted by min(GT_weight, agent_weight) at each rank.
+6. Map to [0, 1] via `1 - mean_ΔE / 50`.
+7. Multiply by the existing coverage gate.
+
+`_tree_bleu` (WebCode2M-inspired):
+
+1. Parse GT and agent HTML with BeautifulSoup.
+2. Extract every 1-height subtree as `(parent_tag,
+   sorted_tuple_of_child_tags)`. Skip `script`, `style`, `meta`,
+   `link`, `br`, `hr`, `head`, `html`, `noscript` so boilerplate
+   doesn't dominate.
+3. Multiset intersection / GT total. Returns recall in [0, 1]; 1.0 if
+   GT is empty (degenerate); 0.0 if agent is empty.
+
+`RenderedPage` gained an `html: str = ""` field; `_render_pages` now
+calls `html.read_text(errors="replace")` alongside the screenshot+JS
+calls. ~one extra line per render.
+
+### `reward.json` schema (v4)
+
+Per-page flat scalar keys gain `tree_bleu` parallel to the existing
+five signals:
+- `<page>_tree_bleu`
+- `<page>_desktop_tree_bleu`, `<page>_mobile_tree_bleu`
+
+Total per-page keys go from 18 → 21. For 6 pages ≈ 127 keys per
+task — still within Harbor's flat-scalars schema. Existing v3.4
+keys are unchanged.
+
+### Things rejected for v4
+
+- **Block-Match (Design2Code-style Hungarian text-block matching).**
+  Spearman 0.94 with v3.4 `text` on the 90-trial set. Pure
+  redundancy; would not add information. The full Design2Code paper
+  also uses per-block bbox + color, but that requires preserving DOM
+  bboxes during the trial and we already have layout for that.
+- **CLIP visual cosine** (Design2Code's high-level head). Adds a
+  PyTorch dependency to the verifier image, which currently bakes
+  only Pillow + numpy + scikit-image + bs4. Defer; revisit if v4
+  user-agreement testing shows visual SSIM saturation is still a
+  problem on >2 archetypes.
+- **Earth Mover's Distance on Lab histograms.** No measurable
+  correlation gain over CIEDE2000-on-dominant-colors in any
+  benchmark we found; not worth the implementation complexity.
+- **Tree edit distance (Zhang-Shasha).** WebCode2M considered and
+  rejected this in favor of TreeBLEU (1-height subtree recall) on
+  the grounds of O(n³) cost and over-penalization of stylistic
+  re-wrapping. We follow their reasoning.
+
+### Calibration regression — to do
+
+The v3 → v3.4 transition included a sanity check (oracle=1.000,
+nop=0.000) on the 10 calibration tasks. v4 should pass the same gate.
+The smoke tests we ran on splash_3d's GT confirm:
+
+- `_tree_bleu(GT, GT) = 1.0000` ✓
+- `_tree_bleu(GT, "") = 0.0000` ✓
+- `_style_score(GT, GT) = 1.0000` ✓
+- `WEIGHTS sum = 1.000` ✓
+
+Full Modal sanity run on the calibration set is still pending.
+
+### Important: refresh task dirs after grader changes
+
+Same staleness rule as every prior grader change. The 10
+final-deliverable task dirs have been refreshed; if any new task
+dirs are created, they'll inherit v4 automatically via
+`build_task_dir` (which copies `src/_container_grade.py` at
+generation time).

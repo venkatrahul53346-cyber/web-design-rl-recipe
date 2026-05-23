@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The stubborn case for braising at 92°C — Sandfork</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* article-page specifics */
+  .article-hero { position: relative; margin-bottom: 0; }
+  .article-hero .hero-img { aspect-ratio: 21/9; overflow: hidden; position: relative; }
+  .article-hero .hero-img img { width:100%; height:100%; object-fit: cover; }
+  .article-hero .hero-img::after { content:''; position:absolute; inset:0; background: linear-gradient(180deg, rgba(14,13,11,.2) 0%, rgba(14,13,11,.55) 55%, rgba(14,13,11,.97) 100%); }
+  .article-hero .hero-text { position:absolute; left:50%; transform: translateX(-50%); right:0; bottom:0; padding: 0 48px 44px; z-index:2; max-width: 1280px; margin: 0 auto; width:100%; }
+  .article-hero .hero-text h1 { font-style: italic; font-weight: 800; max-width: 22ch; font-size: clamp(2.6rem, 6vw, 5rem); }
+  .article-hero .hero-text .dek { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 1.35rem; line-height: 1.4; color: var(--ink); max-width: 56ch; margin-top: 14px; }
+
+  .article-meta-bar { border-bottom: 1px solid var(--bg-rule); padding: 22px 0; margin-bottom: 48px; }
+  .article-meta-bar .inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; }
+  .article-meta-bar .left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .article-meta-bar .share { display: flex; gap: 16px; font-family: var(--display); font-size: .82rem; font-style: italic; color: var(--ink-dim); }
+  .article-meta-bar .share a { color: var(--amber-bright); }
+
+  .article-layout { display: grid; grid-template-columns: 1fr minmax(0, 70ch) 1fr 300px; gap: 0 48px; padding-bottom: 80px; }
+  .article-layout .rail-l { grid-column: 1; padding-right: 24px; padding-top: 6px; }
+  .article-layout .body { grid-column: 2; }
+  .article-layout .gap { grid-column: 3; }
+  .article-layout .rail-r { grid-column: 4; border-left: 1px solid var(--bg-rule); padding-left: 32px; }
+
+  @media (max-width: 1100px) {
+    .article-layout { grid-template-columns: 1fr minmax(0, 70ch) 1fr; }
+    .article-layout .rail-l { display: none; }
+    .article-layout .body { grid-column: 2; }
+    .article-layout .rail-r { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--bg-rule); padding-left: 0; padding-top: 40px; margin-top: 48px; }
+  }
+  @media (max-width: 700px) {
+    .article-layout { grid-template-columns: 1fr; padding: 0 20px 60px; }
+    .article-layout .body, .article-layout .rail-r { grid-column: 1; }
+    .article-hero .hero-text { padding: 0 22px 24px; }
+  }
+
+  .rail-l .rail-label { font-family: var(--display); font-style: italic; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--amber-bright); margin-bottom: 12px; border-bottom: 1px solid var(--bg-rule); padding-bottom: 8px; }
+  .rail-l .contents-list { list-style: none; padding: 0; margin: 0 0 30px; font-family: var(--body); font-size: .92rem; }
+  .rail-l .contents-list li { padding: 8px 0; border-bottom: 1px solid var(--bg-rule); }
+  .rail-l .contents-list a { color: var(--ink-dim); display: flex; gap: 10px; }
+  .rail-l .contents-list a:hover { color: var(--amber-bright); text-decoration: none; }
+  .rail-l .contents-list .num { font-family: var(--display); font-style: italic; color: var(--amber); font-weight: 600; min-width: 22px; }
+
+  /* Article body typography */
+  .article-body { font-family: var(--body); font-size: 1.075rem; line-height: 1.62; color: var(--ink); max-width: 70ch; }
+  .article-body > p:first-of-type::first-letter {
+    font-family: var(--display); font-weight: 800; color: var(--amber-bright);
+    float: left; font-size: 5.2rem; line-height: .85; padding: 6px 12px 0 0; margin-top: 6px;
+  }
+  .article-body h2 { font-family: var(--display); font-weight: 700; font-size: 1.85rem; margin: 2.2em 0 .5em; letter-spacing: -0.02em; }
+  .article-body h2 .num { font-style: italic; color: var(--amber); font-weight: 600; margin-right: 14px; }
+  .article-body h3 { margin: 1.8em 0 .4em; font-size: 1.25rem; }
+  .article-body p { margin: 0 0 1.05em; }
+  .article-body em { color: var(--ink); }
+  .article-body a { color: var(--amber-bright); border-bottom: 1px solid var(--amber); }
+  .article-body a:hover { background: rgba(176,124,90,.12); text-decoration: none; }
+
+  .pullquote { border-top: 2px solid var(--ink); border-bottom: 1px solid var(--bg-rule); padding: 28px 0 22px; margin: 36px 0; }
+  .pullquote blockquote { margin: 0; font-family: var(--display); font-style: italic; font-weight: 500; font-size: 1.85rem; line-height: 1.2; color: var(--ink); letter-spacing: -0.015em; }
+  .pullquote cite { display: block; margin-top: 14px; font-family: var(--body); font-style: normal; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: var(--amber-bright); }
+
+  .figure { margin: 36px 0; }
+  .figure .frame { aspect-ratio: 3/2; background: var(--bg-elev); overflow: hidden; position: relative; }
+  .figure .frame img { width: 100%; height: 100%; object-fit: cover; }
+  .figure figcaption { font-family: var(--body); font-style: italic; font-size: .88rem; color: var(--ink-dim); margin-top: 10px; padding-left: 14px; border-left: 2px solid var(--amber); }
+
+  .recipe-box { background: var(--bg-elev); border-left: 4px solid var(--amber); padding: 28px 32px; margin: 40px 0; }
+  .recipe-box .label { font-family: var(--display); font-style: italic; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: var(--amber-bright); margin-bottom: 8px; }
+  .recipe-box h3 { font-family: var(--display); font-weight: 700; font-size: 1.55rem; margin-bottom: 6px; letter-spacing: -0.015em; }
+  .recipe-box .meta { font-family: var(--body); font-size: .85rem; color: var(--ink-dim); margin-bottom: 16px; font-style: italic; }
+  .recipe-box ul { list-style: none; padding: 0; margin: 0 0 18px; font-family: var(--body); font-size: .98rem; columns: 2; column-gap: 32px; }
+  .recipe-box ul li { padding: 5px 0; break-inside: avoid; border-bottom: 1px dotted var(--bg-rule); }
+  .recipe-box .go { font-family: var(--display); font-weight: 600; font-style: italic; color: var(--amber-bright); }
+  @media (max-width: 600px) { .recipe-box ul { columns: 1; } }
+
+  .sidenote { background: transparent; border-top: 1px solid var(--bg-rule); border-bottom: 1px solid var(--bg-rule); padding: 18px 0; margin: 32px 0; font-family: var(--display); font-style: italic; font-size: 1.05rem; color: var(--ink-dim); }
+  .sidenote strong { color: var(--amber-bright); font-style: normal; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; font-size: .8rem; display: block; margin-bottom: 6px; }
+
+  /* right rail */
+  .rail-r h4 { font-family: var(--display); font-weight: 600; font-style: italic; font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; color: var(--amber-bright); border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin-bottom: 16px; }
+  .most-read { list-style: none; padding: 0; margin: 0 0 40px; }
+  .most-read li { display: grid; grid-template-columns: 48px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--bg-rule); align-items: start; }
+  .most-read .count { font-family: var(--display); font-weight: 800; font-style: italic; font-size: 2.4rem; line-height: 1; color: var(--amber); letter-spacing: -0.04em; }
+  .most-read a { color: var(--ink); font-family: var(--display); font-weight: 500; font-size: 1.02rem; line-height: 1.25; }
+  .most-read a:hover { color: var(--amber-bright); text-decoration: none; }
+  .most-read .meta { font-family: var(--body); font-style: italic; font-size: .8rem; color: var(--ink-mute); margin-top: 4px; }
+
+  .promo { border: 1px solid var(--amber); padding: 24px; margin-bottom: 36px; }
+  .promo .label { font-family: var(--display); font-style: italic; color: var(--amber-bright); font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+  .promo h4 { font-family: var(--display); font-weight: 700; font-style: normal; color: var(--ink); font-size: 1.3rem; letter-spacing: -0.015em; text-transform: none; border: 0; padding: 0; margin-bottom: 10px; }
+  .promo p { font-size: .92rem; color: var(--ink-dim); margin-bottom: 14px; }
+  .promo form { display: flex; gap: 0; }
+  .promo input { flex: 1; background: var(--bg); border: 1px solid var(--bg-rule); color: var(--ink); padding: 10px 12px; font-family: var(--body); font-size: .9rem; border-right: 0; }
+  .promo button { background: var(--honey); color: var(--bg); border: 0; padding: 10px 16px; font-family: var(--display); font-style: italic; font-weight: 600; cursor: pointer; }
+  .promo button:hover { background: var(--amber-bright); }
+
+  /* tag strip + bio */
+  .tag-strip { display: flex; flex-wrap: wrap; gap: 8px; margin: 40px 0 32px; }
+  .author-bio { display: grid; grid-template-columns: 96px 1fr; gap: 22px; align-items: start; padding: 28px 0; border-top: 1px solid var(--bg-rule); border-bottom: 1px solid var(--bg-rule); margin: 16px 0 40px; }
+  .author-bio .avatar { aspect-ratio: 1/1; background: var(--bg-elev); overflow: hidden; }
+  .author-bio .avatar img { width:100%; height:100%; object-fit: cover; }
+  .author-bio .label { font-family: var(--display); font-style: italic; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--amber-bright); margin-bottom: 4px; }
+  .author-bio h4 { font-family: var(--display); font-weight: 700; font-size: 1.25rem; margin-bottom: 6px; }
+  .author-bio p { font-family: var(--body); font-size: .95rem; color: var(--ink-dim); margin: 0; }
+
+  /* comments */
+  .comments { border-top: 2px solid var(--ink); padding-top: 28px; margin-top: 20px; }
+  .comments h3 { font-family: var(--display); font-weight: 700; font-style: italic; font-size: 1.6rem; margin-bottom: 6px; }
+  .comments .comments-meta { font-family: var(--body); font-style: italic; color: var(--ink-dim); font-size: .9rem; margin-bottom: 28px; }
+  .comment { display: grid; grid-template-columns: 56px 1fr; gap: 18px; padding: 20px 0; border-bottom: 1px solid var(--bg-rule); }
+  .comment .avatar { aspect-ratio: 1/1; background: var(--amber); color: var(--bg); font-family: var(--display); font-weight: 800; font-style: italic; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+  .comment .who { font-family: var(--body); font-size: .88rem; color: var(--ink-dim); margin-bottom: 6px; }
+  .comment .who strong { color: var(--ink); font-weight: 600; }
+  .comment .who .dot { color: var(--amber); margin: 0 6px; }
+  .comment p { font-size: 1rem; color: var(--ink); margin: 0; }
+
+  /* related */
+  .related-wrap { background: var(--bg-elev); padding: 56px 0 64px; border-top: 1px solid var(--bg-rule); }
+  .related-wrap .section-head { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 14px; margin-bottom: 32px; }
+  .related-wrap .section-head h2 { font-style: italic; font-weight: 700; font-size: 1.7rem; margin: 0; letter-spacing: -0.02em; }
+  .related-wrap .section-head h2 em { color: var(--amber-bright); font-style: italic; }
+  .related-wrap .section-head a { font-family: var(--display); font-style: italic; font-size: .92rem; color: var(--amber-bright); }
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="masthead">
+    <a href="index.html" class="brand">Sandfork<sup>№ 07</sup></a>
+    <div class="masthead-meta">
+      <span class="issue">Saturday, 18 November · Issue Nº 07 in print</span>
+      <span>—</span>
+      <a href="#">Sign in</a>
+      <a href="#" class="subscribe-btn">Subscribe</a>
+    </div>
+  </div>
+  <nav class="section-nav">
+    <div class="section-nav-inner">
+      <a href="index.html">Today</a>
+      <a href="section.html">Recipes</a>
+      <a href="section.html" class="current">Technique</a>
+      <a href="topic.html">Pantry</a>
+      <a href="video.html">Video</a>
+      <a href="live-blog.html">Live</a>
+      <a href="section.html">Bakery</a>
+      <a href="section.html">Profiles</a>
+      <a href="section.html">Letters</a>
+      <a href="section.html">The Print Journal</a>
+    </div>
+  </nav>
+  <div class="ticker">
+    <span class="ticker-label">In the kitchen</span>
+    <div class="ticker-items">
+      <span><a href="live-blog.html">Live: 36 hours at Saint-Jean bakery, Lyon</a></span>
+      <span>Quince paste is back — three recipes from the new issue</span>
+      <span>Why your stock tastes flat (and the 14-minute fix)</span>
+      <span>Reader letters: the great salt cod debate</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <article>
+    <!-- HERO -->
+    <section class="article-hero hero-lead">
+      <div class="hero-img">
+        <img src="photo-landscape-1.jpg" alt="A heavy iron pot half-lidded on a low flame, with steam curling from beneath the cover">
+      </div>
+      <div class="hero-text">
+        <span class="kicker">Technique · The slow file</span>
+        <h1>The stubborn case for braising <em>at ninety-two degrees</em></h1>
+        <p class="dek">Every cookbook tells you to bring it to a simmer and turn it down. Nobody tells you what that actually means. After three months and forty-one shoulders of pork, we measured.</p>
+      </div>
+    </section>
+
+    <!-- META BAR -->
+    <div class="article-meta-bar">
+      <div class="wrap">
+        <div class="inner">
+          <div class="left byline">
+            By <strong>Hannah Aldous</strong>
+            <span class="dot">·</span> Photographs by <strong>Iyo Tanaka</strong>
+            <span class="dot">·</span> <span class="timestamp">Published 14 November · 18 min read</span>
+          </div>
+          <div class="share">
+            <a href="#">Save</a>
+            <a href="#">Print</a>
+            <a href="#">Share</a>
+            <a href="#">Listen · 22m</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYOUT -->
+    <div class="wrap-wide">
+      <div class="article-layout">
+
+        <!-- LEFT RAIL: contents -->
+        <aside class="rail-l">
+          <div class="rail-label">In this piece</div>
+          <ul class="contents-list">
+            <li><a href="#part-1"><span class="num">i.</span><span>The thermometer in the lid</span></a></li>
+            <li><a href="#part-2"><span class="num">ii.</span><span>Why 92, and not 96</span></a></li>
+            <li><a href="#part-3"><span class="num">iii.</span><span>The collar test</span></a></li>
+            <li><a href="#part-4"><span class="num">iv.</span><span>A short defence of the oven</span></a></li>
+            <li><a href="#recipe"><span class="num">v.</span><span>Recipe: shoulder, cider, sage</span></a></li>
+          </ul>
+          <div class="rail-label">Filed under</div>
+          <p style="font-family:var(--body); font-style:italic; font-size:.9rem; color:var(--ink-dim);">Technique → heat → braising. Also relevant: stocks, the maillard reaction, slow cookers (with reservations).</p>
+        </aside>
+
+        <!-- BODY -->
+        <div class="body">
+          <div class="article-body">
+
+            <p>The first time I tried to write down what a proper braise looks like, I gave up after a paragraph. The language was all there — <em>a bare tremble at the surface, a single bubble every few seconds, the lid set ajar</em> — and none of it told you anything you could repeat. Cooking writing is full of these little betrayals: descriptions that mean everything to the person who already knows, and nothing to the person who doesn't. So in late August, slightly out of frustration and mostly out of stubbornness, I bought a thermometer and started measuring.</p>
+
+            <p>What follows is the result of forty-one shoulders of pork, two whole oxtails, a quantity of lamb necks I'd rather not itemise, and a small notebook now permanently stained with cider. The headline finding is unromantic: a braise that has been described to you, your whole cooking life, as a <em>gentle simmer</em> is in fact happening at about 92°C. Not 100. Not boiling. Ninety-two, give or take a degree. And the difference between 92 and 96 is the difference between meat you want to eat and meat that has been, in the technical sense, ruined.</p>
+
+            <h2 id="part-1"><span class="num">i.</span>The thermometer in the lid</h2>
+
+            <p>I should say at the start: I am not a scientist and this is not a paper. I drilled a small hole in the wooden knob of my Le Creuset, threaded a probe through it, and ran the cable out under the edge of the lid. The probe sat about an inch below the surface of the liquid — close enough to register the cooking water, far enough from the meat to read the bath and not the joint. I cooked, I logged, I ate the evidence.</p>
+
+            <figure class="figure">
+              <div class="frame"><img src="photo-product-1.jpg" alt="A digital probe thermometer threaded through the lid of an enamel pot"></div>
+              <figcaption>The rig, after the third pot. The hole in the knob is not, it turns out, a thing that voids the warranty — but you might want to check.</figcaption>
+            </figure>
+
+            <p>The first surprise was how badly I had been reading the surface. When I turned the hob to the lowest setting on my gas range and waited until the liquid did what cookbooks call a <em>gentle simmer</em> — those soft, occasional plops, three or four a minute — the probe read 98°C. When I dropped the heat further, to what looked like nothing at all, the temperature held at 94. The bubbles I had been chasing for fifteen years were already too much.</p>
+
+            <p>The second surprise was how much better the meat got, three degrees down.</p>
+
+            <h2 id="part-2"><span class="num">ii.</span>Why 92, and not 96</h2>
+
+            <p>Collagen — the connective tissue that gives shoulders, shanks and tails their structure and their reluctance — begins to break down into gelatin at around 65°C. The conversion is slow at first and accelerates with both heat and time. At 100°C you are converting collagen quickly, but you are also driving water out of the muscle fibres at a frightening rate. The meat shreds, but it shreds <em>dry</em>; the strands hold together only because of the sauce around them.</p>
+
+            <div class="pullquote">
+              <blockquote>“At 92°C the meat is doing two things at once: surrendering its collagen, and keeping its water. Push four degrees higher and it gives you only the first.”</blockquote>
+              <cite>— Notes, 4 October</cite>
+            </div>
+
+            <p>At 92°C the conversion still happens — it just takes a bit longer. The reward is that the muscle fibres are not being squeezed dry. You end up with meat that is genuinely tender in a way I had only previously achieved by accident: meat that yields to a fork, but does not collapse when you try to lift a piece intact. That distinction — yielding versus collapsing — turns out to be the whole game.</p>
+
+            <p>There is a related point about the sauce. A braise cooked at 92 reduces more slowly than one at 98, which means your liquid is in the pan longer and is doing more work on the aromatics. <a href="#">The cider in our recipe below</a> spends an extra forty minutes pulling apart sage stems and onion skins that, at a higher heat, would have already given up.</p>
+
+            <div class="sidenote">
+              <strong>A note on hobs</strong>
+              Induction will hold 92°C indefinitely if you can find the right setting; the trouble is that most rings tick between two temperatures rather than holding one. Gas is more forgiving because it is less precise — you adjust by eye and ear. Electric coils are the worst. If you only have an electric hob, skip ahead to part four; the oven is your friend.
+            </div>
+
+            <h2 id="part-3"><span class="num">iii.</span>The collar test</h2>
+
+            <p>I needed a way to describe 92°C without making everyone buy a thermometer. After some experimenting — and a lot of standing over pots looking at them sideways — I settled on what I have started calling the collar test. It is this: lift the lid of your pot a centimetre or two, and look at the ring of liquid where it meets the wall of the pan.</p>
+
+            <p>At 98 or 100, the collar is in constant motion. There is a band of small bubbles continuously breaking against the side of the pot, like a tide line. At 92, the collar is still. The surface in the centre may have one or two slow blisters a minute, but the edge where it meets the metal looks completely flat. <strong>If the collar is still, you are braising. If the collar is moving, you are simmering, and you should turn the heat down.</strong></p>
+
+            <figure class="figure">
+              <div class="frame"><img src="photo-product-2.jpg" alt="Close detail of the inside edge of a braising pot, showing a still surface of liquid"></div>
+              <figcaption>The collar at 92°C. Slack, glassy, almost dull-looking. This is the picture you want.</figcaption>
+            </figure>
+
+            <h2 id="part-4"><span class="num">iv.</span>A short defence of the oven</h2>
+
+            <p>Most braising advice eventually arrives at the same place: put the pot in the oven. There is a reason. An oven set to 130°C will hold the contents of a covered pot at — you guessed it — about 92°C, more or less indefinitely, with almost no attention from you. You do not need a thermometer. You do not need to watch the collar. You need an oven that does roughly what its dial says it does, which is admittedly a larger ask than it should be.</p>
+
+            <p>If your oven runs hot (most do), drop the dial to 120. If it runs cold, push it to 140. The interior of a covered braising pot lags well behind the air around it, which is why oven braising is so much more forgiving than hob braising: the heat is being delivered slowly, from all sides, through a buffer of steam. There is no scorching, because the bottom of the pot is no hotter than the top.</p>
+
+            <p>I cooked the last twelve shoulders this way and then re-cooked the recipe on the hob, to be sure I wasn't fooling myself. The oven versions were, on balance, slightly better — partly because the sauce reduced more slowly, partly because I wasn't fussing with them. The hob versions had a fractionally more interesting crust around the meat where it touched the pot, which I'll concede is a real thing worth having. Take your pick.</p>
+
+            <!-- RECIPE BOX -->
+            <div class="recipe-box" id="recipe">
+              <div class="label">From the recipe file</div>
+              <h3>Pork shoulder, dry cider, sage, a great deal of onion</h3>
+              <div class="meta">Serves 6 generously · 25 min hands-on · 4½ hr in the oven at 130°C</div>
+              <ul>
+                <li>1.6kg pork shoulder, bone in</li>
+                <li>3 large brown onions, sliced thick</li>
+                <li>1 head of garlic, halved across</li>
+                <li>500ml dry cider (Aspall, or any sharp one)</li>
+                <li>250ml light chicken stock</li>
+                <li>1 small bunch sage, on the stem</li>
+                <li>2 bay leaves, fresh if possible</li>
+                <li>1 tbsp flaky salt, plus more</li>
+                <li>Cracked black pepper</li>
+                <li>2 tbsp neutral oil for searing</li>
+                <li>1 tsp cider vinegar, to finish</li>
+                <li>Mustard, mash, or buttered noodles to serve</li>
+              </ul>
+              <a href="#" class="go">Read the full method →</a>
+            </div>
+
+            <h3>One last thing about the lid</h3>
+
+            <p>Leave it on. I know — half the books you have tell you to set it ajar, to crack it, to put a wooden spoon under one edge. They are trying, slightly clumsily, to compensate for the fact that you were cooking too hot in the first place. At 92, evaporation is slow enough that you do not need to vent the pot. If your sauce is too thin at the end, lift the meat out, set it somewhere warm, and reduce the liquid hard on the hob for five minutes. You will get a glossier, more concentrated sauce in less time than three hours of cracked-lid evaporation ever managed.</p>
+
+            <p>The braise has been around for several hundred years longer than the thermometer. People have been making excellent versions of it for almost all of that time without measuring anything. I am not suggesting that you must measure. I am suggesting that <em>if you have ever felt that your braises were nearly there but not quite</em> — if the meat has been a little stringy, or a little dry, or a little tough in the wrong places — the chances are excellent that you have been cooking three degrees too hot. Drop the heat. Watch the collar. The pot will sit there, very nearly silent, and do everything else for you.</p>
+
+            <p style="font-family:var(--display); font-style:italic; color: var(--ink-mute); font-size:.95rem; margin-top: 2.5em;">Hannah Aldous is Sandfork's technique editor. She is currently testing the same theory on bean cookery, with mixed results.</p>
+
+            <!-- TAG STRIP -->
+            <div class="tag-strip">
+              <span class="tag">Braising</span>
+              <span class="tag">Pork</span>
+              <span class="tag">Heat</span>
+              <span class="tag">Slow cooking</span>
+              <span class="tag">Le Creuset</span>
+              <span class="tag">Cider</span>
+              <span class="tag">Autumn</span>
+            </div>
+
+            <!-- AUTHOR BIO -->
+            <div class="author-bio">
+              <div class="avatar"><img src="photo-portrait-1.jpg" alt="Hannah Aldous"></div>
+              <div>
+                <div class="label">The writer</div>
+                <h4>Hannah Aldous</h4>
+                <p>Technique editor at Sandfork. Cooked her way through three Cambridge degrees and now lives in a Norwich house with two large pots and not enough cupboard. She is the author of <em>The Stockpot Year</em> (Faber, 2022) and writes a fortnightly column on heat. <a href="#">More from Hannah →</a></p>
+              </div>
+            </div>
+
+            <!-- COMMENTS -->
+            <section class="comments">
+              <h3>From the kitchen <em style="color:var(--amber-bright);">— readers respond</em></h3>
+              <div class="comments-meta">42 comments · sorted by editor's picks · <a href="#">read all</a></div>
+
+              <div class="comment">
+                <div class="avatar">M</div>
+                <div>
+                  <div class="who"><strong>Margaret Holloway</strong> <span class="dot">·</span> Sheffield <span class="dot">·</span> <span class="timestamp">14 Nov, 7:42pm</span></div>
+                  <p>Cooked the shoulder yesterday. I have an electric hob and used the oven method as suggested. The collar test is going to ruin every previous braise for me — I was definitely cooking too hot. The sauce reduced beautifully off-heat at the end. Thank you for measuring so I didn't have to.</p>
+                </div>
+              </div>
+
+              <div class="comment">
+                <div class="avatar">D</div>
+                <div>
+                  <div class="who"><strong>David Phán</strong> <span class="dot">·</span> Bristol <span class="dot">·</span> <span class="timestamp">14 Nov, 9:15pm</span></div>
+                  <p>A respectful disagreement on lids ajar. For pork belly braises with very fatty cuts I still want to render and reduce simultaneously — leaving the lid set on a wooden spoon achieves both. Otherwise I'm with you. The 92°C number is the most useful thing I've read this year.</p>
+                </div>
+              </div>
+
+              <div class="comment">
+                <div class="avatar">R</div>
+                <div>
+                  <div class="who"><strong>Ruth Avraham</strong> <span class="dot">·</span> Tel Aviv <span class="dot">·</span> <span class="timestamp">15 Nov, 6:02am</span></div>
+                  <p>This is going to read like a humblebrag but my mother braised hamin every Friday of my childhood and never used a thermometer. She put it in the oven on Friday afternoon at "low" and took it out on Saturday lunchtime. I now realise her oven must have been running at about 120°C. Funny how the right answer arrives by intuition over decades.</p>
+                </div>
+              </div>
+
+              <p style="margin-top: 24px;"><a href="#" style="font-family:var(--display); font-style:italic;">Join the conversation — sign in to comment →</a></p>
+            </section>
+
+          </div>
+        </div>
+
+        <!-- spacer -->
+        <div class="gap"></div>
+
+        <!-- RIGHT RAIL -->
+        <aside class="rail-r">
+
+          <div class="promo">
+            <div class="label">The weekly letter</div>
+            <h4>One recipe, one technique, every Friday.</h4>
+            <p>Get Sandfork's Friday letter in your inbox — a single dish worth cooking this weekend, with the timing notes most recipes forget.</p>
+            <form>
+              <input type="email" placeholder="you@kitchen.com">
+              <button type="submit">Subscribe</button>
+            </form>
+          </div>
+
+          <h4>Most read this week</h4>
+          <ol class="most-read">
+            <li>
+              <span class="count">01</span>
+              <div>
+                <a href="#">Why your stock tastes flat (and the 14-minute fix)</a>
+                <div class="meta">Technique · 9 min</div>
+              </div>
+            </li>
+            <li>
+              <span class="count">02</span>
+              <div>
+                <a href="#">A short defence of the brown onion</a>
+                <div class="meta">Pantry · 6 min</div>
+              </div>
+            </li>
+            <li>
+              <span class="count">03</span>
+              <div>
+                <a href="#">36 hours at Saint-Jean bakery, Lyon</a>
+                <div class="meta">Profiles · live</div>
+              </div>
+            </li>
+            <li>
+              <span class="count">04</span>
+              <div>
+                <a href="#">Quince paste is back: three recipes</a>
+                <div class="meta">Recipes · 12 min</div>
+              </div>
+            </li>
+            <li>
+              <span class="count">05</span>
+              <div>
+                <a href="#">The great salt cod debate — your letters</a>
+                <div class="meta">Letters · 8 min</div>
+              </div>
+            </li>
+          </ol>
+
+          <h4>From the technique file</h4>
+          <div class="story story-h" style="margin-bottom: 22px;">
+            <div class="story-img"><img src="illustration-abstract.jpg" alt=""></div>
+            <div>
+              <span class="kicker">Heat</span>
+              <h3><a href="#">What "medium-low" actually means on six different hobs</a></h3>
+            </div>
+          </div>
+          <div class="story story-h" style="margin-bottom: 22px;">
+            <div class="story-img"><img src="photo-product-2.jpg" alt=""></div>
+            <div>
+              <span class="kicker">Salt</span>
+              <h3><a href="#">The case for salting in three stages, not one</a></h3>
+            </div>
+          </div>
+          <div class="story story-h" style="margin-bottom: 22px;">
+            <div class="story-img"><img src="photo-product-1.jpg" alt=""></div>
+            <div>
+              <span class="kicker">Pans</span>
+              <h3><a href="#">Carbon steel is not seasoning itself: a quiet correction</a></h3>
+            </div>
+          </div>
+
+        </aside>
+
+      </div>
+    </div>
+  </article>
+
+  <!-- RELATED -->
+  <section class="related-wrap">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>If you liked this, <em>keep going</em></h2>
+        <a href="section.html">All of Technique →</a>
+      </div>
+      <div class="grid grid-3">
+
+        <article class="story">
+          <div class="story-img"><img src="photo-product-1.jpg" alt=""></div>
+          <span class="kicker">Technique · Stocks</span>
+          <h3><a href="#">The 14-minute fix for a flat stock</a></h3>
+          <p>A second roast, a splash of vinegar, and the conviction to add salt earlier than you think. Why most home stocks fail at minute thirty, and what you can rescue in a quarter of an hour.</p>
+          <div class="byline">By <strong>Jonas Pereira</strong> <span class="dot">·</span> 7 min</div>
+        </article>
+
+        <article class="story">
+          <div class="story-img"><img src="photo-landscape-1.jpg" alt=""></div>
+          <span class="kicker">Technique · Heat</span>
+          <h3><a href="#">Sweating, sautéing, frying: a glossary nobody asked for</a></h3>
+          <p>What we mean when we say <em>sweat the onions</em>, and why your recipe writer probably means something different. Four pans, four temperatures, and the line between flavour and char.</p>
+          <div class="byline">By <strong>Hannah Aldous</strong> <span class="dot">·</span> 11 min</div>
+        </article>
+
+        <article class="story">
+          <div class="story-img"><img src="photo-product-2.jpg" alt=""></div>
+          <span class="kicker">Recipes · Slow</span>
+          <h3><a href="#">Oxtail, red wine, an excessive quantity of bay</a></h3>
+          <p>A six-hour braise that wants nothing from you between the searing and the eating. The bay is not a typo — fifteen leaves, fresh, and a glass of something dark you wouldn't otherwise drink.</p>
+          <div class="byline">By <strong>Iyo Tanaka</strong> <span class="dot">·</span> 14 min</div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">Sandfork</a>
+        <p>A cooking journal, published on paper twice a year and online when there is something to say. Notes from the cooking class — recipes, technique, and the people who make food.</p>
+      </div>
+      <div>
+        <h5>Read</h5>
+        <ul>
+          <li><a href="section.html">Recipes</a></li>
+          <li><a href="section.html">Technique</a></li>
+          <li><a href="section.html">Profiles</a></li>
+          <li><a href="video.html">Video</a></li>
+          <li><a href="live-blog.html">Live blog</a></li>
+          <li><a href="topic.html">Topics A–Z</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>The Journal</h5>
+        <ul>
+          <li><a href="#">Issue Nº 07 — Autumn</a></li>
+          <li><a href="#">The archive</a></li>
+          <li><a href="#">Print subscription · £36</a></li>
+          <li><a href="#">Gift a year</a></li>
+          <li><a href="#">Stockists</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>About</h5>
+        <ul>
+          <li><a href="#">Who we are</a></li>
+          <li><a href="#">Masthead</a></li>
+          <li><a href="#">Contributors</a></li>
+          <li><a href="#">Pitch us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Follow</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Substack</a></li>
+          <li><a href="#">RSS · all stories</a></li>
+          <li><a href="#">Weekly letter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="colophon">© 2024 Sandfork Press Ltd. Set in Fraunces &amp; Source Serif. Printed in Norwich on Munken Pure 100gsm.</div>
+      <div><a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; <a href="#">Ethics &amp; corrections</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

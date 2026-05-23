@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>National Archive — The public record, made accessible</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific layout */
+  .hero-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0; border: 1px solid var(--border); border-left: 0; border-right: 0; }
+  .hero-main { padding: 8px 32px 8px 0; min-width: 0; }
+  .hero-side { border-left: 1px solid var(--border); padding: 8px 0 8px 32px; position: relative; min-width: 0; }
+  .hero-main h1 { margin-bottom: 24px; word-wrap: break-word; overflow-wrap: break-word; }
+  .hero-lede { font-size: 1.15rem; color: var(--text-muted); max-width: 560px; margin-bottom: 32px; line-height: 1.5; }
+  .hero-actions { display: flex; gap: 12px; align-items: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .hero-meta { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0; border-top: 1px solid var(--border); }
+  .hero-meta > div { padding: 20px 24px 4px 0; border-right: 1px solid var(--border); min-width: 0; }
+  .hero-meta > div:last-child { border-right: 0; padding-right: 0; padding-left: 24px; }
+  .hero-meta > div:first-child { padding-left: 0; }
+  .hero-meta .num { font-family: var(--mono); font-size: 1.6rem; font-weight: 500; color: var(--text); display: block; letter-spacing: -0.02em; }
+  .hero-meta .lbl { font-family: var(--mono); font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 6px; display: block; }
+  .dot-panel { background-image: radial-gradient(var(--border-strong) 1px, transparent 1px); background-size: 14px 14px; background-position: 0 0; min-height: 320px; border: 1px solid var(--border); position: relative; }
+  .dot-panel-inner { position: absolute; inset: 24px; background: var(--bg-elevated); border: 1px solid var(--border); padding: 22px; }
+  .dot-panel-inner .eb { font-family: var(--mono); font-size: 10.5px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; }
+  .dot-panel-inner h3 { margin: 10px 0 6px; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
+  .dot-panel-inner p { font-size: 13px; color: var(--text-muted); margin: 0 0 14px; line-height: 1.5; }
+  .dot-panel-inner .ref { font-family: var(--mono); font-size: 11px; color: var(--text-dim); padding-top: 12px; border-top: 1px solid var(--border); word-break: break-word; }
+  .dot-panel-inner .ref span { color: var(--text); }
+
+  /* Browse-by grid (collapsed borders) */
+  .browse-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); border: 1px solid var(--border); }
+  .browse-cell { padding: 26px 22px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-right: -1px; margin-bottom: -1px; min-height: 156px; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; color: var(--text); transition: background .15s; }
+  .browse-cell:hover { background: var(--surface); text-decoration: none; color: var(--text); }
+  .browse-cell:hover .browse-arrow { color: var(--accent); transform: translateX(3px); }
+  .browse-cell .browse-count { font-family: var(--mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; }
+  .browse-cell h3 { font-size: 1.05rem; margin: 12px 0 6px; font-weight: 600; letter-spacing: -0.01em; }
+  .browse-cell p { color: var(--text-muted); font-size: 13px; margin: 0; line-height: 1.5; }
+  .browse-arrow { font-family: var(--mono); color: var(--text-dim); transition: transform .15s, color .15s; font-size: 14px; align-self: flex-end; }
+
+  /* Two-column split: spotlight + notices */
+  .split { display: grid; grid-template-columns: 1.5fr 1fr; gap: 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .split-main { padding: 40px 40px 40px 0; border-right: 1px solid var(--border); min-width: 0; }
+  .split-side { padding: 40px 0 40px 40px; min-width: 0; }
+
+  .spotlight-item { display: grid; grid-template-columns: 110px 1fr auto; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--border); align-items: baseline; }
+  .spotlight-item:last-child { border-bottom: 0; }
+  .spotlight-item > div { min-width: 0; }
+  .spotlight-date { font-family: var(--mono); font-size: 12px; color: var(--text-muted); letter-spacing: 0.04em; }
+  .spotlight-item h3 { font-size: 1rem; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.005em; }
+  .spotlight-item h3 a { text-decoration: none; color: var(--text); }
+  .spotlight-item h3 a:hover { color: var(--accent-hover); }
+  .spotlight-item p { color: var(--text-muted); font-size: 13.5px; margin: 0; line-height: 1.5; }
+  .spotlight-tag { font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; white-space: nowrap; }
+
+  .notice { border-left: 3px solid var(--accent); padding: 14px 18px; background: var(--surface); margin-bottom: 14px; }
+  .notice .eb { font-family: var(--mono); font-size: 10.5px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; }
+  .notice h4 { font-size: 14px; text-transform: none; letter-spacing: -0.005em; color: var(--text); margin: 4px 0 4px; font-weight: 600; }
+  .notice p { font-size: 13px; color: var(--text-muted); margin: 0; }
+  .notice.warn { border-left-color: var(--warn); }
+  .notice.warn .eb { color: var(--warn); }
+  .notice.ok { border-left-color: var(--ok); }
+  .notice.ok .eb { color: var(--ok); }
+
+  .hours-wrap { width: 100%; overflow-x: auto; }
+  .hours-table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+  .hours-table th, .hours-table td { text-align: left; padding: 10px 8px 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .hours-table th { font-family: var(--mono); font-weight: 500; font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; padding-bottom: 10px; }
+  .hours-table td { color: var(--text); }
+  .hours-table td.mono { font-family: var(--mono); font-size: 12.5px; color: var(--text-muted); white-space: nowrap; }
+  .hours-table .chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; padding: 2px 8px; border: 1px solid var(--border); color: var(--text-muted); white-space: nowrap; }
+  .hours-table .chip::before { content: ''; width: 6px; height: 6px; background: var(--ok); }
+  .hours-table .chip.closed::before { background: var(--text-dim); }
+  .hours-table .chip.warn::before { background: var(--warn); }
+
+  /* Featured collection band */
+  .collection { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border: 1px solid var(--border); }
+  .collection-cell { padding: 32px 28px; border-right: 1px solid var(--border); min-width: 0; display: flex; flex-direction: column; }
+  .collection-cell:last-child { border-right: 0; }
+  .collection-cell .eb { font-family: var(--mono); font-size: 10.5px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; }
+  .collection-cell h3 { font-size: 1.25rem; margin: 14px 0 10px; font-weight: 600; letter-spacing: -0.015em; }
+  .collection-cell p { font-size: 13.5px; color: var(--text-muted); margin: 0 0 18px; line-height: 1.55; }
+  .collection-cell .meta-row { display: flex; flex-wrap: wrap; gap: 12px 18px; font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; padding-top: 14px; border-top: 1px solid var(--border); margin-top: auto; }
+  .collection-cell .meta-row span strong { color: var(--text); font-weight: 500; }
+
+  /* How to request — numbered steps */
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); border: 1px solid var(--border); }
+  .step { padding: 28px 24px; border-right: 1px solid var(--border); min-width: 0; }
+  .step:last-child { border-right: 0; }
+  .step-num { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.12em; }
+  .step h3 { font-size: 0.98rem; margin: 14px 0 8px; font-weight: 600; letter-spacing: -0.005em; }
+  .step p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+  /* CTA strip */
+  .cta-strip { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; padding: 44px 0; }
+  .cta-strip h2 { font-size: 1.5rem; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .cta-strip p { color: var(--text-muted); margin: 0; font-size: 14.5px; }
+  .cta-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-main { padding-right: 0; }
+    .hero-side { border-left: 0; border-top: 1px solid var(--border); padding: 32px 0 0; margin-top: 24px; }
+    .browse-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .split { grid-template-columns: 1fr; }
+    .split-main { padding: 32px 0; border-right: 0; border-bottom: 1px solid var(--border); }
+    .split-side { padding: 32px 0; }
+    .collection { grid-template-columns: 1fr; }
+    .collection-cell { border-right: 0; border-bottom: 1px solid var(--border); }
+    .collection-cell:last-child { border-bottom: 0; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .step { border-bottom: 1px solid var(--border); }
+    .step:nth-child(odd) { border-right: 1px solid var(--border); }
+    .step:nth-child(even) { border-right: 0; }
+    .step:nth-last-child(-n+2) { border-bottom: 0; }
+    .cta-strip { grid-template-columns: 1fr; gap: 20px; }
+    .hero-meta { grid-template-columns: 1fr; }
+    .hero-meta > div { border-right: 0; border-bottom: 1px solid var(--border); padding: 16px 0 !important; }
+    .hero-meta > div:last-child { border-bottom: 0; }
+    .spotlight-item { grid-template-columns: 1fr; gap: 6px; }
+    .spotlight-tag { order: -1; }
+  }
+
+  @media (max-width: 560px) {
+    .browse-grid { grid-template-columns: 1fr; }
+    .browse-cell { border-right: 0; }
+    .steps { grid-template-columns: 1fr; }
+    .step { border-right: 0 !important; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: 0; }
+    .dot-panel { min-height: 280px; }
+    .dot-panel-inner { inset: 16px; padding: 18px; }
+  }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+<div class="gov-ribbon">
+  <div class="container">
+    <span class="ribbon-flag">An official site of the National Government</span>
+    <span class="ribbon-sep">·</span>
+    <a href="#">How you know</a>
+    <span style="margin-left:auto;display:inline-flex;gap:14px;align-items:center;">
+      <a href="#" aria-label="Accessibility settings">Accessibility</a>
+      <span class="ribbon-sep">·</span>
+      <a href="#">EN</a> <span class="ribbon-sep">/</span> <a href="#">FR</a> <span class="ribbon-sep">/</span> <a href="#">ES</a>
+    </span>
+  </div>
+</div>
+<header class="site-header" role="banner">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">National Archive</span>
+        <span class="brand-sub">Records · Datasets · Heritage</span>
+      </span>
+    </a>
+    <form class="header-search" role="search" aria-label="Search the archive">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" placeholder="Search 14.2 million records, files, and datasets…" aria-label="Search records">
+      <kbd>⌘ K</kbd>
+    </form>
+    <div class="header-utils">
+      <a class="util-btn" href="forms.html">Request</a>
+      <a class="util-btn" href="#">Sign in</a>
+    </div>
+  </div>
+  <nav class="primary-nav" aria-label="Primary">
+    <ul>
+      <li><a href="index.html" aria-current="page" class="active">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="departments.html">Departments</a></li>
+      <li><a href="forms.html">Forms &amp; Requests</a></li>
+      <li><a href="news.html">News &amp; Notices</a></li>
+      <li><a href="about.html">About the Archive</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="main">
+
+  <section class="section-hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-main">
+          <span class="eyebrow">Public record · Open by default</span>
+          <h1 style="margin-top:14px;">The public record,<br>made accessible.</h1>
+          <p class="hero-lede">Search the catalogue, read digitised documents, download open datasets, and submit requests for restricted material. Every file held by the Archive is described in the same place, in plain language.</p>
+          <div class="hero-actions">
+            <a href="services.html" class="btn btn-primary">Search the catalogue
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+            <a href="forms.html" class="btn btn-ghost">Submit a records request</a>
+          </div>
+          <div class="hero-meta">
+            <div>
+              <span class="num">14,217,442</span>
+              <span class="lbl">Catalogued items</span>
+            </div>
+            <div>
+              <span class="num">2.18M</span>
+              <span class="lbl">Digitised pages</span>
+            </div>
+            <div>
+              <span class="num">874</span>
+              <span class="lbl">Open datasets</span>
+            </div>
+          </div>
+        </div>
+        <aside class="hero-side" aria-label="Featured record">
+          <div class="dot-panel">
+            <div class="dot-panel-inner">
+              <div class="eb">Record of the week</div>
+              <h3>Cabinet minutes on the 1956 currency reform</h3>
+              <p>Sixty-eight pages of cabinet deliberation, declassified after the standard 30-year embargo expired. Newly OCR'd and cross-linked to Treasury correspondence in series FT/19.</p>
+              <div class="ref">REF <span>CAB/14/229</span> · 1956–02–11 · <span>Public</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow" style="color:var(--text-muted);">§ 01 — Holdings</div>
+          <h2 style="margin-top:8px;">Browse by record type</h2>
+        </div>
+        <a href="services.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;">All record types →</a>
+      </div>
+
+      <div class="browse-grid">
+        <a href="#" class="browse-cell">
+          <div><div class="browse-count">4,820,116 items</div><h3>Government records</h3><p>Cabinet papers, ministerial correspondence, departmental files, and committee proceedings from 1867 onward.</p></div>
+          <span class="browse-arrow">→</span>
+        </a>
+        <a href="#" class="browse-cell">
+          <div><div class="browse-count">3,114,902 items</div><h3>Civil registers</h3><p>Births, deaths, marriages, immigration manifests, naturalisation certificates, and electoral rolls.</p></div>
+          <span class="browse-arrow">→</span>
+        </a>
+        <a href="#" class="browse-cell">
+          <div><div class="browse-count">1,962,330 items</div><h3>Maps &amp; cartography</h3><p>Cadastral surveys, ordnance maps, admiralty charts, and aerial photography from 1810 to present.</p></div>
+          <span class="browse-arrow">→</span>
+        </a>
+        <a href="#" class="browse-cell">
+          <div><div class="browse-count">1,447,581 items</div><h3>Military service</h3><p>Service records, regimental diaries, casualty lists, and post-war pension claims. Some access restrictions apply.</p></div>
+          <span class="browse-arrow">→</span>
+        </a>
+        <a href="#" class="browse-cell">
+          <div><div class="browse-count">982,704 items</div><h3>Court &amp; legal</h3><p>Supreme Court judgments, inquest records, land tribunal decisions, and historic criminal proceedings.</p></div>
+          <span class="browse-arrow">→</span>
+        </a>
+        <a href="#" class="browse-cell">
+          <div><div class="browse-count">874 datasets</div><h3>Open datasets</h3><p>Machine-readable releases under OGL v3.0: census aggregates, budget tables, infrastructure spending, and more.</p></div>
+          <span class="browse-arrow">→</span>
+        </a>
+        <a href="#" class="browse-cell">
+          <div><div class="browse-count">638,219 items</div><h3>Photographs &amp; film</h3><p>Official photography, newsreel footage, and donated press archives spanning 1880 to 2002.</p></div>
+          <span class="browse-arrow">→</span>
+        </a>
+        <a href="#" class="browse-cell">
+          <div><div class="browse-count">412,690 items</div><h3>Sound &amp; oral history</h3><p>Recorded parliamentary debates, public broadcasts, and the National Oral History Project (1972–).</p></div>
+          <span class="browse-arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      <div class="split">
+        <div class="split-main">
+          <div class="eyebrow" style="color:var(--text-muted);">§ 02 — Recently opened</div>
+          <h2 style="margin:8px 0 24px;font-size:1.4rem;">Files released to the public</h2>
+
+          <div class="spotlight-item">
+            <div class="spotlight-date">2025–03–18</div>
+            <div>
+              <h3><a href="#">Treasury memoranda on the 1995 banking commission</a></h3>
+              <p>342 files transferred from the Department of Finance under the standard 30-year rule. Index and digitised first 40 boxes available.</p>
+            </div>
+            <div class="spotlight-tag">CAB / FT</div>
+          </div>
+
+          <div class="spotlight-item">
+            <div class="spotlight-date">2025–03–11</div>
+            <div>
+              <h3><a href="#">Maritime inquiry into the SS Carrigan grounding (1973)</a></h3>
+              <p>Full transcripts, witness statements, and vessel survey diagrams released after the 50-year embargo lapsed. Cross-referenced to admiralty chart series.</p>
+            </div>
+            <div class="spotlight-tag">MAR / 50yr</div>
+          </div>
+
+          <div class="spotlight-item">
+            <div class="spotlight-date">2025–03–04</div>
+            <div>
+              <h3><a href="#">Cabinet papers, second Donovan administration (1991–1994)</a></h3>
+              <p>One hundred and twelve cabinet meetings, twelve sub-committee series, and the full reading list circulated to ministers in the period.</p>
+            </div>
+            <div class="spotlight-tag">CAB / 30yr</div>
+          </div>
+
+          <div class="spotlight-item">
+            <div class="spotlight-date">2025–02–25</div>
+            <div>
+              <h3><a href="#">Local government boundary review correspondence</a></h3>
+              <p>Submissions, objections, and final determinations from the 1994 review of municipal boundaries in the central provinces.</p>
+            </div>
+            <div class="spotlight-tag">LG / 30yr</div>
+          </div>
+
+          <div style="margin-top:24px;">
+            <a href="news.html" class="btn btn-ghost btn-sm">All releases →</a>
+          </div>
+        </div>
+
+        <aside class="split-side" aria-label="Operational notices and reading room hours">
+          <div class="eyebrow" style="color:var(--text-muted);">§ 03 — Notices</div>
+          <h2 style="margin:8px 0 18px;font-size:1.4rem;">Service status</h2>
+
+          <div class="notice warn">
+            <div class="eb">Planned outage</div>
+            <h4>Catalogue downtime · Sat 22 Mar, 02:00–06:00</h4>
+            <p>Search and online ordering will be unavailable while we migrate the indexer. Reading room access unaffected.</p>
+          </div>
+
+          <div class="notice">
+            <div class="eb">FOI advisory</div>
+            <h4>Request volumes elevated</h4>
+            <p>Average response time for restricted-access requests is currently 24 working days, against a 20-day target.</p>
+          </div>
+
+          <div class="notice ok">
+            <div class="eb">New finding aid</div>
+            <h4>Series guide: Justice ministry (1920–1965)</h4>
+            <p>A revised 84-page guide is now available, including a concordance to the pre-1949 numbering system.</p>
+          </div>
+
+          <div class="hours-wrap">
+            <table class="hours-table">
+              <thead>
+                <tr><th>Reading rooms</th><th>Hours</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Central, Capitol Square</td><td class="mono">Tue–Sat · 09:00–17:00</td><td><span class="chip">Open</span></td></tr>
+                <tr><td>Map &amp; Cartography</td><td class="mono">Wed–Fri · 10:00–16:00</td><td><span class="chip">Open</span></td></tr>
+                <tr><td>Northern Branch, Halden</td><td class="mono">Thu–Sat · 10:00–16:00</td><td><span class="chip warn">By appt.</span></td></tr>
+                <tr><td>Sound &amp; Film, Annex C</td><td class="mono">Closed for refit</td><td><span class="chip closed">Closed</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow" style="color:var(--text-muted);">§ 04 — Editorial</div>
+          <h2 style="margin-top:8px;">Featured collections</h2>
+        </div>
+        <a href="#" style="font-size:13px;color:var(--text-muted);text-decoration:none;">All collections →</a>
+      </div>
+
+      <div class="collection">
+        <article class="collection-cell">
+          <div class="eb">Curated · 1914–1919</div>
+          <h3>The Great War service files</h3>
+          <p>Two hundred and twelve thousand individual service records, fully digitised and searchable by name, regiment, or service number. Includes attestation papers, medical boards, and pension correspondence.</p>
+          <div class="meta-row">
+            <span>ITEMS <strong>212,447</strong></span>
+            <span>FORMAT <strong>PDF / TIFF</strong></span>
+            <span>ACCESS <strong>Open</strong></span>
+          </div>
+        </article>
+        <article class="collection-cell">
+          <div class="eb">Curated · 1810–1901</div>
+          <h3>Cadastral and survey maps</h3>
+          <p>Nineteenth-century property surveys, drainage schemes, and railway gazettes, georeferenced to modern coordinates where source quality permits. Useful for legal title, environmental, and local-history research.</p>
+          <div class="meta-row">
+            <span>SHEETS <strong>38,902</strong></span>
+            <span>FORMAT <strong>GeoTIFF</strong></span>
+            <span>ACCESS <strong>Open</strong></span>
+          </div>
+        </article>
+        <article class="collection-cell">
+          <div class="eb">Open data · 1851–2021</div>
+          <h3>Decennial census aggregates</h3>
+          <p>Eighteen censuses, harmonised into a single schema. Population, household, occupation, and dwelling tables at national, regional, and municipal levels. Individual returns released after 100 years.</p>
+          <div class="meta-row">
+            <span>TABLES <strong>4,118</strong></span>
+            <span>FORMAT <strong>CSV / Parquet</strong></span>
+            <span>LICENCE <strong>OGL v3.0</strong></span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow" style="color:var(--text-muted);">§ 05 — Procedure</div>
+          <h2 style="margin-top:8px;">How to request a record</h2>
+        </div>
+        <a href="forms.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;">Full guidance →</a>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">STEP 01</div>
+          <h3>Find the reference</h3>
+          <p>Use the catalogue to locate the file. Every item has a unique reference (e.g. CAB/14/229) that you will need on the request form.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">STEP 02</div>
+          <h3>Check access status</h3>
+          <p>Most records are open. Files marked restricted, embargoed, or sensitive require either a justified request or a wait for the embargo to lapse.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">STEP 03</div>
+          <h3>Submit the form</h3>
+          <p>Open records can be ordered for the reading room or as a reproduction. Restricted records require an FOI form and, where applicable, a stated public-interest justification.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">STEP 04</div>
+          <h3>Receive a determination</h3>
+          <p>Open requests are typically fulfilled within 5 working days. FOI determinations are issued within 20 working days under the Records Act.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm" style="background:var(--bg-elevated);">
+    <div class="container">
+      <div class="cta-strip">
+        <div>
+          <div class="eyebrow" style="color:var(--accent);">For researchers &amp; journalists</div>
+          <h2 style="margin-top:8px;">Register for a reader's ticket</h2>
+          <p>A reader's ticket grants in-person access to the reading rooms and the ability to order original material from secure storage. Free of charge, valid for three years.</p>
+        </div>
+        <div class="cta-actions">
+          <a href="forms.html" class="btn btn-primary">Apply for a ticket</a>
+          <a href="about.html" class="btn btn-ghost">Reading room rules</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">National Archive</span>
+            <span class="brand-sub">Est. 1934</span>
+          </span>
+        </a>
+        <p>The custodian of the nation's permanent public record. Open to researchers, journalists, and the public — in person and online.</p>
+        <p class="mono" style="font-size:12px;color:var(--text-dim);margin-top:14px;">Reading rooms · Tue–Sat 09:00–17:00</p>
+      </div>
+      <div class="footer-col">
+        <h5>Research</h5>
+        <ul>
+          <li><a href="services.html">Catalogue search</a></li>
+          <li><a href="#">Digitised collections</a></li>
+          <li><a href="#">Open datasets</a></li>
+          <li><a href="#">Finding aids</a></li>
+          <li><a href="#">Citation guidance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Requests</h5>
+        <ul>
+          <li><a href="forms.html">Records request (FOI)</a></li>
+          <li><a href="forms.html">Reading room booking</a></li>
+          <li><a href="forms.html">Reproduction order</a></li>
+          <li><a href="forms.html">Restricted access</a></li>
+          <li><a href="forms.html">Transfer of records</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="about.html">Mission &amp; mandate</a></li>
+          <li><a href="departments.html">Departments</a></li>
+          <li><a href="#">Leadership</a></li>
+          <li><a href="news.html">News &amp; notices</a></li>
+          <li><a href="#">Annual reports</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Help</h5>
+        <ul>
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a href="#">Accessibility</a></li>
+          <li><a href="#">Languages</a></li>
+          <li><a href="#">Sitemap</a></li>
+          <li><a href="#">Status &amp; outages</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 1934–2025 National Archive. Open content licensed under the Open Government Licence v3.0 unless otherwise noted.</span>
+      <span class="legal">
+        <a href="#">Privacy notice</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Cookies</a>
+        <a href="#">FOI disclosures</a>
+      </span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

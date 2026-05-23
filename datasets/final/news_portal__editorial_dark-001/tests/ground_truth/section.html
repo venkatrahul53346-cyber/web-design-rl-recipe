@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technique — Sandfork</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .section-masthead { padding: 56px 0 32px; border-bottom: 2px solid var(--ink); margin-bottom: 48px; }
+  .section-masthead .kicker { font-size: .9rem; }
+  .section-masthead h1 { font-style: italic; font-weight: 800; max-width: 14ch; margin-bottom: 18px; }
+  .section-masthead .section-intro { font-family: var(--display); font-weight: 400; font-style: italic; font-size: 1.35rem; line-height: 1.4; color: var(--ink-dim); max-width: 58ch; }
+  .section-masthead-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 56px; align-items: end; }
+  .section-masthead-grid .editors-note { border-left: 2px solid var(--amber); padding-left: 22px; font-size: .95rem; color: var(--ink-dim); }
+  .section-masthead-grid .editors-note strong { color: var(--ink); font-family: var(--display); font-weight: 600; display: block; margin-bottom: 6px; letter-spacing: -0.01em; }
+  @media (max-width: 900px) { .section-masthead-grid { grid-template-columns: 1fr; gap: 28px; } }
+
+  .featured-technique { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0; margin-bottom: 72px; border-top: 1px solid var(--bg-rule); border-bottom: 1px solid var(--bg-rule); }
+  .featured-technique .ft-img { aspect-ratio: 4/3; overflow: hidden; background: var(--bg-elev); }
+  .featured-technique .ft-img img { width: 100%; height: 100%; object-fit: cover; }
+  .featured-technique .ft-text { padding: 40px 44px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid var(--bg-rule); }
+  .featured-technique h2 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); font-style: italic; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 14px; }
+  .featured-technique h2 a { color: var(--ink); }
+  .featured-technique .ft-dek { font-size: 1.05rem; color: var(--ink-dim); margin-bottom: 22px; max-width: 50ch; }
+  .featured-technique .ft-meta { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--bg-rule); }
+  @media (max-width: 900px) { .featured-technique { grid-template-columns: 1fr; } .featured-technique .ft-text { border-left: 0; padding: 28px; } }
+
+  .section-head-bar { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin-bottom: 32px; }
+  .section-head-bar h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+  .section-head-bar h2 em { color: var(--amber-bright); font-weight: 500; }
+  .section-head-bar .see-all { font-family: var(--display); font-style: italic; font-size: .9rem; color: var(--amber-bright); }
+
+  .layout-main { display: grid; grid-template-columns: 1fr 320px; gap: 56px; margin-bottom: 80px; }
+  @media (max-width: 1000px) { .layout-main { grid-template-columns: 1fr; } }
+
+  .most-read { border-top: 2px solid var(--ink); padding-top: 16px; }
+  .most-read h4 { font-family: var(--display); font-weight: 700; font-style: italic; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; color: var(--amber-bright); margin-bottom: 22px; }
+  .most-read ol { list-style: none; padding: 0; margin: 0; counter-reset: mr; }
+  .most-read li { counter-increment: mr; display: grid; grid-template-columns: 54px 1fr; gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--bg-rule); align-items: start; }
+  .most-read li:last-child { border-bottom: 0; }
+  .most-read li::before { content: counter(mr, decimal-leading-zero); font-family: var(--display); font-weight: 800; font-size: 2.4rem; line-height: 1; color: var(--amber); letter-spacing: -0.04em; }
+  .most-read li h5 { font-family: var(--display); font-weight: 600; font-size: 1rem; line-height: 1.25; margin: 0 0 4px; }
+  .most-read li h5 a { color: var(--ink); }
+  .most-read li h5 a:hover { color: var(--amber-bright); text-decoration: none; }
+  .most-read li .timestamp { font-size: .76rem; }
+
+  .promo { border: 1px solid var(--amber); padding: 28px 26px; margin-top: 40px; }
+  .promo .kicker { margin-bottom: 8px; }
+  .promo h4 { font-family: var(--display); font-style: italic; font-weight: 600; font-size: 1.3rem; line-height: 1.2; margin-bottom: 10px; }
+  .promo p { font-size: .92rem; color: var(--ink-dim); margin-bottom: 16px; }
+  .promo form { display: flex; gap: 0; border: 1px solid var(--bg-rule); }
+  .promo input { flex: 1; background: transparent; border: 0; padding: 10px 12px; color: var(--ink); font-family: var(--body); font-size: .9rem; min-width: 0; }
+  .promo input:focus { outline: 1px solid var(--amber); }
+  .promo button { background: var(--honey); color: var(--bg); border: 0; padding: 10px 16px; font-family: var(--display); font-weight: 600; font-style: italic; font-size: .9rem; cursor: pointer; }
+  .promo button:hover { background: var(--amber-bright); }
+
+  .skills-rail { background: var(--bg-elev); padding: 48px 40px; margin: 0 -28px 80px; border-top: 1px solid var(--bg-rule); border-bottom: 1px solid var(--bg-rule); }
+  .skills-rail-inner { max-width: 1280px; margin: 0 auto; padding: 0 28px; }
+  .skills-rail .section-head-bar { border-bottom-color: var(--amber); }
+  .skills-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--bg-rule); }
+  .skill-cell { padding: 28px 24px 28px 0; border-right: 1px solid var(--bg-rule); }
+  .skill-cell:last-child { border-right: 0; padding-right: 0; }
+  .skill-cell:nth-child(n+2) { padding-left: 24px; }
+  .skill-num { font-family: var(--display); font-style: italic; font-weight: 500; color: var(--amber-bright); font-size: .85rem; letter-spacing: .08em; margin-bottom: 12px; display: block; }
+  .skill-cell h4 { font-family: var(--display); font-weight: 700; font-size: 1.2rem; line-height: 1.2; margin-bottom: 8px; letter-spacing: -0.015em; }
+  .skill-cell h4 a { color: var(--ink); }
+  .skill-cell p { font-size: .9rem; color: var(--ink-dim); margin: 0; }
+  @media (max-width: 900px) { .skills-grid { grid-template-columns: repeat(2, 1fr); } .skill-cell { border-right: 0; border-bottom: 1px solid var(--bg-rule); padding: 22px 0; } .skill-cell:nth-child(n+2) { padding-left: 0; } .skills-rail { margin: 0 0 60px; padding: 36px 0; } }
+
+  .longread-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px 32px; margin-bottom: 80px; }
+  .longread-grid .lr-lead { grid-row: span 2; }
+  .longread-grid .lr-lead .story-img { aspect-ratio: 4/5; }
+  .longread-grid .lr-lead h3 { font-size: 1.9rem; font-style: italic; font-weight: 600; letter-spacing: -0.02em; }
+  .longread-grid .lr-lead p { font-size: 1rem; }
+  @media (max-width: 900px) { .longread-grid { grid-template-columns: 1fr; } .longread-grid .lr-lead { grid-row: auto; } }
+
+  .glossary { border-top: 2px solid var(--ink); padding-top: 28px; margin-bottom: 80px; }
+  .glossary-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
+  .glossary-head h2 { font-size: 1.6rem; font-style: italic; font-weight: 700; }
+  .glossary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+  .gloss-item { border-top: 1px solid var(--bg-rule); padding-top: 16px; }
+  .gloss-item dt { font-family: var(--display); font-weight: 700; font-size: 1.15rem; color: var(--amber-bright); margin-bottom: 6px; letter-spacing: -0.01em; }
+  .gloss-item dd { margin: 0; font-size: .92rem; color: var(--ink-dim); line-height: 1.5; }
+  @media (max-width: 800px) { .glossary-grid { grid-template-columns: 1fr; gap: 22px; } }
+
+  .pagination { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--bg-rule); border-bottom: 1px solid var(--bg-rule); padding: 22px 0; margin-bottom: 60px; font-family: var(--display); font-style: italic; font-size: .95rem; flex-wrap: wrap; gap: 12px; }
+  .pagination .pg-pages { display: flex; gap: 18px; color: var(--ink-dim); font-style: normal; font-family: var(--body); font-size: .9rem; }
+  .pagination .pg-pages a { color: var(--ink); }
+  .pagination .pg-pages a.cur { color: var(--amber-bright); border-bottom: 2px solid var(--amber-bright); padding-bottom: 2px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="masthead">
+    <a href="index.html" class="brand">Sandfork<sup>№ 07</sup></a>
+    <div class="masthead-meta">
+      <span class="issue">Saturday, 18 November · Issue Nº 07 in print</span>
+      <span>—</span>
+      <a href="#">Sign in</a>
+      <a href="#" class="subscribe-btn">Subscribe</a>
+    </div>
+  </div>
+  <nav class="section-nav">
+    <div class="section-nav-inner">
+      <a href="index.html">Today</a>
+      <a href="section.html">Recipes</a>
+      <a href="section.html" class="current">Technique</a>
+      <a href="topic.html">Pantry</a>
+      <a href="video.html">Video</a>
+      <a href="live-blog.html">Live</a>
+      <a href="section.html">Bakery</a>
+      <a href="section.html">Profiles</a>
+      <a href="section.html">Letters</a>
+      <a href="section.html">The Print Journal</a>
+    </div>
+  </nav>
+  <div class="ticker">
+    <span class="ticker-label">In the kitchen</span>
+    <div class="ticker-items">
+      <span><a href="live-blog.html">Live: 36 hours at Saint-Jean bakery, Lyon</a></span>
+      <span>Quince paste is back — three recipes from the new issue</span>
+      <span>Why your stock tastes flat (and the 14-minute fix)</span>
+      <span>Reader letters: the great salt cod debate</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section-masthead">
+    <div class="section-masthead-grid">
+      <div>
+        <span class="kicker">Section · Technique</span>
+        <h1>The how, and the why behind it.</h1>
+        <p class="section-intro">Knife work, heat management, fermentation, doughs that misbehave. Technique is the slow part of cooking — the part recipes assume you already know. We write it down here, with the science where it helps and the hands where it doesn't.</p>
+      </div>
+      <div class="editors-note">
+        <strong>From the editor</strong>
+        This month we're paying attention to <em>browning</em> — the Maillard end of things, deglazing, fond, why a dry pan beats a hot one nine times out of ten. Plus: Hannah Otieno on tempering chocolate by ear, and a long argument about garlic.
+      </div>
+    </div>
+  </section>
+
+  <article class="featured-technique">
+    <div class="ft-img">
+      <img src="photo-product-1.jpg" alt="A cast-iron pan with a deeply browned chicken thigh">
+    </div>
+    <div class="ft-text">
+      <span class="kicker">The long read · 22 min</span>
+      <h2><a href="#">A defence of the dry pan, and other heresies about browning</a></h2>
+      <p class="ft-dek">For thirty years we have been told to get the pan smoking, add the fat, then the protein. Marco Pellegrino, who has cooked through four kitchens and one divorce, thinks we have been getting it backwards. A patient look at fond, fat, and what really happens in the first ninety seconds.</p>
+      <div class="ft-meta">
+        <p class="byline"><strong>Marco Pellegrino</strong> <span class="dot">·</span> Photographs by Esme Liang <span class="dot">·</span> <span class="timestamp">Published 14 November</span></p>
+        <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="tag">Heat</span>
+          <span class="tag">Maillard</span>
+          <span class="tag">Cast iron</span>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <div class="layout-main">
+    <div>
+      <div class="section-head-bar">
+        <h2>Recently filed <em>in Technique</em></h2>
+        <a href="#" class="see-all">All 187 pieces →</a>
+      </div>
+
+      <div class="longread-grid">
+        <article class="story lr-lead">
+          <div class="story-img"><img src="photo-landscape-1.jpg" alt="Dough being folded on a wooden bench"></div>
+          <span class="kicker">Bread · A series</span>
+          <h3><a href="#">Stretch, fold, wait, repeat: a quiet method for high-hydration dough at home</a></h3>
+          <p>You don't need a stand mixer or a stone oven. You need patience and a wet hand. Part three of our home-baker's primer covers the bulk ferment — when to push, when to leave the bowl alone.</p>
+          <p class="byline"><strong>Iona MacRae</strong> <span class="dot">·</span> <span class="timestamp">12 Nov</span></p>
+        </article>
+
+        <article class="story">
+          <div class="story-img"><img src="photo-product-2.jpg" alt="A chef's knife mid-cut through an onion"></div>
+          <span class="kicker">Knife work</span>
+          <h3><a href="#">The honest truth about your onions (you are crushing them)</a></h3>
+          <p>If your eyes water before the first cut, the knife is the problem. A short lesson in pressure and edge.</p>
+          <p class="byline"><strong>Kenji Watanabe</strong> <span class="dot">·</span> <span class="timestamp">10 Nov</span></p>
+        </article>
+
+        <article class="story">
+          <div class="story-img"><img src="illustration-abstract.jpg" alt="Glass jar of fermenting cabbage with bubbles"></div>
+          <span class="kicker">Fermentation</span>
+          <h3><a href="#">When kraut goes pink: a field guide to telling rot from beauty</a></h3>
+          <p>A short taxonomy of the colours, smells, and textures you'll meet in week two of any wild ferment.</p>
+          <p class="byline"><strong>Dr. Priya Subramanian</strong> <span class="dot">·</span> <span class="timestamp">9 Nov</span></p>
+        </article>
+
+        <article class="story">
+          <div class="story-img"><img src="photo-product-1.jpg" alt="A pot of stock at a low simmer"></div>
+          <span class="kicker">Stock &amp; broth</span>
+          <h3><a href="#">Why your stock tastes flat, and the fourteen-minute fix</a></h3>
+          <p>A second roast, a splash of vinegar, and one ingredient most cooks forget at the bottom of the bag.</p>
+          <p class="byline"><strong>Marco Pellegrino</strong> <span class="dot">·</span> <span class="timestamp">7 Nov</span></p>
+        </article>
+
+        <article class="story">
+          <div class="story-img"><img src="photo-product-2.jpg" alt="Tempered chocolate being spread on marble"></div>
+          <span class="kicker">Pastry</span>
+          <h3><a href="#">Tempering chocolate by ear: Hannah Otieno on listening to a pour</a></h3>
+          <p>A thermometer tells you what already happened. The sound of chocolate on marble tells you what is about to.</p>
+          <p class="byline"><strong>Hannah Otieno</strong> <span class="dot">·</span> <span class="timestamp">5 Nov</span></p>
+        </article>
+      </div>
+
+      <div class="section-head-bar">
+        <h2>From the archive <em>· still useful</em></h2>
+        <a href="#" class="see-all">Browse archive →</a>
+      </div>
+
+      <div class="grid grid-2" style="margin-bottom: 60px;">
+        <article class="story story-h">
+          <div class="story-img"><img src="photo-product-1.jpg" alt="Garlic cloves"></div>
+          <div>
+            <span class="kicker">2022 · Aromatics</span>
+            <h3><a href="#">Twelve things to do with garlic that aren't mincing</a></h3>
+            <p class="byline"><strong>Iona MacRae</strong> <span class="dot">·</span> <span class="timestamp">Issue Nº 03</span></p>
+          </div>
+        </article>
+        <article class="story story-h">
+          <div class="story-img"><img src="photo-product-2.jpg" alt="Eggs in water"></div>
+          <div>
+            <span class="kicker">2023 · Eggs</span>
+            <h3><a href="#">The boiled egg, in seven degrees of done</a></h3>
+            <p class="byline"><strong>Marco Pellegrino</strong> <span class="dot">·</span> <span class="timestamp">Issue Nº 05</span></p>
+          </div>
+        </article>
+        <article class="story story-h">
+          <div class="story-img"><img src="illustration-abstract.jpg" alt="A salt cellar"></div>
+          <div>
+            <span class="kicker">2021 · Seasoning</span>
+            <h3><a href="#">Salt is a tool, not a finish: when to add it (mostly: earlier)</a></h3>
+            <p class="byline"><strong>Kenji Watanabe</strong> <span class="dot">·</span> <span class="timestamp">Issue Nº 02</span></p>
+          </div>
+        </article>
+        <article class="story story-h">
+          <div class="story-img"><img src="photo-landscape-1.jpg" alt="Roast vegetables on a sheet pan"></div>
+          <div>
+            <span class="kicker">2023 · Roasting</span>
+            <h3><a href="#">Why your sheet pan is the wrong size (and what to do about it)</a></h3>
+            <p class="byline"><strong>Esme Liang</strong> <span class="dot">·</span> <span class="timestamp">Issue Nº 06</span></p>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <aside>
+      <div class="most-read">
+        <h4>Most read in Technique</h4>
+        <ol>
+          <li>
+            <div>
+              <h5><a href="#">Why your stock tastes flat (and the fourteen-minute fix)</a></h5>
+              <span class="timestamp">Marco Pellegrino · 7 Nov</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h5><a href="#">The honest truth about your onions</a></h5>
+              <span class="timestamp">Kenji Watanabe · 10 Nov</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h5><a href="#">Stretch, fold, wait, repeat — part three</a></h5>
+              <span class="timestamp">Iona MacRae · 12 Nov</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h5><a href="#">Tempering chocolate by ear</a></h5>
+              <span class="timestamp">Hannah Otieno · 5 Nov</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h5><a href="#">When kraut goes pink: rot or beauty?</a></h5>
+              <span class="timestamp">P. Subramanian · 9 Nov</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="promo">
+        <span class="kicker">The technique letter</span>
+        <h4>One method, every Friday, in your inbox.</h4>
+        <p>A single piece of technique, explained properly. No recipe cards, no affiliate links, no shouting. Free; written by the editors.</p>
+        <form onsubmit="event.preventDefault();">
+          <input type="email" placeholder="your@email" aria-label="email">
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+    </aside>
+  </div>
+
+  <section class="skills-rail">
+    <div class="skills-rail-inner">
+      <div class="section-head-bar">
+        <h2>A beginner's curriculum <em>· start here</em></h2>
+        <a href="#" class="see-all">The full reading list →</a>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-cell">
+          <span class="skill-num">№ 01 — Heat</span>
+          <h4><a href="#">Read the pan, not the recipe</a></h4>
+          <p>How to tell a screaming pan from a sulking one, by smoke, sound, and the back of your hand.</p>
+        </div>
+        <div class="skill-cell">
+          <span class="skill-num">№ 02 — Salt</span>
+          <h4><a href="#">Season early, then again</a></h4>
+          <p>Why salting a stew at the end is doing two-thirds of the work and getting one-third of the flavour.</p>
+        </div>
+        <div class="skill-cell">
+          <span class="skill-num">№ 03 — Knife</span>
+          <h4><a href="#">Three cuts, in order</a></h4>
+          <p>If you learn the rock, the push, and the draw — in that order — you will never lecture yourself again.</p>
+        </div>
+        <div class="skill-cell">
+          <span class="skill-num">№ 04 — Fat</span>
+          <h4><a href="#">Butter, oil, and when to mix them</a></h4>
+          <p>A small treatise on smoke points, foaming, and the very British habit of using both at once.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="glossary">
+    <div class="glossary-head">
+      <h2><em>A working glossary</em> · terms we use a lot</h2>
+      <a href="topic.html" class="see-all">Topics A–Z →</a>
+    </div>
+    <dl class="glossary-grid">
+      <div class="gloss-item">
+        <dt>Fond</dt>
+        <dd>The browned residue stuck to the bottom of a pan after searing. The most underused free flavour in any kitchen. Dissolve it with wine, stock, or water before it burns.</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Bulk ferment</dt>
+        <dd>The first long rise of a dough, before shaping. Where flavour and structure are built. Time it by appearance, not the clock.</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Temper</dt>
+        <dd>To bring an ingredient — eggs, chocolate, gelatine — gently to a target temperature so it behaves predictably afterward. Less alchemy than housekeeping.</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Mise en place</dt>
+        <dd>Everything ready before you start. The single most boring habit that will improve your cooking the most.</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Brunoise</dt>
+        <dd>A two-millimetre dice. Worth learning once; useful for the rest of your life, particularly with carrots and celeriac.</dd>
+      </div>
+      <div class="gloss-item">
+        <dt>Reduction</dt>
+        <dd>Boiling a liquid down to concentrate it. Patience, mostly. Salt last, taste twice.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <nav class="pagination" aria-label="Pagination">
+    <a href="#" style="color: var(--ink-dim);">← Newer pieces</a>
+    <div class="pg-pages">
+      <a href="#" class="cur">1</a>
+      <a href="#">2</a>
+      <a href="#">3</a>
+      <a href="#">4</a>
+      <span style="color: var(--ink-mute);">…</span>
+      <a href="#">19</a>
+    </div>
+    <a href="#">Older pieces →</a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">Sandfork</a>
+        <p>A cooking journal, published on paper twice a year and online when there is something to say. Notes from the cooking class — recipes, technique, and the people who make food.</p>
+      </div>
+      <div>
+        <h5>Read</h5>
+        <ul>
+          <li><a href="section.html">Recipes</a></li>
+          <li><a href="section.html">Technique</a></li>
+          <li><a href="section.html">Profiles</a></li>
+          <li><a href="video.html">Video</a></li>
+          <li><a href="live-blog.html">Live blog</a></li>
+          <li><a href="topic.html">Topics A–Z</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>The Journal</h5>
+        <ul>
+          <li><a href="#">Issue Nº 07 — Autumn</a></li>
+          <li><a href="#">The archive</a></li>
+          <li><a href="#">Print subscription · £36</a></li>
+          <li><a href="#">Gift a year</a></li>
+          <li><a href="#">Stockists</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>About</h5>
+        <ul>
+          <li><a href="#">Who we are</a></li>
+          <li><a href="#">Masthead</a></li>
+          <li><a href="#">Contributors</a></li>
+          <li><a href="#">Pitch us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Follow</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Substack</a></li>
+          <li><a href="#">RSS · all stories</a></li>
+          <li><a href="#">Weekly letter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="colophon">© 2024 Sandfork Press Ltd. Set in Fraunces &amp; Source Serif. Printed in Norwich on Munken Pure 100gsm.</div>
+      <div><a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; <a href="#">Ethics &amp; corrections</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

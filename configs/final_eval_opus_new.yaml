@@ -1,0 +1,26 @@
+job_name: final-eval-opus-v34-new
+jobs_dir: jobs
+n_attempts: 10
+timeout_multiplier: 1.0
+
+orchestrator:
+  type: local
+  n_concurrent_trials: 20
+  quiet: false
+
+environment:
+  type: modal
+  delete: true
+
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-opus-4-7
+
+datasets:
+  - path: datasets/final
+    task_names:
+      - government__dark_native_clean-001
+      - hotel_booking__photo_warm_display-001
+      - news_portal__editorial_dark-001
+      - healthcare_clinic__glassy_pastel-001
+      - product_splash__crypto_neon-001

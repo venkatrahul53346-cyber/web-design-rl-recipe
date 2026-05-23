@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About the Archive — Mission, History &amp; Leadership · National Archive</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .about-hero { display: grid; grid-template-columns: 1.4fr 1fr; gap: 64px; align-items: end; }
+  .about-hero .lede { font-size: 1.2rem; line-height: 1.55; color: var(--text); max-width: 56ch; }
+  .about-hero .meta-stack { border-left: 1px solid var(--border); padding-left: 28px; }
+  .about-hero .meta-stack dl { margin: 0; display: grid; grid-template-columns: 1fr; gap: 18px; }
+  .about-hero .meta-stack dt { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 4px; }
+  .about-hero .meta-stack dd { margin: 0; font-size: 14px; color: var(--text); }
+  .dot-panel { background-image: radial-gradient(var(--border-strong) 1px, transparent 1px); background-size: 14px 14px; height: 180px; border: 1px solid var(--border); margin-top: 28px; }
+
+  .two-col { display: grid; grid-template-columns: 240px 1fr; gap: 56px; }
+  .two-col .col-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); padding-top: 4px; }
+  .two-col p { max-width: 68ch; color: var(--text); }
+  .two-col p + p { margin-top: 1em; }
+  .pullquote { border-left: 2px solid var(--accent); padding: 4px 0 4px 20px; margin: 28px 0; font-size: 1.05rem; color: var(--text); }
+  .pullquote cite { display: block; margin-top: 10px; font-style: normal; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); }
+
+  .timeline { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--border); margin-top: 8px; }
+  .timeline > div { padding: 22px 22px 26px; border-right: 1px solid var(--border); background: var(--surface); }
+  .timeline > div:last-child { border-right: none; }
+  .timeline .year { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: 0.08em; }
+  .timeline h4 { color: var(--text); text-transform: none; letter-spacing: -0.01em; font-size: 0.98rem; margin: 6px 0 10px; font-weight: 600; }
+  .timeline p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+  .values-list { border: 1px solid var(--border); border-bottom: none; }
+  .values-list > article { display: grid; grid-template-columns: 80px 220px 1fr; gap: 32px; padding: 28px; border-bottom: 1px solid var(--border); background: var(--surface); align-items: start; }
+  .values-list .num { font-family: var(--mono); font-size: 13px; color: var(--text-dim); }
+  .values-list h3 { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; }
+  .values-list p { margin: 0; color: var(--text-muted); font-size: 14px; max-width: 60ch; }
+
+  .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--border); margin-top: 8px; }
+  .team-card { padding: 22px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); margin-right: -1px; margin-bottom: -1px; }
+  .team-card .portrait { width: 100%; aspect-ratio: 1/1; background: var(--bg-elevated); border: 1px solid var(--border); background-image: radial-gradient(var(--border-strong) 1px, transparent 1px); background-size: 8px 8px; margin-bottom: 16px; }
+  .team-card h4 { font-size: 0.98rem; text-transform: none; letter-spacing: -0.01em; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+  .team-card .role { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 10px; }
+  .team-card .bio { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0; }
+  .team-card .id { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-top: 12px; }
+
+  .notice { border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--surface); padding: 20px 22px; }
+  .notice h3 { font-size: 0.95rem; margin-bottom: 6px; }
+  .notice p { margin: 0; font-size: 14px; color: var(--text-muted); }
+
+  .figures { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--border); }
+  .figures > div { padding: 24px 22px; border-right: 1px solid var(--border); background: var(--surface); }
+  .figures > div:last-child { border-right: none; }
+  .figures .label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); }
+  .figures .num { font-family: var(--sans); font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; margin-top: 8px; display: block; }
+  .figures .unit { font-family: var(--mono); font-size: 12px; color: var(--text-dim); margin-left: 4px; }
+
+  .notices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  @media (max-width: 900px) {
+    .about-hero, .two-col { grid-template-columns: 1fr; gap: 32px; }
+    .about-hero .meta-stack { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 28px; }
+    .timeline { grid-template-columns: 1fr 1fr; }
+    .timeline > div { border-right: none; border-bottom: 1px solid var(--border); }
+    .timeline > div:nth-child(odd) { border-right: 1px solid var(--border); }
+    .team-grid { grid-template-columns: 1fr 1fr; }
+    .figures { grid-template-columns: 1fr 1fr; }
+    .figures > div { border-right: none; border-bottom: 1px solid var(--border); }
+    .figures > div:nth-child(odd) { border-right: 1px solid var(--border); }
+    .values-list > article { grid-template-columns: 1fr; gap: 8px; padding: 22px; }
+    .notices-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 560px) {
+    .timeline { grid-template-columns: 1fr; }
+    .timeline > div, .timeline > div:nth-child(odd) { border-right: none; border-bottom: 1px solid var(--border); }
+    .timeline > div:last-child { border-bottom: none; }
+    .team-grid { grid-template-columns: 1fr; }
+    .figures { grid-template-columns: 1fr; }
+    .figures > div, .figures > div:nth-child(odd) { border-right: none; border-bottom: 1px solid var(--border); }
+    .figures > div:last-child { border-bottom: none; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+<div class="gov-ribbon">
+  <div class="container">
+    <span class="ribbon-flag">An official site of the National Government</span>
+    <span class="ribbon-sep">·</span>
+    <a href="#">How you know</a>
+    <span style="margin-left:auto;display:inline-flex;gap:14px;align-items:center;">
+      <a href="#" aria-label="Accessibility settings">Accessibility</a>
+      <span class="ribbon-sep">·</span>
+      <a href="#">EN</a> <span class="ribbon-sep">/</span> <a href="#">FR</a> <span class="ribbon-sep">/</span> <a href="#">ES</a>
+    </span>
+  </div>
+</div>
+<header class="site-header" role="banner">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">National Archive</span>
+        <span class="brand-sub">Records · Datasets · Heritage</span>
+      </span>
+    </a>
+    <form class="header-search" role="search" aria-label="Search the archive">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" placeholder="Search 14.2 million records, files, and datasets…" aria-label="Search records">
+      <kbd>⌘ K</kbd>
+    </form>
+    <div class="header-utils">
+      <a class="util-btn" href="forms.html">Request</a>
+      <a class="util-btn" href="#">Sign in</a>
+    </div>
+  </div>
+  <nav class="primary-nav" aria-label="Primary">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="departments.html">Departments</a></li>
+      <li><a href="forms.html">Forms &amp; Requests</a></li>
+      <li><a href="news.html">News &amp; Notices</a></li>
+      <li><a href="about.html" aria-current="page" class="active">About the Archive</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <span aria-current="page">About the Archive</span>
+  </div>
+</nav>
+
+<main id="main">
+
+  <section class="section-hero">
+    <div class="container">
+      <span class="eyebrow">About · Mission &amp; Mandate</span>
+      <h1 style="margin-top:18px;max-width:18ch;">The custodian of the nation's permanent public record.</h1>
+      <div class="about-hero" style="margin-top:44px;">
+        <p class="lede">The National Archive identifies, preserves, and makes available the records of government and the documentary heritage of the nation. We serve researchers, journalists, public servants, and citizens — without fee, in any of the three official languages, and to the standard required by statute.</p>
+        <div class="meta-stack">
+          <dl>
+            <div><dt>Established</dt><dd>4 March 1934, by Act of Parliament</dd></div>
+            <div><dt>Governing statute</dt><dd>National Records Act, c. 12 (1934, rev. 2019)</dd></div>
+            <div><dt>Reporting authority</dt><dd>Department of Culture &amp; Heritage</dd></div>
+            <div><dt>Director General</dt><dd>Dr. Mariam Ó Beirne (since 2021)</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      <div class="figures">
+        <div><span class="label">Holdings</span><span class="num">14.2M<span class="unit">records</span></span></div>
+        <div><span class="label">Shelving</span><span class="num">312<span class="unit">linear km</span></span></div>
+        <div><span class="label">Open datasets</span><span class="num">4,180</span></div>
+        <div><span class="label">Annual visitors</span><span class="num">86,400</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-lg">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">§ 01</span>
+          <h2 style="margin-top:8px;">Our mission</h2>
+        </div>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;">Statutory · Public</span>
+      </div>
+      <div class="two-col">
+        <div class="col-label">Mandate</div>
+        <div>
+          <p>We exist to ensure that the decisions of public bodies remain legible to the people they serve. Every record we accession — a cabinet minute, a parish register, a satellite-derived flood map — is held in trust for the public and made accessible under the principle that government information belongs, by default, to those it was created to serve.</p>
+          <p>Our duty extends beyond preservation. We catalogue, conserve, digitise, translate, and explain. We train departmental records officers, advise on transfer schedules, and operate the national finding-aids infrastructure used by twenty-two ministries and more than 1,400 local authorities. Where access is restricted by law — for personal privacy, national security, or commercial sensitivity — we operate a transparent appeals process under the Freedom of Information Act.</p>
+          <div class="pullquote">
+            "A nation that cannot examine its own record cannot reform it. The Archive is therefore not a warehouse of the past, but an instrument of the present."
+            <cite>— Reading Room Inaugural Address, 1934</cite>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-lg" style="background:var(--bg-elevated);">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">§ 02</span>
+          <h2 style="margin-top:8px;">Founding &amp; history</h2>
+        </div>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;">Est. 1934 · 91 years</span>
+      </div>
+      <div class="two-col">
+        <div class="col-label">Origin</div>
+        <div>
+          <p>The Archive was established by the National Records Act of 1934, following two decades of campaigning by historians, lawyers, and parliamentary clerks who had watched the wartime correspondence of the previous government dispersed across private collections, sold at auction, or — in several documented cases — burned. The founding Act consolidated record-keeping duties that had been scattered across the State Paper Office, the Treasury Muniments, and a dozen departmental cellars, and placed them under a single Keeper accountable to Parliament.</p>
+          <p>The first reading room opened on the ground floor of the old Patent Office on Verney Street in March 1935, with a staff of nine and shelving for roughly 40,000 files. Today the Archive operates from a purpose-built facility completed in 1978, with a satellite conservation laboratory in the Northern Region and a fully digital ingestion pipeline accepting electronic records from forty-six government bodies.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:40px;">
+        <div class="timeline">
+          <div>
+            <span class="year">1934</span>
+            <h4>National Records Act</h4>
+            <p>Parliament establishes the Archive as an independent statutory body and appoints the first Keeper of the Records.</p>
+          </div>
+          <div>
+            <span class="year">1968</span>
+            <h4>Public access reform</h4>
+            <p>The thirty-year rule is reduced to twenty for most government series; the first public catalogue is published.</p>
+          </div>
+          <div>
+            <span class="year">2003</span>
+            <h4>Digital mandate</h4>
+            <p>Electronic records are recognised as equivalent to paper; the Archive begins continuous online ingestion.</p>
+          </div>
+          <div>
+            <span class="year">2021</span>
+            <h4>Open data programme</h4>
+            <p>Launch of the public dataset portal under the Open Government Licence v3.0, now hosting 4,180 datasets.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-lg">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">§ 03</span>
+          <h2 style="margin-top:8px;">Values that govern our work</h2>
+        </div>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;">Code of practice</span>
+      </div>
+
+      <div class="values-list">
+        <article>
+          <span class="num">01 /</span>
+          <h3>Accuracy of record</h3>
+          <p>Records are preserved in the form in which they were created. We do not edit, summarise, or improve them. Where transcription or translation is provided, both versions are retained and clearly distinguished.</p>
+        </article>
+        <article>
+          <span class="num">02 /</span>
+          <h3>Openness by default</h3>
+          <p>Information held by public bodies is presumed to be public. Restrictions are applied only where required by statute, and every restriction is documented, time-bound, and appealable.</p>
+        </article>
+        <article>
+          <span class="num">03 /</span>
+          <h3>Equal access</h3>
+          <p>No fee is charged for use of the catalogue, reading rooms, or basic reproductions. Services are provided in three official languages, with translation support on request.</p>
+        </article>
+        <article>
+          <span class="num">04 /</span>
+          <h3>Plain language</h3>
+          <p>Finding aids, guidance, and decision notices are written for citizens, not specialists. We test our public-facing materials with non-expert readers before publication.</p>
+        </article>
+        <article>
+          <span class="num">05 /</span>
+          <h3>Permanence</h3>
+          <p>We accession with a horizon measured in centuries. Conservation, format migration, and storage decisions are made against that standard, not against operational convenience.</p>
+        </article>
+        <article>
+          <span class="num">06 /</span>
+          <h3>Independence</h3>
+          <p>The Archive does not act on the instruction of any minister in matters of accession, description, or disclosure. The Keeper reports to Parliament directly under the Act.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-lg" style="background:var(--bg-elevated);">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">§ 04</span>
+          <h2 style="margin-top:8px;">Senior leadership &amp; office of the keeper</h2>
+        </div>
+        <a href="departments.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;">All departments →</a>
+      </div>
+
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="portrait" aria-hidden="true"></div>
+          <h4>Dr. Mariam Ó Beirne</h4>
+          <div class="role">Director General &amp; Keeper</div>
+          <p class="bio">Historian of administrative law. Joined 2008; appointed Keeper in 2021. Oversees statutory functions and parliamentary reporting.</p>
+          <div class="id">ID · DG-001</div>
+        </div>
+        <div class="team-card">
+          <div class="portrait" aria-hidden="true"></div>
+          <h4>Henrik Vasiliev</h4>
+          <div class="role">Deputy Keeper, Operations</div>
+          <p class="bio">Former head of the Cabinet Office records unit. Responsible for reading rooms, accession schedules, and inter-departmental transfers.</p>
+          <div class="id">ID · DK-OPS-002</div>
+        </div>
+        <div class="team-card">
+          <div class="portrait" aria-hidden="true"></div>
+          <h4>Adaeze Okonkwo</h4>
+          <div class="role">Director, Public Services</div>
+          <p class="bio">Leads the public reading rooms, citizen request line, and outreach to schools, libraries, and local archives.</p>
+          <div class="id">ID · PS-003</div>
+        </div>
+        <div class="team-card">
+          <div class="portrait" aria-hidden="true"></div>
+          <h4>Tomás Lindqvist</h4>
+          <div class="role">Director, Digital &amp; Data</div>
+          <p class="bio">Computer scientist, formerly of the National Statistics Office. Oversees ingest, format migration, and the open dataset portal.</p>
+          <div class="id">ID · DD-004</div>
+        </div>
+        <div class="team-card">
+          <div class="portrait" aria-hidden="true"></div>
+          <h4>Yuki Saint-Martin</h4>
+          <div class="role">Head of Conservation</div>
+          <p class="bio">Paper and parchment specialist. Leads the conservation laboratory and the format-migration programme for at-risk magnetic media.</p>
+          <div class="id">ID · CON-005</div>
+        </div>
+        <div class="team-card">
+          <div class="portrait" aria-hidden="true"></div>
+          <h4>Rosa Halberstam</h4>
+          <div class="role">General Counsel</div>
+          <p class="bio">Advises on Freedom of Information appeals, restricted-access determinations, and the Archive's statutory obligations.</p>
+          <div class="id">ID · LEG-006</div>
+        </div>
+        <div class="team-card">
+          <div class="portrait" aria-hidden="true"></div>
+          <h4>Ben Achterberg</h4>
+          <div class="role">Chief Cataloguer</div>
+          <p class="bio">Oversees descriptive standards, finding aids, and the controlled vocabularies that underpin the public catalogue.</p>
+          <div class="id">ID · CAT-007</div>
+        </div>
+        <div class="team-card">
+          <div class="portrait" aria-hidden="true"></div>
+          <h4>Inès Carvalho</h4>
+          <div class="role">Head of Outreach &amp; Education</div>
+          <p class="bio">Manages school programmes, the visiting-researcher scheme, and partnerships with regional and municipal archives.</p>
+          <div class="id">ID · OUT-008</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="notices-grid">
+        <div class="notice">
+          <h3>Reading our annual report</h3>
+          <p>The 2024 Annual Report to Parliament covers accessions, FOI determinations, conservation activity, and financial accounts. Available in HTML, PDF, and accessible plain-text formats.</p>
+          <p style="margin-top:14px;"><a href="#" class="btn btn-sm">Download — 2024 Annual Report (PDF, 3.4 MB)</a></p>
+        </div>
+        <div class="notice">
+          <h3>Visit the Archive</h3>
+          <p>The main reading rooms at Verney Street are open Tuesday to Saturday, 09:00–17:00. A reader's ticket is free and can be obtained on arrival with proof of identity.</p>
+          <p style="margin-top:14px;"><a href="contact.html" class="btn btn-sm">Plan a visit →</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">National Archive</span>
+            <span class="brand-sub">Est. 1934</span>
+          </span>
+        </a>
+        <p>The custodian of the nation's permanent public record. Open to researchers, journalists, and the public — in person and online.</p>
+        <p class="mono" style="font-size:12px;color:var(--text-dim);margin-top:14px;">Reading rooms · Tue–Sat 09:00–17:00</p>
+      </div>
+      <div class="footer-col">
+        <h5>Research</h5>
+        <ul>
+          <li><a href="services.html">Catalogue search</a></li>
+          <li><a href="#">Digitised collections</a></li>
+          <li><a href="#">Open datasets</a></li>
+          <li><a href="#">Finding aids</a></li>
+          <li><a href="#">Citation guidance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Requests</h5>
+        <ul>
+          <li><a href="forms.html">Records request (FOI)</a></li>
+          <li><a href="forms.html">Reading room booking</a></li>
+          <li><a href="forms.html">Reproduction order</a></li>
+          <li><a href="forms.html">Restricted access</a></li>
+          <li><a href="forms.html">Transfer of records</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="about.html">Mission &amp; mandate</a></li>
+          <li><a href="departments.html">Departments</a></li>
+          <li><a href="#">Leadership</a></li>
+          <li><a href="news.html">News &amp; notices</a></li>
+          <li><a href="#">Annual reports</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Help</h5>
+        <ul>
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a href="#">Accessibility</a></li>
+          <li><a href="#">Languages</a></li>
+          <li><a href="#">Sitemap</a></li>
+          <li><a href="#">Status &amp; outages</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 1934–2025 National Archive. Open content licensed under the Open Government Licence v3.0 unless otherwise noted.</span>
+      <span class="legal">
+        <a href="#">Privacy notice</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Cookies</a>
+        <a href="#">FOI disclosures</a>
+      </span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

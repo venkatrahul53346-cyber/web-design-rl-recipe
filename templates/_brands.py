@@ -353,3 +353,113 @@ BRANDS_BY_VERTICAL["media"]        = _MEDIA
 BRANDS_BY_VERTICAL["agency"]       = _AGENCY
 BRANDS_BY_VERTICAL["hospitality"]  = _HOSPITALITY
 BRANDS_BY_VERTICAL["ai-product"]   = _AI_PRODUCT
+
+
+_GOVERNMENT = [
+    BrandPersona(
+        name="City of Brentwell",
+        tagline="Services for residents and businesses",
+        value_prop=(
+            "Official site of the City of Brentwell. Information about taxes, "
+            "permits, public services, council meetings, and how to contact "
+            "your local representatives."
+        ),
+        product_category="municipal government portal",
+        target_audience="residents, business owners, and visitors of Brentwell",
+        vertical="government",
+    ),
+    BrandPersona(
+        name="National Archive",
+        tagline="The public record, made accessible",
+        value_prop=(
+            "Search, browse, and request records held by the National Archive. "
+            "Open public datasets, digitised historical documents, and online "
+            "request forms for restricted materials."
+        ),
+        product_category="national archive / records authority",
+        target_audience="researchers, journalists, and the general public",
+        vertical="government",
+    ),
+    BrandPersona(
+        name="Department of Transport",
+        tagline="Roads, transit, and travel guidance",
+        value_prop=(
+            "Driver licensing, vehicle registration, public transit schedules, "
+            "and active road-works alerts. Pay tolls and fines online."
+        ),
+        product_category="transport authority",
+        target_audience="drivers, commuters, and freight operators",
+        vertical="government",
+    ),
+]
+
+
+_HEALTHCARE = [
+    BrandPersona(
+        name="Brookline Health",
+        tagline="Better care, closer to home",
+        value_prop=(
+            "Brookline Health is a network of community clinics offering "
+            "primary care, paediatrics, behavioural health, and same-day "
+            "appointments at locations across the region."
+        ),
+        product_category="multi-specialty clinic network",
+        target_audience="local families and patients seeking primary care",
+        vertical="healthcare",
+    ),
+    BrandPersona(
+        name="Cardinal Medical",
+        tagline="Specialised care, evidence-based",
+        value_prop=(
+            "Cardinal Medical is a regional academic medical centre. Cardiac, "
+            "oncology, neurology, and orthopaedics. Find a doctor, schedule an "
+            "appointment, access patient portal."
+        ),
+        product_category="academic medical centre",
+        target_audience="patients seeking specialty care and referrals",
+        vertical="healthcare",
+    ),
+    BrandPersona(
+        name="Lighthouse Mental Health",
+        tagline="Therapy that meets you where you are",
+        value_prop=(
+            "Online and in-person therapy with licensed therapists. Match with "
+            "a therapist in 24 hours. Sliding-scale pricing; insurance accepted."
+        ),
+        product_category="mental health platform",
+        target_audience="adults seeking accessible therapy",
+        vertical="healthcare",
+    ),
+]
+
+
+_MARKETPLACE = [
+    BrandPersona(
+        name="Atelier Market",
+        tagline="Independent makers, hand-picked",
+        value_prop=(
+            "Atelier is a curated marketplace for independent makers — "
+            "ceramics, textiles, woodwork, small-batch food. Every seller "
+            "vetted by a real human, every order ships from the maker."
+        ),
+        product_category="curated maker marketplace",
+        target_audience="people who buy from independents",
+        vertical="marketplace",
+    ),
+    BrandPersona(
+        name="Drift Holiday",
+        tagline="Stays you can't book elsewhere",
+        value_prop=(
+            "Drift is a marketplace for independent rentals — designed homes, "
+            "off-grid cabins, owner-managed villas. Book direct, no booking fees."
+        ),
+        product_category="vacation rental marketplace",
+        target_audience="design-conscious travellers",
+        vertical="marketplace",
+    ),
+]
+
+
+BRANDS_BY_VERTICAL["government"]  = _GOVERNMENT
+BRANDS_BY_VERTICAL["healthcare"]  = _HEALTHCARE
+BRANDS_BY_VERTICAL["marketplace"] = _MARKETPLACE

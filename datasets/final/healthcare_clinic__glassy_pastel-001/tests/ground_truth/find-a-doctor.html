@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find a Doctor — Cardinal Medical</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .fad-hero { padding: 72px 0 40px; }
+  .fad-hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 3rem; align-items: end; }
+  @media (max-width: 880px) { .fad-hero-grid { grid-template-columns: 1fr; gap: 2rem; } }
+  .fad-hero h1 { max-width: 14ch; }
+  .filter-bar { padding: 1rem; display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1fr auto; gap: 0.75rem; align-items: end; }
+  .filter-bar .field { display: flex; flex-direction: column; gap: 0.35rem; }
+  .filter-bar label { font-size: 0.74rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); padding-left: 0.6rem; }
+  .filter-bar .input, .filter-bar .select { width: 100%; padding: 0.7rem 0.9rem; border-radius: var(--radius-pill); background: rgba(255,255,255,0.7); border: 1px solid var(--glass-border-soft); font: inherit; font-size: 0.94rem; color: var(--ink); outline: none; transition: all 0.15s; }
+  .filter-bar .input:focus, .filter-bar .select:focus { border-color: var(--accent-soft); box-shadow: 0 0 0 4px var(--accent-tint); background: #fff; }
+  .filter-bar .btn-primary { height: 42px; padding: 0 1.4rem; }
+  @media (max-width: 880px) { .filter-bar { grid-template-columns: 1fr 1fr; } .filter-bar .btn-primary { grid-column: span 2; justify-content: center; } }
+  .chips-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; align-items: center; }
+  .chips-row .label { font-size: 0.82rem; color: var(--ink-soft); margin-right: 0.4rem; }
+  .results-layout { display: grid; grid-template-columns: 260px 1fr; gap: 2.5rem; margin-top: 56px; }
+  @media (max-width: 880px) { .results-layout { grid-template-columns: 1fr; } }
+  .side-filters { padding: 1.4rem; align-self: start; position: sticky; top: 96px; }
+  .side-filters h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin: 1.2rem 0 0.6rem; font-weight: 600; }
+  .side-filters h4:first-child { margin-top: 0; }
+  .side-filters label.check { display: flex; align-items: center; gap: 0.55rem; font-size: 0.92rem; color: var(--ink-muted); padding: 0.3rem 0; cursor: pointer; }
+  .side-filters input[type=checkbox] { accent-color: var(--accent); }
+  .results-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.5rem; }
+  .results-count { font-size: 0.92rem; color: var(--ink-muted); }
+  .results-count strong { color: var(--ink); font-weight: 600; }
+  .doctor-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+  @media (max-width: 880px) { .doctor-grid { grid-template-columns: 1fr; } }
+  .doctor-card { padding: 1.4rem; display: grid; grid-template-columns: 88px 1fr; gap: 1.1rem; transition: transform 0.18s, box-shadow 0.18s; }
+  .doctor-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift), var(--shadow-glass); }
+  .doctor-avatar { width: 88px; height: 88px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-soft), var(--accent-deep)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 500; font-size: 1.6rem; letter-spacing: -0.02em; border: 2px solid rgba(255,255,255,0.7); flex-shrink: 0; }
+  .doctor-name { font-size: 1.08rem; font-weight: 600; color: var(--ink); margin: 0 0 0.15rem; letter-spacing: -0.02em; }
+  .doctor-spec { font-size: 0.9rem; color: var(--accent-deep); margin: 0 0 0.55rem; font-weight: 500; }
+  .doctor-meta { font-size: 0.85rem; color: var(--ink-muted); display: flex; flex-direction: column; gap: 0.2rem; margin-bottom: 0.8rem; }
+  .doctor-meta .row { display: flex; align-items: center; gap: 0.4rem; }
+  .doctor-meta svg { width: 14px; height: 14px; color: var(--ink-soft); flex-shrink: 0; }
+  .doctor-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.9rem; }
+  .doctor-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .doctor-actions .btn { padding: 0.55rem 0.95rem; font-size: 0.86rem; }
+  .pagination { display: flex; justify-content: center; gap: 0.4rem; margin-top: 2.5rem; }
+  .pagination a { padding: 0.55rem 0.95rem; border-radius: var(--radius-pill); background: rgba(255,255,255,0.55); border: 1px solid var(--glass-border-soft); color: var(--ink-muted); font-size: 0.9rem; font-weight: 500; backdrop-filter: blur(8px); }
+  .pagination a.current { background: var(--accent); color: #fff; border-color: transparent; }
+  .help-band { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1.25rem; margin-top: 80px; }
+  @media (max-width: 880px) { .help-band { grid-template-columns: 1fr; } }
+  .help-card { padding: 1.6rem; }
+  .help-card h3 { font-size: 1.05rem; margin-bottom: 0.45rem; }
+  .help-card p { font-size: 0.92rem; margin-bottom: 0.9rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a href="index.html" class="brand" aria-label="Cardinal Medical home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+      </span>
+      <span>Cardinal Medical<small>Academic Medical Centre</small></span>
+    </a>
+    <nav class="nav-primary" aria-label="Primary">
+      <a href="services.html">Care &amp; Services</a>
+      <a href="find-a-doctor.html" class="active">Find a Doctor</a>
+      <a href="locations.html">Locations</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="patient-portal.html" class="nav-portal">Patient Portal</a>
+      <a href="appointment.html" class="btn btn-primary">Book appointment</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="fad-hero">
+    <div class="wrap">
+      <div class="fad-hero-grid">
+        <div class="stack">
+          <span class="eyebrow">Physician directory</span>
+          <h1>Find the right specialist for your care.</h1>
+          <p class="lede">Search 412 board-certified physicians across cardiology, oncology, neurology, orthopaedics, and primary care. Filter by specialty, location, language, or insurance — and request an appointment directly from any profile.</p>
+        </div>
+        <div class="glass-quiet" style="padding: 1.2rem 1.4rem;">
+          <p style="margin: 0 0 0.4rem; font-size: 0.86rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500;">Need help choosing?</p>
+          <p style="margin: 0 0 0.8rem; font-size: 0.95rem; color: var(--ink);">A care navigator can match you with the right specialist based on your symptoms, referral, and insurance.</p>
+          <a href="tel:18005550140" class="btn-link">Call 1-800-555-0140</a>
+        </div>
+      </div>
+
+      <div class="glass filter-bar" style="margin-top: 2.5rem;" role="search" aria-label="Find a doctor">
+        <div class="field">
+          <label for="q">Name, condition, or procedure</label>
+          <input class="input" id="q" type="search" placeholder="e.g. atrial fibrillation, Dr. Chen, knee replacement">
+        </div>
+        <div class="field">
+          <label for="spec">Specialty</label>
+          <select class="select" id="spec">
+            <option>All specialties</option>
+            <option>Cardiology</option>
+            <option>Oncology — Medical</option>
+            <option>Oncology — Surgical</option>
+            <option>Neurology</option>
+            <option>Orthopaedic Surgery</option>
+            <option>Primary Care</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="loc">Location</label>
+          <select class="select" id="loc">
+            <option>All locations</option>
+            <option>Greenfield Main Campus</option>
+            <option>Westshore Heart Pavilion</option>
+            <option>Northgate Cancer Centre</option>
+            <option>Riverbend Orthopaedic Clinic</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="avail">Availability</label>
+          <select class="select" id="avail">
+            <option>Any time</option>
+            <option>Within 7 days</option>
+            <option>Within 2 weeks</option>
+            <option>Within a month</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+
+      <div class="chips-row">
+        <span class="label">Popular:</span>
+        <a href="#" class="pill">Heart failure</a>
+        <a href="#" class="pill">Breast cancer</a>
+        <a href="#" class="pill">Stroke recovery</a>
+        <a href="#" class="pill">Sports medicine</a>
+        <a href="#" class="pill">Second opinion</a>
+        <a href="#" class="pill pill-accent pill-dot">Accepting new patients</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="results-layout">
+        <aside class="glass side-filters" aria-label="Refine results">
+          <h4>Sub-specialty</h4>
+          <label class="check"><input type="checkbox" checked> Interventional Cardiology</label>
+          <label class="check"><input type="checkbox"> Electrophysiology</label>
+          <label class="check"><input type="checkbox"> Heart Failure</label>
+          <label class="check"><input type="checkbox"> Cardio-Oncology</label>
+
+          <h4>Language</h4>
+          <label class="check"><input type="checkbox"> English</label>
+          <label class="check"><input type="checkbox"> Spanish</label>
+          <label class="check"><input type="checkbox"> Mandarin</label>
+          <label class="check"><input type="checkbox"> ASL interpreter</label>
+
+          <h4>Insurance</h4>
+          <label class="check"><input type="checkbox"> Medicare</label>
+          <label class="check"><input type="checkbox"> Medicaid (Ohio)</label>
+          <label class="check"><input type="checkbox"> Anthem BCBS</label>
+          <label class="check"><input type="checkbox"> UnitedHealthcare</label>
+          <label class="check"><input type="checkbox"> Aetna</label>
+
+          <h4>Visit type</h4>
+          <label class="check"><input type="checkbox"> In-person</label>
+          <label class="check"><input type="checkbox"> Telehealth video</label>
+          <label class="check"><input type="checkbox"> Same-day urgent consult</label>
+
+          <h4>Gender</h4>
+          <label class="check"><input type="radio" name="g"> Any</label>
+          <label class="check"><input type="radio" name="g"> Female</label>
+          <label class="check"><input type="radio" name="g"> Male</label>
+        </aside>
+
+        <div>
+          <div class="results-header">
+            <div class="results-count">Showing <strong>1–8</strong> of <strong>87</strong> physicians matching your filters</div>
+            <div>
+              <label for="sort" style="font-size: 0.86rem; color: var(--ink-soft); margin-right: 0.4rem;">Sort by</label>
+              <select class="select" id="sort" style="padding: 0.5rem 0.9rem; border-radius: var(--radius-pill); background: rgba(255,255,255,0.7); border: 1px solid var(--glass-border-soft); font: inherit; font-size: 0.88rem;">
+                <option>Earliest availability</option>
+                <option>Best patient ratings</option>
+                <option>Most experience</option>
+                <option>Distance from me</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="doctor-grid">
+
+            <article class="glass doctor-card">
+              <div class="doctor-avatar" aria-hidden="true">PC</div>
+              <div>
+                <h3 class="doctor-name">Priya Chen, MD, PhD</h3>
+                <p class="doctor-spec">Interventional Cardiology</p>
+                <div class="doctor-meta">
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> Westshore Heart Pavilion</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="10"/></svg> Next available: Thu, Apr 4</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg> 14 yrs · Stanford, Cleveland Clinic fellowship</div>
+                </div>
+                <div class="doctor-tags">
+                  <span class="pill pill-good pill-dot">Accepting new patients</span>
+                  <span class="pill">English · Mandarin</span>
+                </div>
+                <div class="doctor-actions">
+                  <a href="appointment.html" class="btn btn-primary">Book visit</a>
+                  <a href="#" class="btn btn-ghost">View profile</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass doctor-card">
+              <div class="doctor-avatar" aria-hidden="true">MO</div>
+              <div>
+                <h3 class="doctor-name">Marcus Okafor, MD</h3>
+                <p class="doctor-spec">Medical Oncology — Breast</p>
+                <div class="doctor-meta">
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> Northgate Cancer Centre</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="10"/></svg> Next available: Tue, Apr 2</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg> 19 yrs · Active investigator, SWOG trials</div>
+                </div>
+                <div class="doctor-tags">
+                  <span class="pill pill-good pill-dot">Accepting new patients</span>
+                  <span class="pill pill-accent">Telehealth available</span>
+                </div>
+                <div class="doctor-actions">
+                  <a href="appointment.html" class="btn btn-primary">Book visit</a>
+                  <a href="#" class="btn btn-ghost">View profile</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass doctor-card">
+              <div class="doctor-avatar" aria-hidden="true">SR</div>
+              <div>
+                <h3 class="doctor-name">Sofía Ramírez, MD</h3>
+                <p class="doctor-spec">Vascular Neurology · Stroke</p>
+                <div class="doctor-meta">
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> Greenfield Main Campus</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="10"/></svg> Next available: Mon, Apr 8</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg> 11 yrs · Comprehensive Stroke Centre director</div>
+                </div>
+                <div class="doctor-tags">
+                  <span class="pill">English · Spanish</span>
+                  <span class="pill pill-accent">Referral preferred</span>
+                </div>
+                <div class="doctor-actions">
+                  <a href="appointment.html" class="btn btn-primary">Book visit</a>
+                  <a href="#" class="btn btn-ghost">View profile</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass doctor-card">
+              <div class="doctor-avatar" aria-hidden="true">JW</div>
+              <div>
+                <h3 class="doctor-name">James Whitaker, DO</h3>
+                <p class="doctor-spec">Orthopaedic Surgery — Sports Medicine</p>
+                <div class="doctor-meta">
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> Riverbend Orthopaedic Clinic</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="10"/></svg> Next available: Fri, Mar 29</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg> 8 yrs · Team physician, Greenfield University</div>
+                </div>
+                <div class="doctor-tags">
+                  <span class="pill pill-good pill-dot">Accepting new patients</span>
+                  <span class="pill">Same-day MRI on-site</span>
+                </div>
+                <div class="doctor-actions">
+                  <a href="appointment.html" class="btn btn-primary">Book visit</a>
+                  <a href="#" class="btn btn-ghost">View profile</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass doctor-card">
+              <div class="doctor-avatar" aria-hidden="true">EL</div>
+              <div>
+                <h3 class="doctor-name">Eleanor Larsson, MD</h3>
+                <p class="doctor-spec">Electrophysiology</p>
+                <div class="doctor-meta">
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> Westshore Heart Pavilion</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="10"/></svg> Next available: Wed, Apr 17</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg> 22 yrs · 4,200+ ablations performed</div>
+                </div>
+                <div class="doctor-tags">
+                  <span class="pill pill-accent">Referral required</span>
+                  <span class="pill">AFib programme lead</span>
+                </div>
+                <div class="doctor-actions">
+                  <a href="appointment.html" class="btn btn-primary">Book visit</a>
+                  <a href="#" class="btn btn-ghost">View profile</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass doctor-card">
+              <div class="doctor-avatar" aria-hidden="true">DK</div>
+              <div>
+                <h3 class="doctor-name">David Kowalski, MD</h3>
+                <p class="doctor-spec">Neurosurgery — Spine</p>
+                <div class="doctor-meta">
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> Greenfield Main Campus</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="10"/></svg> Next available: Mon, Apr 22</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg> 16 yrs · Minimally invasive spine fellowship</div>
+                </div>
+                <div class="doctor-tags">
+                  <span class="pill pill-accent">Second-opinion visits</span>
+                  <span class="pill">English · Polish</span>
+                </div>
+                <div class="doctor-actions">
+                  <a href="appointment.html" class="btn btn-primary">Book visit</a>
+                  <a href="#" class="btn btn-ghost">View profile</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass doctor-card">
+              <div class="doctor-avatar" aria-hidden="true">AT</div>
+              <div>
+                <h3 class="doctor-name">Aisha Tran, MD, MPH</h3>
+                <p class="doctor-spec">Cardio-Oncology</p>
+                <div class="doctor-meta">
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> Northgate Cancer Centre</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="10"/></svg> Next available: Thu, Apr 11</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg> 9 yrs · Joint cardiac + oncology survivorship clinic</div>
+                </div>
+                <div class="doctor-tags">
+                  <span class="pill pill-good pill-dot">Accepting new patients</span>
+                  <span class="pill pill-accent">Telehealth available</span>
+                </div>
+                <div class="doctor-actions">
+                  <a href="appointment.html" class="btn btn-primary">Book visit</a>
+                  <a href="#" class="btn btn-ghost">View profile</a>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass doctor-card">
+              <div class="doctor-avatar" aria-hidden="true">RB</div>
+              <div>
+                <h3 class="doctor-name">Robert Buchanan, MD</h3>
+                <p class="doctor-spec">Movement Disorders Neurology</p>
+                <div class="doctor-meta">
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> Greenfield Main Campus</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="10"/></svg> Next available: Tue, May 6</div>
+                  <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/></svg> 27 yrs · Parkinson’s &amp; DBS programme</div>
+                </div>
+                <div class="doctor-tags">
+                  <span class="pill">Referral required</span>
+                  <span class="pill">Active research trials</span>
+                </div>
+                <div class="doctor-actions">
+                  <a href="appointment.html" class="btn btn-primary">Book visit</a>
+                  <a href="#" class="btn btn-ghost">View profile</a>
+                </div>
+              </div>
+            </article>
+
+          </div>
+
+          <nav class="pagination" aria-label="Results pages">
+            <a href="#" class="current">1</a>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">…</a>
+            <a href="#">11</a>
+            <a href="#">Next</a>
+          </nav>
+
+          <div class="help-band">
+            <div class="glass-strong help-card">
+              <span class="eyebrow">Referrals</span>
+              <h3 style="margin-top: 0.6rem;">Sending a patient to us?</h3>
+              <p>Physicians can submit referrals through our secure clinician portal, by fax to 1-800-555-0144, or via Epic Care Link. Most consults are scheduled within 5 business days.</p>
+              <a href="#referrals" class="btn-link">Provider referrals</a>
+            </div>
+            <div class="glass help-card">
+              <span class="eyebrow">Second opinions</span>
+              <h3 style="margin-top: 0.6rem;">Not sure about a diagnosis?</h3>
+              <p>Our specialists review outside records and imaging within 7–10 days. Available in person, by video, or as a records-only consult.</p>
+              <a href="#second-opinion" class="btn-link">Request a review</a>
+            </div>
+            <div class="glass help-card">
+              <span class="eyebrow">International</span>
+              <h3 style="margin-top: 0.6rem;">Travelling for care</h3>
+              <p>Our International Patient Services team coordinates appointments, lodging, language assistance, and billing for patients from outside the U.S.</p>
+              <a href="#international" class="btn-link">International services</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-emergency">
+      <svg class="i i-lg" style="color: var(--warn);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      <div><strong>If this is a medical emergency, dial 911.</strong> For urgent but non-emergency concerns after hours, call our 24-hour nurse line at <a href="tel:18005550199">1-800-555-0199</a>.</div>
+    </div>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+          </span>
+          <span>Cardinal Medical</span>
+        </a>
+        <p>A regional academic medical centre advancing specialty care in cardiology, oncology, neurology, and orthopaedics — close to home, evidence-based at every step.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Care</h4>
+        <ul>
+          <li><a href="services.html">All specialties</a></li>
+          <li><a href="services.html#cardiac">Cardiac Institute</a></li>
+          <li><a href="services.html#oncology">Cancer Centre</a></li>
+          <li><a href="services.html#neurology">Neurosciences</a></li>
+          <li><a href="services.html#ortho">Orthopaedics</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Patients</h4>
+        <ul>
+          <li><a href="appointment.html">Request an appointment</a></li>
+          <li><a href="find-a-doctor.html">Find a doctor</a></li>
+          <li><a href="patient-portal.html">Patient portal</a></li>
+          <li><a href="locations.html">Locations &amp; hours</a></li>
+          <li><a href="#billing">Billing &amp; insurance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <ul>
+          <li><a href="about.html">Our mission</a></li>
+          <li><a href="about.html#research">Research &amp; trials</a></li>
+          <li><a href="about.html#education">Medical education</a></li>
+          <li><a href="about.html#careers">Careers</a></li>
+          <li><a href="about.html#newsroom">Newsroom</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:18005550140">1-800-555-0140</a></li>
+          <li><a href="mailto:hello@cardinalmedical.org">hello@cardinalmedical.org</a></li>
+          <li>2400 University Drive<br>Greenfield, OH 45123</li>
+          <li><a href="#language">Language assistance</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <small>© 2025 Cardinal Medical Centre. A 501(c)(3) non-profit teaching hospital.</small>
+      <div class="footer-legal">
+        <a href="#privacy">Privacy &amp; HIPAA</a>
+        <a href="#nondiscrimination">Non-discrimination</a>
+        <a href="#accessibility">Accessibility</a>
+        <a href="#terms">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

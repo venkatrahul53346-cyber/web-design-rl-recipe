@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sandfork — Notes from the cooking class</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* page-specific compositional rules only */
+  main.today { padding-bottom: 72px; }
+  .today-hero { padding-top: 0; }
+  .today-lead .grid-lead-secondary { padding: 28px 0 56px; border-bottom: 1px solid var(--bg-rule); }
+  .secondary-stack { display: flex; flex-direction: column; gap: 28px; }
+  .secondary-stack .story-h + .story-h { border-top: 1px solid var(--bg-rule); padding-top: 28px; }
+  .section-strip { padding: 56px 0 24px; border-bottom: 1px solid var(--bg-rule); }
+  .section-strip-tight { padding: 40px 0; border-bottom: 1px solid var(--bg-rule); }
+  .section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); margin-bottom: 32px; }
+  .section-title h2 { margin: 0; font-style: italic; font-weight: 700; }
+  .section-title .more { font-family: var(--display); font-style: italic; font-size: .95rem; color: var(--amber-bright); }
+  .live-indicator { display: inline-flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 600; font-style: italic; color: var(--live); text-transform: uppercase; letter-spacing: .08em; font-size: .78rem; }
+  .live-indicator::before { content: ''; width: 8px; height: 8px; background: var(--live); border-radius: 50%; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+  /* The class — editorial split: 7/5 asymmetric */
+  .class-block { display: grid; grid-template-columns: 7fr 5fr; gap: 48px; align-items: center; padding: 72px 0; }
+  .class-block .class-photo { aspect-ratio: 5/6; background: var(--bg-elev); overflow: hidden; }
+  .class-block .class-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .class-block h2 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.02; font-style: italic; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 18px; }
+  .class-block .lede { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 1.25rem; line-height: 1.45; color: var(--ink-dim); max-width: 36ch; margin-bottom: 24px; }
+  .class-block .cta { display: inline-block; font-family: var(--display); font-weight: 600; font-style: italic; background: var(--honey); color: var(--bg); padding: 12px 22px; font-size: 1rem; letter-spacing: 0; }
+  .class-block .cta:hover { background: var(--amber-bright); text-decoration: none; }
+  .class-block .cta-meta { font-family: var(--body); font-style: italic; color: var(--ink-mute); font-size: .85rem; margin-top: 14px; }
+  @media (max-width: 900px) { .class-block { grid-template-columns: 1fr; gap: 28px; padding: 48px 0; } }
+
+  /* Recipe trio with amber numerals */
+  .recipe-trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .recipe-card { display: grid; grid-template-columns: 64px 1fr; gap: 18px; align-items: start; }
+  .recipe-card .num { font-family: var(--display); font-weight: 800; font-style: italic; font-size: 3.2rem; line-height: .9; color: var(--amber-bright); }
+  .recipe-card h3 { font-size: 1.3rem; margin-bottom: 6px; }
+  .recipe-card h3 a { color: var(--ink); }
+  .recipe-card .meta { font-family: var(--body); font-style: italic; color: var(--ink-mute); font-size: .82rem; margin-bottom: 8px; }
+  .recipe-card p { color: var(--ink-dim); font-size: .95rem; }
+  @media (max-width: 900px) { .recipe-trio { grid-template-columns: 1fr; gap: 28px; } }
+
+  /* Most-read sidebar pattern */
+  .read-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 56px; align-items: start; }
+  .read-list { list-style: none; padding: 0; margin: 0; }
+  .read-list li { display: grid; grid-template-columns: 56px 1fr; gap: 14px; padding: 18px 0; border-top: 1px solid var(--bg-rule); }
+  .read-list li:first-child { border-top: 0; padding-top: 0; }
+  .read-list .count { font-family: var(--display); font-weight: 800; font-style: italic; font-size: 2.4rem; line-height: .9; color: var(--amber); }
+  .read-list h4 { font-size: 1.05rem; margin: 0 0 4px; line-height: 1.25; }
+  .read-list h4 a { color: var(--ink); }
+  .read-list .byline { font-size: .78rem; }
+  @media (max-width: 900px) { .read-grid { grid-template-columns: 1fr; gap: 40px; } }
+
+  /* Promo */
+  .promo { border: 1px solid var(--amber); padding: 36px 40px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: center; margin: 56px 0; }
+  .promo .kicker { margin-bottom: 4px; }
+  .promo h3 { font-family: var(--display); font-style: italic; font-weight: 700; font-size: 1.9rem; line-height: 1.1; margin-bottom: 10px; }
+  .promo p { color: var(--ink-dim); margin: 0; max-width: 48ch; }
+  .promo form { display: flex; gap: 0; }
+  .promo input { flex: 1; background: transparent; border: 1px solid var(--bg-rule); border-right: 0; color: var(--ink); padding: 12px 14px; font-family: var(--body); font-size: 1rem; }
+  .promo button { background: var(--honey); color: var(--bg); border: 1px solid var(--honey); padding: 12px 20px; font-family: var(--display); font-style: italic; font-weight: 600; cursor: pointer; }
+  .promo button:hover { background: var(--amber-bright); border-color: var(--amber-bright); }
+  @media (max-width: 900px) { .promo { grid-template-columns: 1fr; padding: 28px; } }
+
+  /* Live blog teaser */
+  .live-teaser { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 56px 0; border-bottom: 1px solid var(--bg-rule); align-items: start; }
+  .live-teaser .live-photo { aspect-ratio: 4/3; background: var(--bg-elev); overflow: hidden; }
+  .live-teaser .live-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .live-teaser h2 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); line-height: 1.05; font-style: italic; font-weight: 700; margin: 10px 0 14px; }
+  .live-feed { list-style: none; padding: 0; margin: 18px 0 0; border-top: 1px solid var(--bg-rule); }
+  .live-feed li { padding: 14px 0; border-bottom: 1px solid var(--bg-rule); display: grid; grid-template-columns: 78px 1fr; gap: 14px; }
+  .live-feed .t { font-family: var(--body); font-style: italic; color: var(--amber-bright); font-size: .85rem; }
+  .live-feed .e { color: var(--ink); }
+  .live-feed .e strong { font-family: var(--display); font-weight: 600; }
+  @media (max-width: 900px) { .live-teaser { grid-template-columns: 1fr; gap: 28px; } }
+
+  /* Issue / print plug — full-bleed dark band */
+  .print-band { background: var(--bg-elev); border-top: 1px solid var(--bg-rule); border-bottom: 1px solid var(--bg-rule); padding: 72px 0; margin-top: 32px; }
+  .print-band-inner { display: grid; grid-template-columns: 1fr 1.2fr; gap: 56px; align-items: center; }
+  .print-band .cover { aspect-ratio: 3/4; background: #2A2620; overflow: hidden; max-width: 360px; }
+  .print-band .cover img { width: 100%; height: 100%; object-fit: cover; }
+  .print-band h2 { font-size: clamp(2rem, 4vw, 3rem); font-style: italic; font-weight: 800; line-height: 1.02; letter-spacing: -0.025em; margin-bottom: 18px; }
+  .print-band p { color: var(--ink-dim); max-width: 52ch; margin-bottom: 22px; }
+  .print-band .contents { columns: 2; column-gap: 32px; font-family: var(--body); color: var(--ink-dim); font-size: .92rem; margin: 22px 0 28px; }
+  .print-band .contents span { display: block; padding: 6px 0; border-top: 1px solid var(--bg-rule); break-inside: avoid; }
+  .print-band .contents span em { color: var(--amber-bright); font-style: italic; margin-right: 8px; }
+  .print-band .cta { display: inline-block; font-family: var(--display); font-weight: 600; font-style: italic; background: transparent; color: var(--ink); padding: 12px 22px; border: 1px solid var(--amber); }
+  .print-band .cta:hover { background: var(--amber); color: var(--bg); text-decoration: none; }
+  @media (max-width: 900px) { .print-band-inner { grid-template-columns: 1fr; gap: 32px; } .print-band .contents { columns: 1; } }
+
+  /* Quote pull */
+  .pull { padding: 64px 0; border-bottom: 1px solid var(--bg-rule); }
+  .pull blockquote { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.2; color: var(--ink); max-width: 28ch; margin: 0; letter-spacing: -0.015em; }
+  .pull blockquote::before { content: '\201C'; color: var(--amber-bright); font-size: 1.4em; line-height: 0; vertical-align: -.2em; margin-right: .1em; }
+  .pull .attr { font-family: var(--body); color: var(--ink-dim); margin-top: 20px; font-size: .92rem; }
+  .pull .attr strong { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="masthead">
+    <a href="index.html" class="brand">Sandfork<sup>№ 07</sup></a>
+    <div class="masthead-meta">
+      <span class="issue">Saturday, 18 November · Issue Nº 07 in print</span>
+      <span>—</span>
+      <a href="#">Sign in</a>
+      <a href="#" class="subscribe-btn">Subscribe</a>
+    </div>
+  </div>
+  <nav class="section-nav">
+    <div class="section-nav-inner">
+      <a href="index.html" class="current">Today</a>
+      <a href="section.html">Recipes</a>
+      <a href="section.html">Technique</a>
+      <a href="topic.html">Pantry</a>
+      <a href="video.html">Video</a>
+      <a href="live-blog.html">Live</a>
+      <a href="section.html">Bakery</a>
+      <a href="section.html">Profiles</a>
+      <a href="section.html">Letters</a>
+      <a href="section.html">The Print Journal</a>
+    </div>
+  </nav>
+  <div class="ticker">
+    <span class="ticker-label">In the kitchen</span>
+    <div class="ticker-items">
+      <span><a href="live-blog.html">Live: 36 hours at Saint-Jean bakery, Lyon</a></span>
+      <span>Quince paste is back — three recipes from the new issue</span>
+      <span>Why your stock tastes flat (and the 14-minute fix)</span>
+      <span>Reader letters: the great salt cod debate</span>
+    </div>
+  </div>
+</header>
+
+<main class="today">
+
+  <!-- HERO: full-bleed photo, headline bottom-left -->
+  <section class="today-hero">
+    <div class="hero-lead" style="margin-bottom:0;">
+      <div class="hero-img">
+        <img src="photo-landscape-1.jpg" alt="A hand pulling apart the crumb of a still-warm country loaf, late evening light">
+      </div>
+      <div class="hero-text">
+        <span class="kicker">Issue Nº 07 · The bread issue</span>
+        <h1><em>The loaf that</em> taught me to be patient.</h1>
+        <p class="dek">Eight months in a Lyon bakery, two failed starters, and the night I finally understood what the bakers meant when they said the dough was ready. A long read to begin Nº 07 — and an invitation to cook along.</p>
+        <p style="margin-top:22px;">
+          <a href="#class" class="subscribe-btn" style="font-family:var(--display);font-weight:600;font-style:italic;background:var(--honey);color:var(--bg);padding:11px 22px;display:inline-block;">Begin reading →</a>
+          <span class="timestamp" style="margin-left:18px;">22 min read · by Iola Renner</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEAD + SECONDARY: today's stories -->
+  <section class="today-lead">
+    <div class="wrap">
+      <div class="grid-lead-secondary">
+        <div>
+          <article class="story story-lg">
+            <div class="story-img"><img src="photo-product-1.jpg" alt="Quartered quinces blistering in a copper pan"></div>
+            <span class="kicker">Pantry · The autumn shelf</span>
+            <h3><a href="#"><em>On quince:</em> the fruit you cannot eat raw, and the three things to do with the rest of the bowl.</a></h3>
+            <p>By the time the quinces are pale gold and the kitchen smells of warm honey, you've already done the hardest part. A working guide to membrillo, poached halves for breakfast, and a savoury chutney that keeps until Christmas.</p>
+            <p class="byline"><strong>Marit Halvorsen</strong> <span class="dot">·</span> <em>Friday, 9.40pm</em> <span class="dot">·</span> 14 min</p>
+          </article>
+        </div>
+        <aside class="col-rule secondary-stack">
+          <article class="story story-h">
+            <div class="story-img"><img src="photo-product-2.jpg" alt="Stockpot at a low simmer"></div>
+            <div>
+              <span class="kicker">Technique</span>
+              <h3><a href="#">Why your stock tastes flat — and the fourteen-minute fix.</a></h3>
+              <p class="byline"><strong>Theo Aaltonen</strong> <span class="dot">·</span> <em>7 min</em></p>
+            </div>
+          </article>
+          <article class="story story-h">
+            <div class="story-img"><img src="illustration-abstract.jpg" alt="Reader letter pages spread on a wooden table"></div>
+            <div>
+              <span class="kicker">Letters</span>
+              <h3><a href="#">The great salt cod debate: seventy-one readers, four cities, one stubborn cookbook.</a></h3>
+              <p class="byline"><strong>The editors</strong> <span class="dot">·</span> <em>Read 41 replies</em></p>
+            </div>
+          </article>
+          <article class="story story-h">
+            <div class="story-img"><img src="photo-portrait-1.jpg" alt="A profile portrait, kitchen in soft focus behind"></div>
+            <div>
+              <span class="kicker">Profiles</span>
+              <h3><a href="#">Adrienne Cho cooks the way her mother wrote letters: slowly, and only when she means it.</a></h3>
+              <p class="byline"><strong>Iola Renner</strong> <span class="dot">·</span> <em>18 min</em></p>
+            </div>
+          </article>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT SANDFORK IS — the editorial split -->
+  <section id="class">
+    <div class="wrap">
+      <div class="class-block">
+        <div class="class-photo">
+          <img src="photo-portrait-1.jpg" alt="A cluttered prep bench: notebook open, knife, a bowl of shallots, half a glass of wine">
+        </div>
+        <div>
+          <span class="kicker">What this is</span>
+          <h2>Notes from the <em>cooking class,</em> twice a year on paper.</h2>
+          <p class="lede">Sandfork is a journal for people who already know how to cook and want to cook better. Long recipes that explain themselves. Technique pieces that don't lie about how hard a thing is. Profiles of the people who make food worth eating.</p>
+          <p style="color:var(--ink-dim); max-width: 52ch; margin-bottom: 28px;">No recipe carousels. No fifteen-minute weeknight anything. We publish when there is something to say, and twice a year we set it in type, print it in Norwich on uncoated stock, and send it to subscribers in plain brown paper.</p>
+          <a class="cta" href="#">Subscribe — £36 a year</a>
+          <p class="cta-meta">Two print issues · the weekly letter · the archive · cancel any time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECIPES FROM THE ISSUE: numbered trio -->
+  <section class="section-strip">
+    <div class="wrap">
+      <div class="section-title">
+        <h2>Three recipes from Nº 07</h2>
+        <a class="more" href="section.html">All recipes →</a>
+      </div>
+      <div class="recipe-trio">
+        <article class="recipe-card">
+          <div class="num">01</div>
+          <div>
+            <span class="tag">Bakery</span>
+            <h3 style="margin-top:10px;"><a href="#">A slow country loaf, twenty-six hours from flour to table.</a></h3>
+            <p class="meta">Active 40 min · Total 26 hr · Makes one 900g boule</p>
+            <p>The bread we begin every issue with. A 70% hydration dough, one long bulk in a cool kitchen, and a bake hot enough to scare you the first time.</p>
+          </div>
+        </article>
+        <article class="recipe-card">
+          <div class="num">02</div>
+          <div>
+            <span class="tag">Pantry</span>
+            <h3 style="margin-top:10px;"><a href="#">Membrillo, the way Marit's grandmother set it on the windowsill.</a></h3>
+            <p class="meta">Active 30 min · Total 3 hr · Makes 1.2 kg</p>
+            <p>Equal weights of fruit and sugar, a vanilla pod if you have one, and the patience to stir for the last fifteen minutes when it wants to catch.</p>
+          </div>
+        </article>
+        <article class="recipe-card">
+          <div class="num">03</div>
+          <div>
+            <span class="tag">Technique</span>
+            <h3 style="margin-top:10px;"><a href="#">Brown butter that does not break, every time.</a></h3>
+            <p class="meta">Active 12 min · Total 12 min · Makes 180 ml</p>
+            <p>A short recipe with a long explanation. We talk about the foam, the sound, the moment the smell turns from biscuit to hazelnut, and what to do when it goes past.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE TEASER -->
+  <section>
+    <div class="wrap">
+      <div class="live-teaser">
+        <div class="live-photo">
+          <img src="photo-landscape-1.jpg" alt="A baker at 4am, dusting flour from a wooden peel">
+        </div>
+        <div>
+          <span class="live-indicator">Live now · Lyon, 04.12 local</span>
+          <h2>Thirty-six hours at <em>Saint-Jean,</em> a bakery that hasn't closed since 1962.</h2>
+          <p style="color:var(--ink-dim); max-width:52ch;">Iola is in the back room with Patrice, the third-generation baker, and a levain that lives in a wooden trough older than any of us. Updates from the oven, the till, and the queue that starts forming at six.</p>
+          <ul class="live-feed">
+            <li><span class="t">04.12</span><span class="e"><strong>Scoring the boules.</strong> Patrice does it in two cuts, never four. The shape of the ear, he says, is a question of confidence.</span></li>
+            <li><span class="t">03.40</span><span class="e"><strong>The levain is loud tonight.</strong> A faint hiss when the cloth is lifted — a good sign, apparently.</span></li>
+            <li><span class="t">02.55</span><span class="e"><strong>First load in.</strong> 240°C falling to 220°C. Twenty-eight loaves, thirty-eight minutes.</span></li>
+          </ul>
+          <p style="margin-top:18px;"><a href="live-blog.html">Follow the full live blog →</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PULL QUOTE -->
+  <section class="pull">
+    <div class="wrap-narrow">
+      <blockquote>You don't learn to bake bread. You learn to read it. After that, the recipe is mostly a suggestion about timing.</blockquote>
+      <p class="attr"><strong>Patrice Vialat</strong>, baker, Boulangerie Saint-Jean — <em>from the cover essay, Issue Nº 07.</em></p>
+    </div>
+  </section>
+
+  <!-- MOST READ + NEWSLETTER PROMO -->
+  <section class="section-strip">
+    <div class="wrap">
+      <div class="read-grid">
+        <div>
+          <div class="section-title">
+            <h2>The most-read this week</h2>
+            <a class="more" href="#">The archive →</a>
+          </div>
+          <ol class="read-list">
+            <li>
+              <span class="count">1</span>
+              <div>
+                <h4><a href="#">The seven mistakes I made learning to braise, in order.</a></h4>
+                <p class="byline"><strong>Theo Aaltonen</strong> <span class="dot">·</span> <em>Technique</em></p>
+              </div>
+            </li>
+            <li>
+              <span class="count">2</span>
+              <div>
+                <h4><a href="#">A pound of butter and what it can do for a Tuesday.</a></h4>
+                <p class="byline"><strong>Marit Halvorsen</strong> <span class="dot">·</span> <em>Pantry</em></p>
+              </div>
+            </li>
+            <li>
+              <span class="count">3</span>
+              <div>
+                <h4><a href="#">Adrienne Cho's kitchen is the quietest one I've cooked in.</a></h4>
+                <p class="byline"><strong>Iola Renner</strong> <span class="dot">·</span> <em>Profiles</em></p>
+              </div>
+            </li>
+            <li>
+              <span class="count">4</span>
+              <div>
+                <h4><a href="#">On knives: the three you need, the four you don't.</a></h4>
+                <p class="byline"><strong>The editors</strong> <span class="dot">·</span> <em>Pantry</em></p>
+              </div>
+            </li>
+            <li>
+              <span class="count">5</span>
+              <div>
+                <h4><a href="#">Salt cod, and why the recipe in your book is probably wrong.</a></h4>
+                <p class="byline"><strong>Sebastián Ortiz</strong> <span class="dot">·</span> <em>Recipes</em></p>
+              </div>
+            </li>
+          </ol>
+        </div>
+        <aside>
+          <div class="section-title" style="border-bottom-color: var(--amber);">
+            <h2 style="color: var(--amber-bright);">From the editor</h2>
+          </div>
+          <p style="font-family: var(--display); font-style: italic; font-size: 1.15rem; line-height:1.4; color: var(--ink); margin-bottom: 14px;">A note from Iola, on what we're trying to do with Nº 07 and why bread keeps pulling us back.</p>
+          <p style="color: var(--ink-dim); font-size: .95rem;">When we started Sandfork, we said we'd publish only the things we'd want to read on a Sunday evening with the dishes still to do. Issue Nº 07 is the closest we've come.</p>
+          <p style="color: var(--ink-dim); font-size: .95rem;">It is also, fair warning, the longest. Forty-eight more pages than last spring, a foldout map of a Lyon arrondissement, and a recipe index at the back that I am quietly proud of.</p>
+          <p><a href="#">Read the editor's letter →</a></p>
+        </aside>
+      </div>
+
+      <div class="promo">
+        <div>
+          <span class="kicker">The weekly letter</span>
+          <h3>One recipe, one technique, one thing worth reading. Friday afternoons.</h3>
+          <p>Written by the editors, free to read, sent only when we have something to say. About 4,200 cooks read it last week.</p>
+        </div>
+        <form onsubmit="event.preventDefault();">
+          <input type="email" placeholder="your@kitchen.com" aria-label="Email address">
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRINT BAND -->
+  <section class="print-band">
+    <div class="wrap">
+      <div class="print-band-inner">
+        <div class="cover">
+          <img src="photo-product-2.jpg" alt="Cover of Sandfork issue Nº 07 — a single dark loaf, photographed from above">
+        </div>
+        <div>
+          <span class="kicker">Issue Nº 07 · Autumn · 184 pages</span>
+          <h2>The bread issue is at the printers.</h2>
+          <p>Eight months of reporting on flour, on water, on the people who turn one into the other. Plus: a thirty-page recipe book bound into the centre, on uncoated stock you can write on without it bleeding through.</p>
+          <div class="contents">
+            <span><em>p.06</em> The loaf that taught me to be patient — Iola Renner</span>
+            <span><em>p.34</em> A field guide to flour, with photographs</span>
+            <span><em>p.58</em> Thirty-six hours at Saint-Jean — reporting from Lyon</span>
+            <span><em>p.82</em> The recipe book — twelve breads, in order of difficulty</span>
+            <span><em>p.124</em> Adrienne Cho, at home, between the lunch and dinner service</span>
+            <span><em>p.146</em> Letters, corrections, and the great salt cod debate</span>
+            <span><em>p.168</em> Pantry — quince, brown butter, anchovy</span>
+            <span><em>p.180</em> Colophon, contributors, and a foldout map</span>
+          </div>
+          <a class="cta" href="#">Subscribe to the print journal →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">Sandfork</a>
+        <p>A cooking journal, published on paper twice a year and online when there is something to say. Notes from the cooking class — recipes, technique, and the people who make food.</p>
+      </div>
+      <div>
+        <h5>Read</h5>
+        <ul>
+          <li><a href="section.html">Recipes</a></li>
+          <li><a href="section.html">Technique</a></li>
+          <li><a href="section.html">Profiles</a></li>
+          <li><a href="video.html">Video</a></li>
+          <li><a href="live-blog.html">Live blog</a></li>
+          <li><a href="topic.html">Topics A–Z</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>The Journal</h5>
+        <ul>
+          <li><a href="#">Issue Nº 07 — Autumn</a></li>
+          <li><a href="#">The archive</a></li>
+          <li><a href="#">Print subscription · £36</a></li>
+          <li><a href="#">Gift a year</a></li>
+          <li><a href="#">Stockists</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>About</h5>
+        <ul>
+          <li><a href="#">Who we are</a></li>
+          <li><a href="#">Masthead</a></li>
+          <li><a href="#">Contributors</a></li>
+          <li><a href="#">Pitch us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Follow</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Substack</a></li>
+          <li><a href="#">RSS · all stories</a></li>
+          <li><a href="#">Weekly letter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="colophon">© 2024 Sandfork Press Ltd. Set in Fraunces &amp; Source Serif. Printed in Norwich on Munken Pure 100gsm.</div>
+      <div><a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; <a href="#">Ethics &amp; corrections</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

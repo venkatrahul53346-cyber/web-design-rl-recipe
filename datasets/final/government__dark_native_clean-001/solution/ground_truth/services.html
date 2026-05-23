@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services — National Archive</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  img, svg { max-width: 100%; height: auto; }
+  .services-hero-grid { display:grid; grid-template-columns: 1.4fr 1fr; gap:0; border:1px solid var(--border); border-left:0; border-right:0; }
+  .services-hero-grid > div { padding: 56px 40px; min-width: 0; }
+  .services-hero-grid > div:first-child { border-right:1px solid var(--border); }
+  .dot-panel { background-image: radial-gradient(var(--border-strong) 1px, transparent 1px); background-size: 14px 14px; }
+  .layout-split { display:grid; grid-template-columns: 280px minmax(0, 1fr); gap:0; }
+  .sidenav { border-right:1px solid var(--border); padding:40px 32px 40px 0; position:sticky; top:120px; align-self:start; min-width:0; }
+  .sidenav h4 { margin-bottom: 14px; font-size: 11px; }
+  .sidenav ul { list-style:none; padding:0; margin:0 0 28px; }
+  .sidenav li { border-bottom:1px solid var(--border); }
+  .sidenav li a { display:block; padding:10px 0 10px 12px; font-size:13.5px; text-decoration:none; color:var(--text-muted); border-left:2px solid transparent; }
+  .sidenav li a:hover { color:var(--text); }
+  .sidenav li a.current { color:var(--text); border-left-color:var(--accent); }
+  .content-col { padding: 40px 0 40px 48px; min-width: 0; }
+  .task-grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:0; border:1px solid var(--border); margin: 0 0 40px; }
+  .task-card { padding: 24px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--surface); text-decoration:none; color:var(--text); display:block; min-width:0; }
+  .task-card:hover { background: var(--surface-2); }
+  .task-card .ico { width:28px; height:28px; border:1px solid var(--border-strong); display:grid; place-items:center; margin-bottom:14px; color:var(--accent); }
+  .task-card h3 { font-size: 15px; margin-bottom:6px; }
+  .task-card p { font-size: 13px; color: var(--text-muted); margin:0; line-height:1.5; }
+  .task-card .meta { font-family:var(--mono); font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.1em; margin-top:14px; display:block; }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border:1px solid var(--border); }
+  .data-table { width:100%; border-collapse:collapse; font-size:13.5px; min-width: 720px; }
+  .data-table th { text-align:left; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--text-muted); font-weight:500; padding:12px 16px; border-bottom:1px solid var(--border); background: var(--bg-elevated); white-space: nowrap; }
+  .data-table td { padding:14px 16px; border-bottom:1px solid var(--border); vertical-align: top; }
+  .data-table tr:last-child td { border-bottom:0; }
+  .data-table .mono { font-family: var(--mono); font-size: 12.5px; color: var(--text-muted); }
+  .chip { display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; padding: 3px 8px; border:1px solid var(--border-strong); color:var(--text-muted); white-space: nowrap; }
+  .chip .dot { width:6px; height:6px; border-radius:50%; }
+  .chip.ok .dot { background: var(--ok); } .chip.ok { color: var(--text); }
+  .chip.warn .dot { background: var(--warn); }
+  .chip.closed .dot { background: var(--accent); }
+  .notice { border:1px solid var(--border); border-left:3px solid var(--accent); padding: 18px 22px; background: var(--bg-elevated); margin: 0 0 32px; }
+  .notice h3 { font-size: 14px; margin-bottom:4px; }
+  .notice p { font-size: 13.5px; color: var(--text-muted); margin:0; }
+  .notice .eyebrow { display:block; margin-bottom:8px; }
+  .stat-row { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); border:1px solid var(--border); }
+  .stat { padding: 24px; border-right:1px solid var(--border); min-width:0; }
+  .stat:last-child { border-right:0; }
+  .stat .num { font-size: 1.85rem; font-weight:700; letter-spacing:-0.02em; }
+  .stat .num-unit { font-family:var(--mono); font-size:12px; color:var(--text-muted); margin-left:6px; }
+  .stat .lbl { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--text-muted); margin-top:6px; }
+  .svc-detail { border-top:1px solid var(--border); padding: 32px 0; display:grid; grid-template-columns: 200px minmax(0,1fr) 200px; gap: 32px; }
+  .svc-detail .lead { font-size: 18px; line-height:1.45; color:var(--text); margin-bottom:14px; letter-spacing:-0.005em; }
+  .svc-detail .meta-col { font-family:var(--mono); font-size: 11.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.1em; min-width:0; }
+  .svc-detail .meta-col div { padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .svc-detail .meta-col div span { display:block; color: var(--text); font-family: var(--sans); text-transform:none; letter-spacing:0; font-size: 13px; margin-top:2px; word-wrap: break-word; }
+  .svc-detail h2 { margin-bottom: 10px; font-size: 1.5rem; }
+  .svc-detail .actions { margin-top: 16px; display:flex; gap: 10px; flex-wrap: wrap; }
+  .ribbon-num { font-family:var(--mono); font-size: 11px; color: var(--accent); letter-spacing:.14em; text-transform:uppercase; display:block; margin-bottom:12px; }
+  .help-grid { display:grid; grid-template-columns: 1fr 1fr; gap:0; border:1px solid var(--border); }
+  .help-grid > div { padding: 40px; min-width:0; }
+  .help-grid > div:first-child { border-right:1px solid var(--border); }
+
+  @media (max-width: 900px) {
+    .services-hero-grid { grid-template-columns: minmax(0,1fr); }
+    .services-hero-grid > div { padding: 36px 24px; }
+    .services-hero-grid > div:first-child { border-right:0; border-bottom:1px solid var(--border); }
+    .layout-split { grid-template-columns: minmax(0,1fr); }
+    .sidenav { position:static; padding: 24px 0; border-right:0; border-bottom:1px solid var(--border); }
+    .content-col { padding: 32px 0; }
+    .task-grid { grid-template-columns: minmax(0,1fr); }
+    .stat-row { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .stat { border-bottom:1px solid var(--border); }
+    .stat:nth-child(2) { border-right:0; }
+    .svc-detail { grid-template-columns: minmax(0,1fr); gap: 18px; padding: 28px 0; }
+    .help-grid { grid-template-columns: minmax(0,1fr); }
+    .help-grid > div { padding: 28px 24px; }
+    .help-grid > div:first-child { border-right:0; border-bottom:1px solid var(--border); }
+  }
+  @media (max-width: 560px) {
+    .stat-row { grid-template-columns: minmax(0,1fr); }
+    .stat { border-right:0; }
+    .section-header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+<div class="gov-ribbon">
+  <div class="container">
+    <span class="ribbon-flag">An official site of the National Government</span>
+    <span class="ribbon-sep">·</span>
+    <a href="#">How you know</a>
+    <span style="margin-left:auto;display:inline-flex;gap:14px;align-items:center;">
+      <a href="#" aria-label="Accessibility settings">Accessibility</a>
+      <span class="ribbon-sep">·</span>
+      <a href="#">EN</a> <span class="ribbon-sep">/</span> <a href="#">FR</a> <span class="ribbon-sep">/</span> <a href="#">ES</a>
+    </span>
+  </div>
+</div>
+<header class="site-header" role="banner">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">National Archive</span>
+        <span class="brand-sub">Records · Datasets · Heritage</span>
+      </span>
+    </a>
+    <form class="header-search" role="search" aria-label="Search the archive">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" placeholder="Search 14.2 million records, files, and datasets…" aria-label="Search records">
+      <kbd>⌘ K</kbd>
+    </form>
+    <div class="header-utils">
+      <a class="util-btn" href="forms.html">Request</a>
+      <a class="util-btn" href="#">Sign in</a>
+    </div>
+  </div>
+  <nav class="primary-nav" aria-label="Primary">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html" aria-current="page" class="active">Services</a></li>
+      <li><a href="departments.html">Departments</a></li>
+      <li><a href="forms.html">Forms &amp; Requests</a></li>
+      <li><a href="news.html">News &amp; Notices</a></li>
+      <li><a href="about.html">About the Archive</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <span aria-current="page">Services</span>
+  </div>
+</nav>
+
+<main id="main">
+
+  <section class="section-hero">
+    <div class="container">
+      <span class="eyebrow">SVC · INDEX · 2025.11</span>
+      <h1 style="margin: 14px 0 18px; max-width: 920px;">Public services of the National Archive</h1>
+      <p style="max-width:740px; font-size:17px; color:var(--text-muted); margin:0;">Eleven services are available to the public. Catalogue search and the open datasets portal require no account. Records requests, reading-room access, and reproduction orders require a free researcher account and, in some cases, identity verification.</p>
+    </div>
+  </section>
+
+  <section class="section-sm" style="padding-top:0; padding-bottom:0; border-bottom:0;">
+    <div class="services-hero-grid">
+      <div>
+        <span class="eyebrow">START HERE</span>
+        <h2 style="margin: 12px 0 14px;">Not sure where to begin?</h2>
+        <p style="color:var(--text-muted); max-width: 520px;">If you are looking for a specific document, a family member, a court file, or government data — the catalogue is the single search across all eleven holdings. About 62% of public requests are answered without staff assistance.</p>
+        <div style="display:flex; gap:10px; margin-top: 22px; flex-wrap:wrap;">
+          <a class="btn btn-primary" href="#catalogue">Search the catalogue</a>
+          <a class="btn" href="#guide">Use the research guide</a>
+        </div>
+      </div>
+      <div class="dot-panel" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <span class="eyebrow" style="color:var(--text-muted);">HOLDINGS · LIVE</span>
+        <div style="font-family:var(--mono); font-size:13px; line-height:1.9; color:var(--text-muted); margin-top:auto;">
+          14,231,488 catalogued records<br>
+          3,802,114 digitised pages online<br>
+          428 open datasets · OGL v3.0<br>
+          Last index sync: 18 Nov 2025, 04:12 UTC
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">§ 01 — POPULAR TASKS</span>
+          <h2 style="margin-top:6px;">What people came here to do</h2>
+        </div>
+        <span class="mono" style="font-family:var(--mono); font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.12em;">Ranked · last 30 days</span>
+      </div>
+
+      <div class="task-grid">
+        <a class="task-card" href="#">
+          <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+          <h3>Search the public catalogue</h3>
+          <p>Search descriptions of 14.2M records across 11 holdings. No account required.</p>
+          <span class="meta">No account · Free</span>
+        </a>
+        <a class="task-card" href="forms.html">
+          <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H6v18h12V7zM14 3v4h4"/></svg></span>
+          <h3>Request a record (FOI)</h3>
+          <p>Lodge a freedom-of-information request for non-public records held by federal agencies.</p>
+          <span class="meta">Account · 20 days SLA</span>
+        </a>
+        <a class="task-card" href="forms.html">
+          <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></span>
+          <h3>Book a reading-room seat</h3>
+          <p>Reserve a desk at the Capitol or Northgate reading rooms. Bookings open 14 days ahead.</p>
+          <span class="meta">Tue–Sat · 09:00–17:00</span>
+        </a>
+        <a class="task-card" href="#">
+          <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h6"/></svg></span>
+          <h3>Download an open dataset</h3>
+          <p>428 datasets in CSV, JSON, and Parquet — census, electoral rolls, parliamentary debates.</p>
+          <span class="meta">OGL v3.0 · API available</span>
+        </a>
+        <a class="task-card" href="forms.html">
+          <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h10v18H7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+          <h3>Order a reproduction</h3>
+          <p>High-resolution scans, certified copies, or microfilm prints delivered by post or download.</p>
+          <span class="meta">From 4.50 per item</span>
+        </a>
+        <a class="task-card" href="#">
+          <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6"/><path d="m17 5 5 5M22 5l-5 5"/></svg></span>
+          <h3>Trace an ancestor</h3>
+          <p>Step-by-step guidance for using civil registers, naturalisation files, and ship manifests.</p>
+          <span class="meta">Free · 40-min walkthrough</span>
+        </a>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <div><span class="num">18,442</span><span class="num-unit">requests</span></div>
+          <div class="lbl">Lodged in Q3 2025</div>
+        </div>
+        <div class="stat">
+          <div><span class="num">94.1</span><span class="num-unit">%</span></div>
+          <div class="lbl">Answered within 20 days</div>
+        </div>
+        <div class="stat">
+          <div><span class="num">11.2</span><span class="num-unit">days avg.</span></div>
+          <div class="lbl">Median response time</div>
+        </div>
+        <div class="stat">
+          <div><span class="num">4.50</span><span class="num-unit">€ / scan</span></div>
+          <div class="lbl">Standard reproduction</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-lg">
+    <div class="container">
+      <div class="layout-split">
+        <aside class="sidenav" aria-label="Service categories">
+          <h4>On this page</h4>
+          <ul>
+            <li><a href="#catalogue" class="current">Catalogue &amp; search</a></li>
+            <li><a href="#requests">Records requests</a></li>
+            <li><a href="#reading">Reading rooms</a></li>
+            <li><a href="#reproduction">Reproductions</a></li>
+            <li><a href="#datasets">Open datasets</a></li>
+            <li><a href="#transfer">Records transfer</a></li>
+            <li><a href="#guide">Research guidance</a></li>
+          </ul>
+          <h4>Service status</h4>
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px; align-items:flex-start;">
+            <span class="chip ok"><span class="dot"></span>Catalogue · operational</span>
+            <span class="chip ok"><span class="dot"></span>Datasets API · operational</span>
+            <span class="chip warn"><span class="dot"></span>Reproductions · delayed 3–5 d</span>
+            <span class="chip closed"><span class="dot"></span>Northgate · closed 24 Dec</span>
+          </div>
+        </aside>
+
+        <div class="content-col">
+
+          <div class="notice">
+            <span class="eyebrow">NOTICE · 14 NOV 2025</span>
+            <h3>Identity-verified login required for FOI requests from 1 January 2026</h3>
+            <p>To reduce abusive filings, all new freedom-of-information requests will require a verified researcher account. Existing requests will continue under the previous rules. <a href="news.html">Read the full notice →</a></p>
+          </div>
+
+          <article id="catalogue" class="svc-detail" style="border-top:0; padding-top:0;">
+            <div class="meta-col">
+              <div>Service code<span>SVC-01</span></div>
+              <div>Account<span>Not required</span></div>
+              <div>Cost<span>Free</span></div>
+              <div>Channel<span>Online</span></div>
+            </div>
+            <div>
+              <span class="ribbon-num">01 — DISCOVERY</span>
+              <h2>Catalogue &amp; search</h2>
+              <p class="lead">Search descriptions of every record we hold, from cabinet papers of 1937 to last quarter's census tables. Roughly 27% of catalogue entries link to a digitised file you can read in the browser.</p>
+              <p style="color:var(--text-muted);">The catalogue uses full-text search across descriptions, dates, departments, and persons named. You can narrow by holding (e.g. <em>Cabinet Papers</em>, <em>Colonial Office</em>, <em>Vital Statistics</em>), by access status (<em>open</em>, <em>partly closed</em>, <em>under review</em>), and by format. Saved searches require a free account.</p>
+              <div class="actions">
+                <a class="btn btn-primary" href="#">Open the catalogue</a>
+                <a class="btn" href="#">Advanced search syntax</a>
+              </div>
+            </div>
+            <div class="meta-col">
+              <div>Last updated<span>18 Nov 2025</span></div>
+              <div>Coverage<span>1789 – present</span></div>
+              <div>Languages<span>EN · FR · ES</span></div>
+            </div>
+          </article>
+
+          <article id="requests" class="svc-detail">
+            <div class="meta-col">
+              <div>Service code<span>SVC-02</span></div>
+              <div>Account<span>Required · verified</span></div>
+              <div>Cost<span>Free</span></div>
+              <div>SLA<span>20 working days</span></div>
+            </div>
+            <div>
+              <span class="ribbon-num">02 — DISCLOSURE</span>
+              <h2>Records requests (Freedom of Information)</h2>
+              <p class="lead">Request access to records that are not yet open to the public, including departmental correspondence, internal reviews, and case files still inside the 30-year rule.</p>
+              <p style="color:var(--text-muted);">The Archive accepts requests on behalf of all federal bodies under section 14 of the Records Act. Requests are routed to the holding department; the Archive acts as the front door and tracks compliance. You will be notified within five working days whether your request has been accepted, transferred, or refused, and a substantive response is due within twenty working days.</p>
+              <div class="actions">
+                <a class="btn btn-primary" href="forms.html">Start an FOI request</a>
+                <a class="btn" href="#">Disclosure log</a>
+                <a class="btn btn-ghost" href="#">Fee schedule</a>
+              </div>
+            </div>
+            <div class="meta-col">
+              <div>Fees<span>None &lt; 250 pages</span></div>
+              <div>Appeals<span>Information Commissioner</span></div>
+              <div>Statute<span>Records Act §14</span></div>
+            </div>
+          </article>
+
+          <article id="reading" class="svc-detail">
+            <div class="meta-col">
+              <div>Service code<span>SVC-03</span></div>
+              <div>Account<span>Required</span></div>
+              <div>Cost<span>Free</span></div>
+              <div>Locations<span>Capitol · Northgate</span></div>
+            </div>
+            <div>
+              <span class="ribbon-num">03 — ON-SITE</span>
+              <h2>Reading room access</h2>
+              <p class="lead">Original records and fragile materials that cannot be digitised may be consulted in person at one of two reading rooms. Booking is required and seats are released fourteen days in advance.</p>
+              <p style="color:var(--text-muted);">When you book a seat, list the catalogue references you intend to consult. Staff will retrieve the items from secure storage; large or sensitive items may take up to two working days. Pencils, laptops, and phone cameras are permitted; pens, ink, and bags are not. The Capitol room seats 84 readers and is open Tuesday–Saturday; Northgate seats 42 and is open by appointment for restricted holdings.</p>
+              <div class="actions">
+                <a class="btn btn-primary" href="forms.html">Reserve a seat</a>
+                <a class="btn" href="#">Reading-room rules</a>
+              </div>
+            </div>
+            <div class="meta-col">
+              <div>Hours<span>Tue–Sat 09:00–17:00</span></div>
+              <div>Holds<span>Up to 10 items / day</span></div>
+              <div>ID<span>Photo ID required</span></div>
+            </div>
+          </article>
+
+          <article id="reproduction" class="svc-detail">
+            <div class="meta-col">
+              <div>Service code<span>SVC-04</span></div>
+              <div>Account<span>Required</span></div>
+              <div>Cost<span>From 4.50 €</span></div>
+              <div>Turnaround<span>10–14 working days</span></div>
+            </div>
+            <div>
+              <span class="ribbon-num">04 — COPIES</span>
+              <h2>Reproductions &amp; certified copies</h2>
+              <p class="lead">Order high-resolution scans, certified paper copies, or microfilm prints of items in our holdings. Certified copies bear the Archivist's seal and are admissible in court.</p>
+              <p style="color:var(--text-muted);">Standard scans (600 dpi, TIFF + JPEG) are 4.50 € per page. Bound volumes and items larger than A2 are quoted individually. For commercial reproduction in print or broadcast, a separate publication licence applies; consult the licensing office before placing an order.</p>
+              <div class="actions">
+                <a class="btn btn-primary" href="forms.html">Place a reproduction order</a>
+                <a class="btn" href="#">Publication licensing</a>
+              </div>
+            </div>
+            <div class="meta-col">
+              <div>Formats<span>TIFF · JPEG · PDF/A</span></div>
+              <div>Delivery<span>Download · post</span></div>
+              <div>Status<span style="color:var(--warn);">Delayed 3–5 days</span></div>
+            </div>
+          </article>
+
+          <article id="datasets" class="svc-detail">
+            <div class="meta-col">
+              <div>Service code<span>SVC-05</span></div>
+              <div>Account<span>Not required</span></div>
+              <div>Cost<span>Free</span></div>
+              <div>Licence<span>OGL v3.0</span></div>
+            </div>
+            <div>
+              <span class="ribbon-num">05 — OPEN DATA</span>
+              <h2>Open datasets &amp; API</h2>
+              <p class="lead">428 structured datasets — from the 1881 census to monthly parliamentary voting records — are published under the Open Government Licence and consumable via REST and bulk download.</p>
+              <p style="color:var(--text-muted);">The API is rate-limited to 1,000 requests per hour for anonymous use and 20,000 per hour with a free key. All endpoints return JSON; bulk dumps are also available as CSV, Parquet, and SQLite. Schemas are versioned and breaking changes are announced ninety days in advance through the changelog.</p>
+              <div class="actions">
+                <a class="btn btn-primary" href="#">Browse the catalogue</a>
+                <a class="btn" href="#">API documentation</a>
+                <a class="btn btn-ghost" href="#">Changelog</a>
+              </div>
+            </div>
+            <div class="meta-col">
+              <div>Endpoints<span>v3 · stable</span></div>
+              <div>Rate limit<span>20k req / hour</span></div>
+              <div>Uptime (90d)<span>99.97%</span></div>
+            </div>
+          </article>
+
+          <article id="transfer" class="svc-detail">
+            <div class="meta-col">
+              <div>Service code<span>SVC-06</span></div>
+              <div>Account<span>Agency only</span></div>
+              <div>Cost<span>Internal</span></div>
+              <div>Audience<span>Government bodies</span></div>
+            </div>
+            <div>
+              <span class="ribbon-num">06 — TRANSFER</span>
+              <h2>Transfer of records from agencies</h2>
+              <p class="lead">Federal departments and statutory bodies transfer records of permanent value to the Archive on a rolling schedule. This service is not for members of the public.</p>
+              <p style="color:var(--text-muted);">Records keepers should consult their disposal authority before initiating a transfer. The Archive accepts paper, microform, and digital records that meet our preservation specifications (PDF/A-2, TIFF, FFV1/MKV for audiovisual). A transfer manifest must accompany every shipment, and physical transfers are scheduled fortnightly.</p>
+              <div class="actions">
+                <a class="btn" href="forms.html">Open a transfer ticket</a>
+                <a class="btn" href="#">Specifications (PDF)</a>
+              </div>
+            </div>
+            <div class="meta-col">
+              <div>Contact<span style="word-break:break-all;">transfers@archive.gov</span></div>
+              <div>Schedule<span>Fortnightly</span></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">§ 02 — FEES &amp; SLAS</span>
+          <h2 style="margin-top:6px;">Cost, turnaround, and access rules at a glance</h2>
+        </div>
+        <a href="#" class="mono" style="font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.12em;">Download full schedule (PDF)</a>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:80px;">Code</th>
+              <th>Service</th>
+              <th style="width:140px;">Cost</th>
+              <th style="width:160px;">Turnaround</th>
+              <th style="width:140px;">Account</th>
+              <th style="width:140px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">SVC-01</td>
+              <td>Catalogue search</td>
+              <td>Free</td>
+              <td class="mono">Instant</td>
+              <td>Not required</td>
+              <td><span class="chip ok"><span class="dot"></span>Open</span></td>
+            </tr>
+            <tr>
+              <td class="mono">SVC-02</td>
+              <td>FOI records request</td>
+              <td>Free up to 250 pp.</td>
+              <td class="mono">20 working days</td>
+              <td>Verified</td>
+              <td><span class="chip ok"><span class="dot"></span>Open</span></td>
+            </tr>
+            <tr>
+              <td class="mono">SVC-03</td>
+              <td>Reading-room booking</td>
+              <td>Free</td>
+              <td class="mono">14 days ahead</td>
+              <td>Required</td>
+              <td><span class="chip ok"><span class="dot"></span>Open</span></td>
+            </tr>
+            <tr>
+              <td class="mono">SVC-04</td>
+              <td>Reproduction order</td>
+              <td>From 4.50 €</td>
+              <td class="mono">10–14 working days</td>
+              <td>Required</td>
+              <td><span class="chip warn"><span class="dot"></span>Delayed</span></td>
+            </tr>
+            <tr>
+              <td class="mono">SVC-05</td>
+              <td>Open datasets &amp; API</td>
+              <td>Free</td>
+              <td class="mono">Instant</td>
+              <td>Optional (key)</td>
+              <td><span class="chip ok"><span class="dot"></span>Open</span></td>
+            </tr>
+            <tr>
+              <td class="mono">SVC-06</td>
+              <td>Agency records transfer</td>
+              <td>Internal</td>
+              <td class="mono">Fortnightly</td>
+              <td>Agency only</td>
+              <td><span class="chip ok"><span class="dot"></span>Open</span></td>
+            </tr>
+            <tr>
+              <td class="mono">SVC-07</td>
+              <td>Northgate restricted room</td>
+              <td>Free</td>
+              <td class="mono">By appointment</td>
+              <td>Verified</td>
+              <td><span class="chip closed"><span class="dot"></span>Closed 24 Dec</span></td>
+            </tr>
+            <tr>
+              <td class="mono">SVC-08</td>
+              <td>Publication licensing</td>
+              <td>Quoted</td>
+              <td class="mono">7 working days</td>
+              <td>Required</td>
+              <td><span class="chip ok"><span class="dot"></span>Open</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="guide" class="section-sm" style="padding: 56px 0 88px;">
+    <div class="container">
+      <div class="help-grid">
+        <div>
+          <span class="eyebrow">NEED HELP CHOOSING?</span>
+          <h2 style="margin: 14px 0 12px; font-size: 1.5rem;">Speak to a research advisor</h2>
+          <p style="color:var(--text-muted); max-width: 460px;">Advisors answer questions about the catalogue, suggest finding aids, and help you frame an FOI request so that it is not refused on technicalities. The service is free and runs Tuesday to Friday.</p>
+          <div style="margin-top: 22px; display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn btn-primary" href="contact.html">Book a 30-min consultation</a>
+            <a class="btn" href="#">Email an advisor</a>
+          </div>
+        </div>
+        <div>
+          <span class="eyebrow" style="color:var(--text-muted);">CONTACT · MONO</span>
+          <div style="font-family:var(--mono); font-size: 13.5px; line-height: 2.1; margin-top: 16px; color: var(--text-muted); word-break: break-word;">
+            advisors@archive.gov<br>
+            +00 1 800 ARCHIVE · ext. 2<br>
+            Tue–Fri · 10:00 – 16:00 local<br>
+            Median wait: 4 min 12 s
+          </div>
+          <p style="font-size:12.5px; color:var(--text-dim); margin-top:18px; max-width:380px;">For accessibility accommodations including signed video relay and large-print materials, see <a href="#">accessibility services</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">National Archive</span>
+            <span class="brand-sub">Est. 1934</span>
+          </span>
+        </a>
+        <p>The custodian of the nation's permanent public record. Open to researchers, journalists, and the public — in person and online.</p>
+        <p class="mono" style="font-size:12px;color:var(--text-dim);margin-top:14px;">Reading rooms · Tue–Sat 09:00–17:00</p>
+      </div>
+      <div class="footer-col">
+        <h5>Research</h5>
+        <ul>
+          <li><a href="services.html">Catalogue search</a></li>
+          <li><a href="#">Digitised collections</a></li>
+          <li><a href="#">Open datasets</a></li>
+          <li><a href="#">Finding aids</a></li>
+          <li><a href="#">Citation guidance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Requests</h5>
+        <ul>
+          <li><a href="forms.html">Records request (FOI)</a></li>
+          <li><a href="forms.html">Reading room booking</a></li>
+          <li><a href="forms.html">Reproduction order</a></li>
+          <li><a href="forms.html">Restricted access</a></li>
+          <li><a href="forms.html">Transfer of records</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="about.html">Mission &amp; mandate</a></li>
+          <li><a href="departments.html">Departments</a></li>
+          <li><a href="#">Leadership</a></li>
+          <li><a href="news.html">News &amp; notices</a></li>
+          <li><a href="#">Annual reports</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Help</h5>
+        <ul>
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a href="#">Accessibility</a></li>
+          <li><a href="#">Languages</a></li>
+          <li><a href="#">Sitemap</a></li>
+          <li><a href="#">Status &amp; outages</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 1934–2025 National Archive. Open content licensed under the Open Government Licence v3.0 unless otherwise noted.</span>
+      <span class="legal">
+        <a href="#">Privacy notice</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Cookies</a>
+        <a href="#">FOI disclosures</a>
+      </span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,31 +1,51 @@
-"""In-container grader for the web-design RL task — v3 (5 signals).
+"""In-container grader for the web-design RL task — v4 (6 signals).
 
 Runs inside the Harbor verifier (default: shared with the agent's container).
 Reads the agent's HTML/CSS from /app/, screenshots them with playwright in
 the same chromium that screenshots the ground truth (so visual SSIM is
-apples-to-apples). All five signals are computed from the **rendered page**,
-never from the raw HTML source.
+apples-to-apples). Five signals are computed from the **rendered page**;
+TreeBLEU is computed from the raw HTML.
 
-The five signals (weights):
+The six signals (weights):
 
-  Layout         (0.30) — for each "structurally significant" tag (nav,
+  Layout         (0.25) — for each "structurally significant" tag (nav,
                           h1, form, …), greedy-match agent bboxes to GT
                           bboxes, average IoU, weighted by tag importance.
                           Catches "right elements, wrong arrangement."
-  Visual         (0.25) — SSIM on grayscale-resized 640×400 screenshots.
+  Visual         (0.20) — SSIM on grayscale-resized 640×400 screenshots.
                           Catches pixel-level placement, font, rendering.
-  Component      (0.20) — weighted multiset Jaccard over visible tag
-                          names. Same idea as v2's "structure" but tags
-                          are weighted by importance (nav=1.5, div=0.5).
-                          Catches "missing the navbar."
+  Component      (0.05) — weighted multiset Jaccard over visible tag
+                          names (nav=1.5, div=0.5). Substantially
+                          downweighted in v4 from v3's 0.20: Spearman
+                          correlation analysis on the v3.4 90-trial set
+                          showed component is 0.82-correlated with the
+                          new tree_bleu and has the lowest within-set
+                          std (0.049) of any signal. Kept at 0.05 for
+                          diagnostic value (catches "agent omitted the
+                          <nav> entirely") rather than 0.00.
   Text           (0.15) — weighted F1 over `innerText` tokens, where each
                           token is weighted by the importance of its
                           parent tag (h1=3.0, button=2.0, p=1.0). Catches
                           "wrong headline" without being dominated by
                           filler-word matches.
-  Style          (0.10) — cosine similarity of HSV color histograms over
-                          the two screenshots. Catches "right structure,
-                          wrong palette."
+  Style          (0.10) — rank-aligned CIEDE2000 in CIE Lab on the top-5
+                          dominant pixel colors of each screenshot, weighted
+                          by min(GT_weight, agent_weight). Replaces v3's
+                          HSV-cosine which had a bimodal-binning artifact
+                          on near-monochrome (dark/light) regimes — see
+                          GRADER.md §7. Field name kept "style" for
+                          back-compat with reward.json consumers; the
+                          semantic is "color-palette match."
+  TreeBLEU       (0.25) — recall of 1-height DOM subtrees (parent_tag,
+                          sorted_tuple_of_child_tags) between agent HTML
+                          and GT HTML. Catches "agent built a thin DOM"
+                          even when the rendered output looks plausible.
+                          Inspired by WebCode2M (Gui et al., WWW 2025).
+                          Highest weight among new signals because it is
+                          the only signal that produces meaningful spread
+                          on tasks where v3.4 had collapsed to ~0.05
+                          variance across 10 agents (ecom_pastel,
+                          pricing_dark, restaurant_photo).
 
 Combined: weighted sum, [0, 1]. Oracle (byte-identical reproduction) → 1.0.
 Empty/garbage agent → 0.0.
@@ -47,6 +67,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 import numpy as np
+from bs4 import BeautifulSoup
 from PIL import Image
 from playwright.sync_api import sync_playwright
 from skimage.metrics import structural_similarity as ssim
@@ -72,11 +93,15 @@ VIEWPORT_WEIGHTS: Dict[str, float] = {
 }
 
 WEIGHTS = {
-    "layout":    0.30,
-    "visual":    0.25,
-    "component": 0.20,
-    "text":      0.15,
-    "style":     0.10,
+    "layout":    0.25,   # was 0.30 in v3.4
+    "visual":    0.20,   # was 0.25 in v3.4
+    "component": 0.05,   # was 0.20 — Spearman 0.82 with tree_bleu on the v3.4 90-trial set;
+                         #   lowest within-set std (0.049). Kept at 0.05 for diagnostics
+                         #   (catches "agent omitted entire <nav>") rather than 0.00.
+    "text":      0.15,   # unchanged — does real discriminative work (std 0.17, ρ=0.71 with baseline)
+    "style":     0.10,   # weight unchanged; v3.4's HSV-cosine swapped for rank-aligned CIEDE2000
+    "tree_bleu": 0.25,   # new — only signal that breaks ties on low-spread tasks
+                         #   (ecom_pastel std 0.06 vs baseline 0.01 = 5.2× more spread).
 }
 
 # Importance weights used by component-recall and layout. Hand-authored from
@@ -144,6 +169,7 @@ class RenderedPage:
     png: Path
     visible_items: List[Dict]          # [{tag, x, y, w, h}, ...]
     text_segments: List[Dict]          # [{tag, text}, ...]
+    html: str = ""                     # raw source HTML (for TreeBLEU)
 
 
 # JS run in-page after load. Returns:
@@ -236,6 +262,7 @@ def _render_pages(html_dir: Path, screenshot_out_dir: Path,
                     png=out_png,
                     visible_items=visibility.get("items", []),
                     text_segments=visibility.get("text_segments", []),
+                    html=html.read_text(errors="replace"),
                 )
         finally:
             browser.close()
@@ -646,36 +673,158 @@ def _text_score(gt_segments: List[Dict], agent_segments: List[Dict]) -> float:
 # ---------------------------------------------------------------------------
 
 
-def _color_histogram(path: Path, h_bins: int = 8, s_bins: int = 4,
-                     v_bins: int = 4) -> np.ndarray:
-    img = Image.open(path).convert("HSV").resize((128, 128))
-    arr = np.asarray(img, dtype=np.int32)
-    h_bin = (arr[:, :, 0] * h_bins // 256).clip(0, h_bins - 1)
-    s_bin = (arr[:, :, 1] * s_bins // 256).clip(0, s_bins - 1)
-    v_bin = (arr[:, :, 2] * v_bins // 256).clip(0, v_bins - 1)
-    idx = (h_bin * (s_bins * v_bins) + s_bin * v_bins + v_bin).ravel()
-    hist = np.bincount(idx, minlength=h_bins * s_bins * v_bins).astype(float)
-    if hist.sum() > 0:
-        hist /= hist.sum()
-    return hist
+# Style — CIEDE2000 perceptual color distance in CIE Lab space.
+# v3 used HSV-histogram cosine, which had a known failure mode: on
+# near-monochrome (dark/light) regimes, hue is numerically meaningless but
+# the histogram bin still depends on it, so two visually-identical dark
+# pages with bg #000000 vs #0c0c0e would land in different hue bins and
+# score cosine ≈ 0. We confirmed this on splash_3d (7/9 false negatives)
+# and dashboard_dense (8/10 false negatives). v4 swaps to CIEDE2000 in
+# CIE Lab — perceptually uniform, no binning artifact.
+
+def _srgb_to_lab(rgb_u8: np.ndarray) -> np.ndarray:
+    """Convert (N, 3) sRGB-uint8 → (N, 3) CIE Lab. Pure numpy, D65 white."""
+    rgb = rgb_u8.astype(np.float64) / 255.0
+    mask = rgb > 0.04045
+    lin = np.where(mask, ((rgb + 0.055) / 1.055) ** 2.4, rgb / 12.92)
+    M = np.array([
+        [0.4124564, 0.3575761, 0.1804375],
+        [0.2126729, 0.7151522, 0.0721750],
+        [0.0193339, 0.1191920, 0.9503041],
+    ])
+    xyz = lin @ M.T / np.array([0.95047, 1.00000, 1.08883])
+    eps = (6.0 / 29.0) ** 3
+    kappa = (29.0 / 6.0) ** 2 / 3.0
+    f = np.where(xyz > eps, np.cbrt(xyz), kappa * xyz + 4.0 / 29.0)
+    L = 116.0 * f[:, 1] - 16.0
+    a = 500.0 * (f[:, 0] - f[:, 1])
+    b = 200.0 * (f[:, 1] - f[:, 2])
+    return np.stack([L, a, b], axis=1)
+
+
+def _ciede2000(lab1: np.ndarray, lab2: np.ndarray) -> np.ndarray:
+    """Element-wise CIEDE2000 between two (N, 3) CIE Lab arrays."""
+    L1, a1, b1 = lab1[:, 0], lab1[:, 1], lab1[:, 2]
+    L2, a2, b2 = lab2[:, 0], lab2[:, 1], lab2[:, 2]
+    C1 = np.sqrt(a1 * a1 + b1 * b1)
+    C2 = np.sqrt(a2 * a2 + b2 * b2)
+    Cbar = (C1 + C2) / 2.0
+    G = 0.5 * (1 - np.sqrt(Cbar ** 7 / (Cbar ** 7 + 25.0 ** 7 + 1e-12)))
+    a1p, a2p = (1 + G) * a1, (1 + G) * a2
+    C1p = np.sqrt(a1p * a1p + b1 * b1)
+    C2p = np.sqrt(a2p * a2p + b2 * b2)
+    h1p = np.degrees(np.arctan2(b1, a1p)) % 360
+    h2p = np.degrees(np.arctan2(b2, a2p)) % 360
+    dLp = L2 - L1
+    dCp = C2p - C1p
+    dhp = h2p - h1p
+    dhp = np.where(dhp > 180, dhp - 360, dhp)
+    dhp = np.where(dhp < -180, dhp + 360, dhp)
+    dHp = 2 * np.sqrt(C1p * C2p) * np.sin(np.radians(dhp / 2.0))
+    Lbarp = (L1 + L2) / 2.0
+    Cbarp = (C1p + C2p) / 2.0
+    hbarp = np.where(np.abs(h1p - h2p) > 180, (h1p + h2p + 360) / 2.0, (h1p + h2p) / 2.0)
+    T = (1 - 0.17 * np.cos(np.radians(hbarp - 30))
+         + 0.24 * np.cos(np.radians(2 * hbarp))
+         + 0.32 * np.cos(np.radians(3 * hbarp + 6))
+         - 0.20 * np.cos(np.radians(4 * hbarp - 63)))
+    dtheta = 30 * np.exp(-(((hbarp - 275) / 25.0) ** 2))
+    Rc = 2 * np.sqrt(Cbarp ** 7 / (Cbarp ** 7 + 25.0 ** 7 + 1e-12))
+    Sl = 1 + (0.015 * (Lbarp - 50) ** 2) / np.sqrt(20 + (Lbarp - 50) ** 2)
+    Sc = 1 + 0.045 * Cbarp
+    Sh = 1 + 0.015 * Cbarp * T
+    Rt = -np.sin(np.radians(2 * dtheta)) * Rc
+    return np.sqrt(
+        (dLp / Sl) ** 2 + (dCp / Sc) ** 2 + (dHp / Sh) ** 2
+        + Rt * (dCp / Sc) * (dHp / Sh)
+    )
+
+
+def _dominant_palette(path: Path, k: int = 5) -> Tuple[np.ndarray, np.ndarray]:
+    """Top-k dominant sRGB colors of a screenshot, with pixel weights.
+    Returns (colors[k,3] uint8, weights[k] float summing to ≤1)."""
+    img = Image.open(path).convert("RGB").resize((128, 128))
+    arr = np.asarray(img, dtype=np.uint8).reshape(-1, 3)
+    q = (arr >> 3).astype(np.int32)         # quantize 5 bits/channel
+    keys = q[:, 0] * 1024 + q[:, 1] * 32 + q[:, 2]
+    counts = Counter(keys.tolist())
+    total = sum(counts.values())
+    cols, ws = [], []
+    for key, cnt in counts.most_common(k):
+        r = (key // 1024) << 3
+        g = ((key // 32) % 32) << 3
+        b = (key % 32) << 3
+        cols.append([r, g, b])
+        ws.append(cnt / total)
+    return np.array(cols, dtype=np.uint8), np.array(ws, dtype=np.float64)
 
 
 def _style_score(gt_png: Path, agent_png: Path) -> float:
-    """HSV color-histogram cosine, with the same content-coverage gate as
-    visual. Two blank pages share ~100% of pixels in the white bin and
-    would otherwise score 1.0 — which doesn't reflect "the agent matched
-    the brand palette." The gate ties the style signal to actually
-    rendering content.
-    """
-    g = _color_histogram(gt_png)
-    a = _color_histogram(agent_png)
-    gn = float(np.linalg.norm(g))
-    an = float(np.linalg.norm(a))
-    if gn == 0 or an == 0:
+    """Rank-aligned palette comparison in CIE Lab via CIEDE2000.
+
+    Pair top-1 GT color with top-1 agent color (both being the dominant
+    pixel color of their image), top-2 with top-2, etc. Average ΔE
+    weighted by min(GT_weight, agent_weight) at each rank, then map to
+    similarity in [0, 1] via 1 - mean_ΔE / 50. Multiplied by the same
+    coverage gate that visual uses (so a blank agent doesn't farm style
+    points by sharing whitespace with the GT).
+
+    The rank-alignment matters: Hungarian-matching the palettes
+    destroys the dominance-ordering signal — a white-bg agent vs a
+    black-bg GT would otherwise pair white→white via the agent's #2
+    color, hiding the failure. Rank alignment forces top-vs-top."""
+    gt_p, gt_w = _dominant_palette(gt_png, k=5)
+    ag_p, ag_w = _dominant_palette(agent_png, k=5)
+    n = min(len(gt_p), len(ag_p))
+    if n == 0:
         return 0.0
-    cos = float(np.dot(g, a) / (gn * an))
-    raw = max(0.0, min(1.0, cos))
+    de = _ciede2000(_srgb_to_lab(gt_p[:n]), _srgb_to_lab(ag_p[:n]))
+    weights = np.minimum(gt_w[:n], ag_w[:n])
+    if weights.sum() == 0:
+        return 0.0
+    mean_de = float(np.average(de, weights=weights))
+    raw = max(0.0, 1.0 - mean_de / 50.0)
     return float(raw * _coverage_gate(gt_png, agent_png))
+
+
+# ---------------------------------------------------------------------------
+# Signal 6 (v4): TreeBLEU — recall of 1-height DOM subtrees.
+# ---------------------------------------------------------------------------
+
+_TREE_SKIP_TAGS = frozenset({"script", "style", "meta", "link", "br", "hr",
+                              "head", "html", "noscript"})
+
+
+def _one_height_subtrees(html: str) -> Counter:
+    """Multiset of (parent_tag, sorted_tuple_of_child_tags) over all
+    elements in the document. Skips meta/script/style/etc. so the score
+    reflects content structure, not boilerplate."""
+    if not html:
+        return Counter()
+    soup = BeautifulSoup(html, "html.parser")
+    out: Counter = Counter()
+    for el in soup.find_all():
+        if el.name in _TREE_SKIP_TAGS:
+            continue
+        children = [c.name for c in el.find_all(recursive=False)
+                    if c.name and c.name not in _TREE_SKIP_TAGS]
+        if not children:
+            continue
+        out[(el.name, tuple(sorted(children)))] += 1
+    return out
+
+
+def _tree_bleu(gt_html: str, agent_html: str) -> float:
+    """Recall of 1-height subtrees: |GT ∩ agent| / |GT|. WebCode2M (Gui
+    et al., WWW 2025) reports precision over the agent; we use recall to
+    penalize agents that build skeletal DOMs. Returns 0 if agent is empty;
+    1 if GT is empty (degenerate task)."""
+    g = _one_height_subtrees(gt_html)
+    if not g:
+        return 1.0 if not agent_html else 0.0
+    a = _one_height_subtrees(agent_html)
+    inter = sum(min(g[k], a[k]) for k in g)
+    return inter / sum(g.values())
 
 
 # ---------------------------------------------------------------------------
@@ -685,12 +834,13 @@ def _style_score(gt_png: Path, agent_png: Path) -> float:
 
 @dataclass
 class ViewportPageScore:
-    """5 sub-signals + a combined score for one page at one viewport."""
+    """6 sub-signals + a combined score for one page at one viewport."""
     layout: float
     visual: float
     component: float
     text: float
     style: float
+    tree_bleu: float
     combined: float
 
 
@@ -707,6 +857,7 @@ class PageScore:
     component: float
     text: float
     style: float
+    tree_bleu: float
     combined: float
     per_viewport: Dict[str, ViewportPageScore] = field(default_factory=dict)
 
@@ -737,6 +888,7 @@ class GradeReport:
             payload[f"{p.name}_component"] = float(p.component)
             payload[f"{p.name}_text"]      = float(p.text)
             payload[f"{p.name}_style"]     = float(p.style)
+            payload[f"{p.name}_tree_bleu"] = float(p.tree_bleu)
             # Per-viewport breakdowns
             for vp_name, vp_score in p.per_viewport.items():
                 payload[f"{p.name}_{vp_name}_layout"]    = float(vp_score.layout)
@@ -744,6 +896,7 @@ class GradeReport:
                 payload[f"{p.name}_{vp_name}_component"] = float(vp_score.component)
                 payload[f"{p.name}_{vp_name}_text"]      = float(vp_score.text)
                 payload[f"{p.name}_{vp_name}_style"]     = float(vp_score.style)
+                payload[f"{p.name}_{vp_name}_tree_bleu"] = float(vp_score.tree_bleu)
                 payload[f"{p.name}_{vp_name}_combined"]  = float(vp_score.combined)
         return payload
 
@@ -791,16 +944,18 @@ def _score_one_viewport(
     )
     text      = _text_score(gt_page.text_segments, agent_page.text_segments)
     style     = _style_score(gt_page.png, agent_page.png)
+    tree_bleu = _tree_bleu(gt_page.html, agent_page.html)
     combined = (
         WEIGHTS["layout"]    * layout
         + WEIGHTS["visual"]    * visual
         + WEIGHTS["component"] * component
         + WEIGHTS["text"]      * text
         + WEIGHTS["style"]     * style
+        + WEIGHTS["tree_bleu"] * tree_bleu
     )
     return ViewportPageScore(
         layout=layout, visual=visual, component=component,
-        text=text, style=style, combined=combined,
+        text=text, style=style, tree_bleu=tree_bleu, combined=combined,
     )
 
 
@@ -853,12 +1008,13 @@ def grade() -> GradeReport:
         # (which is what existing tooling expects to read from reward.json)
         desktop = per_vp.get(canonical_vp)
         if desktop is None:
-            desktop = ViewportPageScore(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+            desktop = ViewportPageScore(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         per_page.append(PageScore(
             name=name,
             layout=desktop.layout, visual=desktop.visual,
             component=desktop.component, text=desktop.text,
-            style=desktop.style, combined=page_combined,
+            style=desktop.style, tree_bleu=desktop.tree_bleu,
+            combined=page_combined,
             per_viewport=per_vp,
         ))
 

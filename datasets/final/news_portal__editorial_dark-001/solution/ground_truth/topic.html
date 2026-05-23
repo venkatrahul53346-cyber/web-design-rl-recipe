@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pantry — Salt, Anchovies, Vinegar &amp; the Things We Keep · Sandfork</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Topic page — local rules only */
+  .topic-mast { padding: 56px 0 44px; border-bottom: 2px solid var(--ink); position: relative; }
+  .topic-mast .crumbs { font-family: var(--body); font-size: .82rem; color: var(--ink-mute); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 18px; }
+  .topic-mast .crumbs a { color: var(--ink-dim); }
+  .topic-mast h1 { font-size: clamp(2.4rem, 7vw, 6rem); font-weight: 800; letter-spacing: -0.035em; margin: 0; }
+  .topic-mast h1 em { font-weight: 600; color: var(--amber-bright); }
+  .topic-mast .topic-desc { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 1.25rem; line-height: 1.45; color: var(--ink-dim); max-width: 56ch; margin-top: 22px; }
+  .topic-mast .topic-stats { display: flex; flex-wrap: wrap; gap: 24px 36px; margin-top: 28px; font-family: var(--body); font-size: .82rem; color: var(--ink-mute); letter-spacing: .05em; text-transform: uppercase; }
+  .topic-mast .topic-stats strong { display: block; font-family: var(--display); font-weight: 700; font-style: normal; color: var(--amber-bright); font-size: 1.6rem; letter-spacing: -0.01em; text-transform: none; margin-bottom: 2px; }
+
+  .pantry-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px 36px; padding: 64px 0 32px; border-bottom: 1px solid var(--bg-rule); }
+  .pantry-grid .lede h2 { font-size: clamp(1.7rem, 3.4vw, 2.8rem); line-height: 1.05; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 14px; }
+  .pantry-grid .lede h2 a { color: var(--ink); }
+  .pantry-grid .lede h2 a:hover { color: var(--amber-bright); text-decoration: none; }
+  .pantry-grid .lede .ill { aspect-ratio: 5/4; margin-bottom: 20px; background: linear-gradient(135deg, #2a1d12 0%, #3d2818 40%, #1a1208 100%); position: relative; overflow: hidden; }
+  .pantry-grid .lede .ill::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 60%, rgba(208,152,112,0.35), transparent 45%), radial-gradient(circle at 70% 35%, rgba(176,124,90,0.25), transparent 50%); }
+  .pantry-grid .lede .ill::after { content: 'Anchovies, opened on marble'; position: absolute; left: 18px; bottom: 14px; font-family: var(--display); font-style: italic; color: var(--ink-dim); font-size: .82rem; letter-spacing: .04em; }
+  .pantry-grid .lede p { font-family: var(--display); font-style: italic; font-size: 1.1rem; color: var(--ink-dim); line-height: 1.5; }
+  .pantry-grid .col-rule { padding-left: 28px; }
+  @media (max-width: 1000px) { .pantry-grid { grid-template-columns: 1fr; gap: 36px; } .pantry-grid .col-rule { border-left: 0; padding-left: 0; border-top: 1px solid var(--bg-rule); padding-top: 28px; } }
+
+  .sub-nav { display: flex; flex-wrap: wrap; gap: 10px 8px; padding: 32px 0; border-bottom: 1px solid var(--bg-rule); }
+  .sub-nav a { font-family: var(--body); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-dim); border: 1px solid var(--bg-rule); padding: 7px 14px; }
+  .sub-nav a:hover { color: var(--amber-bright); border-color: var(--amber); text-decoration: none; }
+  .sub-nav a.on { color: var(--bg); background: var(--amber); border-color: var(--amber); }
+
+  .index-block { padding: 56px 0; border-bottom: 1px solid var(--bg-rule); display: grid; grid-template-columns: 240px 1fr; gap: 48px; }
+  .index-block .index-label { font-family: var(--display); font-style: italic; font-weight: 500; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: var(--amber-bright); }
+  .index-block .index-label strong { display: block; font-family: var(--display); font-style: normal; font-weight: 800; font-size: 2.2rem; color: var(--ink); letter-spacing: -0.02em; text-transform: none; margin-top: 4px; }
+  .index-list { columns: 2; column-gap: 56px; column-rule: 1px solid var(--bg-rule); }
+  .index-list .row { break-inside: avoid; padding: 14px 0; border-bottom: 1px solid var(--bg-rule); display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .index-list .row a { font-family: var(--display); font-weight: 600; font-size: 1.05rem; color: var(--ink); letter-spacing: -0.01em; }
+  .index-list .row a:hover { color: var(--amber-bright); text-decoration: none; }
+  .index-list .row .meta { font-family: var(--body); font-style: italic; font-size: .78rem; color: var(--ink-mute); flex-shrink: 0; }
+  @media (max-width: 800px) { .index-block { grid-template-columns: 1fr; gap: 24px; } .index-list { columns: 1; } }
+
+  .recipe-strip { padding: 56px 0; border-bottom: 1px solid var(--bg-rule); }
+  .recipe-strip .section-h { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; margin-bottom: 32px; border-bottom: 2px solid var(--ink); padding-bottom: 16px; }
+  .recipe-strip .section-h h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0; font-style: italic; font-weight: 700; }
+  .recipe-strip .section-h .see-all { font-family: var(--body); font-style: italic; font-size: .9rem; color: var(--amber-bright); }
+
+  .three-up { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  @media (max-width: 900px) { .three-up { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .three-up { grid-template-columns: 1fr; } }
+
+  .recipe-box { background: var(--bg-elev); border-left: 3px solid var(--amber); padding: 28px 26px 24px; }
+  .recipe-box .kicker { margin-top: 0; }
+  .recipe-box h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; line-height: 1.15; }
+  .recipe-box h3 a { color: var(--ink); }
+  .recipe-box h3 a:hover { color: var(--amber-bright); text-decoration: none; }
+  .recipe-box .specs { display: flex; flex-wrap: wrap; gap: 14px 22px; font-family: var(--body); font-size: .76rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--bg-rule); }
+  .recipe-box .specs strong { color: var(--amber-bright); font-weight: 600; }
+
+  .longread-row { padding: 64px 0; display: grid; grid-template-columns: 1.6fr 1fr; gap: 48px; align-items: start; border-bottom: 1px solid var(--bg-rule); }
+  .longread-row .feature .ill { aspect-ratio: 16/10; margin-bottom: 22px; background: linear-gradient(180deg, #1a1208 0%, #2d2014 35%, #4a3422 70%, #1a1208 100%); position: relative; overflow: hidden; }
+  .longread-row .feature .ill::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(244,237,224,0.04) 0 1px, transparent 1px 18px), radial-gradient(ellipse at 40% 60%, rgba(224,163,106,0.18), transparent 60%); }
+  .longread-row .feature .ill::after { content: 'Salt pans · Guérande, dusk'; position: absolute; bottom: 14px; left: 18px; font-family: var(--display); font-style: italic; color: var(--ink-dim); font-size: .82rem; }
+  .longread-row .feature h2 { font-size: clamp(1.6rem, 3vw, 2.6rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.04; margin-bottom: 14px; }
+  .longread-row .feature h2 a { color: var(--ink); }
+  .longread-row .feature h2 a:hover { color: var(--amber-bright); text-decoration: none; }
+  .longread-row .feature .dek { font-family: var(--display); font-style: italic; font-size: 1.12rem; color: var(--ink-dim); line-height: 1.45; max-width: 50ch; }
+  .most-read { padding-left: 32px; border-left: 1px solid var(--bg-rule); }
+  .most-read .mr-head { font-family: var(--display); font-style: italic; font-weight: 600; color: var(--amber-bright); font-size: .9rem; letter-spacing: .06em; text-transform: uppercase; padding-bottom: 14px; border-bottom: 2px solid var(--ink); margin-bottom: 8px; }
+  .most-read ol { list-style: none; counter-reset: mr; padding: 0; margin: 0; }
+  .most-read li { counter-increment: mr; display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding: 18px 0; border-bottom: 1px solid var(--bg-rule); align-items: start; }
+  .most-read li::before { content: counter(mr, decimal-leading-zero); font-family: var(--display); font-weight: 800; font-style: italic; font-size: 2.2rem; color: var(--amber); line-height: 1; letter-spacing: -0.04em; }
+  .most-read li a { font-family: var(--display); font-weight: 600; color: var(--ink); line-height: 1.2; font-size: 1rem; letter-spacing: -0.01em; }
+  .most-read li a:hover { color: var(--amber-bright); text-decoration: none; }
+  .most-read li .meta { display: block; font-family: var(--body); font-style: italic; color: var(--ink-mute); font-size: .78rem; margin-top: 4px; }
+  @media (max-width: 900px) { .longread-row { grid-template-columns: 1fr; gap: 32px; } .most-read { padding-left: 0; border-left: 0; } }
+
+  .glossary { padding: 64px 0; border-bottom: 1px solid var(--bg-rule); }
+  .glossary h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-style: italic; font-weight: 700; margin-bottom: 6px; }
+  .glossary .sub { font-family: var(--display); font-style: italic; color: var(--ink-dim); margin-bottom: 32px; }
+  .gl-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--bg-rule); }
+  .gl-grid dl { margin: 0; padding: 24px 28px 24px 0; border-bottom: 1px solid var(--bg-rule); border-right: 1px solid var(--bg-rule); min-width: 0; }
+  .gl-grid dl:nth-child(3n) { border-right: 0; padding-right: 0; }
+  .gl-grid dl:nth-child(3n+1) { padding-left: 0; }
+  .gl-grid dl:not(:nth-child(3n+1)) { padding-left: 28px; }
+  .gl-grid dt { font-family: var(--display); font-weight: 700; font-size: 1.1rem; color: var(--ink); letter-spacing: -0.01em; }
+  .gl-grid dt .pron { font-style: italic; font-weight: 400; color: var(--amber-bright); font-size: .82rem; margin-left: 8px; display: inline-block; }
+  .gl-grid dd { margin: 6px 0 0; font-size: .94rem; color: var(--ink-dim); line-height: 1.5; }
+  @media (max-width: 900px) { .gl-grid { grid-template-columns: 1fr 1fr; } .gl-grid dl, .gl-grid dl:nth-child(3n), .gl-grid dl:nth-child(3n+1), .gl-grid dl:not(:nth-child(3n+1)) { padding: 20px 16px 20px 0; border-right: 1px solid var(--bg-rule); } .gl-grid dl:nth-child(2n) { border-right: 0; padding-right: 0; } .gl-grid dl:nth-child(2n+1) { padding-left: 0; } .gl-grid dl:nth-child(2n) { padding-left: 16px; } }
+  @media (max-width: 600px) { .gl-grid { grid-template-columns: 1fr; } .gl-grid dl, .gl-grid dl:nth-child(2n), .gl-grid dl:nth-child(2n+1) { padding: 18px 0 !important; border-right: 0 !important; } }
+
+  .contrib { padding: 56px 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; border-bottom: 1px solid var(--bg-rule); }
+  .contrib .c-head { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 14px; margin-bottom: 12px; }
+  .contrib .c-head h2 { font-size: clamp(1.4rem, 3vw, 1.8rem); font-style: italic; margin: 0; }
+  .contrib .person { display: grid; grid-template-columns: 72px 1fr; gap: 16px; align-items: start; min-width: 0; }
+  .contrib .person .av { width: 72px; height: 72px; background: linear-gradient(135deg, #3a2a1c, #1a1208); position: relative; flex-shrink: 0; overflow: hidden; }
+  .contrib .person .av::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 38%, rgba(208,152,112,0.45) 0%, rgba(208,152,112,0.25) 30%, transparent 55%); }
+  .contrib .person .av::after { content: attr(data-initials); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-style: italic; font-size: 1.4rem; color: var(--amber-bright); letter-spacing: -0.02em; }
+  .contrib .person h4 { font-size: 1.05rem; margin-bottom: 4px; }
+  .contrib .person .role { font-family: var(--display); font-style: italic; font-size: .82rem; color: var(--amber-bright); margin-bottom: 8px; }
+  .contrib .person p { font-size: .88rem; color: var(--ink-dim); margin: 0; }
+  @media (max-width: 900px) { .contrib { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .contrib { grid-template-columns: 1fr; } }
+
+  .promo { padding: 64px 0 72px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .promo .left { border: 1px solid var(--amber); padding: 32px; }
+  .promo .left .kicker { margin-top: 0; }
+  .promo .left h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-style: italic; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .promo .left p { color: var(--ink-dim); margin-bottom: 24px; }
+  .promo form { display: flex; flex-wrap: wrap; gap: 0; }
+  .promo input { flex: 1 1 200px; min-width: 0; background: transparent; border: 1px solid var(--bg-rule); color: var(--ink); font-family: var(--body); font-size: 1rem; padding: 14px 16px; }
+  .promo input::placeholder { color: var(--ink-mute); font-style: italic; }
+  .promo button { background: var(--honey); color: var(--bg); border: 0; font-family: var(--display); font-weight: 700; font-style: italic; font-size: 1rem; padding: 14px 24px; cursor: pointer; letter-spacing: -0.01em; }
+  .promo button:hover { background: var(--amber-bright); }
+  .promo .right h3 { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 1rem; color: var(--amber-bright); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 14px; }
+  .promo .right p { font-family: var(--display); font-style: italic; font-size: 1.3rem; line-height: 1.4; color: var(--ink); max-width: 36ch; }
+  .promo .right .src { font-family: var(--body); font-size: .85rem; color: var(--ink-mute); margin-top: 16px; }
+  @media (max-width: 900px) { .promo { grid-template-columns: 1fr; gap: 32px; } .promo .left { padding: 28px 24px; } }
+
+  /* mobile safety net */
+  @media (max-width: 600px) {
+    .wrap, .wrap-narrow, .wrap-wide { padding-left: 20px; padding-right: 20px; }
+    .index-list .row { flex-direction: column; align-items: flex-start; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="masthead">
+    <a href="index.html" class="brand">Sandfork<sup>№ 07</sup></a>
+    <div class="masthead-meta">
+      <span class="issue">Saturday, 18 November · Issue Nº 07 in print</span>
+      <span>—</span>
+      <a href="#">Sign in</a>
+      <a href="#" class="subscribe-btn">Subscribe</a>
+    </div>
+  </div>
+  <nav class="section-nav">
+    <div class="section-nav-inner">
+      <a href="index.html">Today</a>
+      <a href="section.html">Recipes</a>
+      <a href="section.html">Technique</a>
+      <a href="topic.html" class="current">Pantry</a>
+      <a href="video.html">Video</a>
+      <a href="live-blog.html">Live</a>
+      <a href="section.html">Bakery</a>
+      <a href="section.html">Profiles</a>
+      <a href="section.html">Letters</a>
+      <a href="section.html">The Print Journal</a>
+    </div>
+  </nav>
+  <div class="ticker">
+    <span class="ticker-label">In the kitchen</span>
+    <div class="ticker-items">
+      <span><a href="live-blog.html">Live: 36 hours at Saint-Jean bakery, Lyon</a></span>
+      <span>Quince paste is back — three recipes from the new issue</span>
+      <span>Why your stock tastes flat (and the 14-minute fix)</span>
+      <span>Reader letters: the great salt cod debate</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="topic-mast wrap">
+    <div class="crumbs"><a href="index.html">Sandfork</a> &nbsp;/&nbsp; Topics &nbsp;/&nbsp; <span style="color:var(--amber-bright)">Pantry</span></div>
+    <span class="kicker">A topic, ongoing</span>
+    <h1>The <em>Pantry</em>.<br>Salt, anchovies, vinegar &amp; the things we keep.</h1>
+    <p class="topic-desc">A working index of the ingredients we return to — what to buy, how to store it, what it tastes like when it has gone wrong, and the recipes that prove it has gone right. Edited by Mira Halsall since 2019.</p>
+    <div class="topic-stats">
+      <div><strong>184</strong>Pieces filed</div>
+      <div><strong>61</strong>Ingredients indexed</div>
+      <div><strong>Nov '19</strong>First entry</div>
+      <div><strong>Twice-weekly</strong>New additions</div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="sub-nav" aria-label="Pantry subsections">
+      <a href="#" class="on">All</a>
+      <a href="#">Salt &amp; ferments</a>
+      <a href="#">Tinned &amp; cured</a>
+      <a href="#">Vinegars &amp; acids</a>
+      <a href="#">Fats &amp; oils</a>
+      <a href="#">Grains &amp; pulses</a>
+      <a href="#">Spices</a>
+      <a href="#">Sugar &amp; honey</a>
+      <a href="#">Dairy</a>
+      <a href="#">Dried fruit &amp; nuts</a>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="pantry-grid">
+      <article class="lede">
+        <span class="kicker">This week in the pantry</span>
+        <div class="ill" role="img" aria-label="A row of anchovy tins opened on a marble counter"></div>
+        <h2><a href="#">A field guide to anchovies, from the cheap tin to the Cantabrian gold</a></h2>
+        <p>We ate our way through forty-two tins — Spanish, Italian, Moroccan, a Croatian outlier — to settle, once and for all, which are worth the £14 jar and which are perfectly fine on toast with butter.</p>
+        <div class="byline">By <strong>Mira Halsall</strong> <span class="dot">·</span> Photographs by Niko Andersen <span class="dot">·</span> <span class="timestamp">9 min read</span></div>
+      </article>
+
+      <article class="col-rule">
+        <span class="kicker">Companion read</span>
+        <h3><a href="#" style="font-family:var(--display);font-weight:700;font-size:1.3rem;color:var(--ink);letter-spacing:-0.015em;line-height:1.15;display:block;">Don't rinse them. Don't fillet them. And other things to stop doing to good anchovies.</a></h3>
+        <p style="color:var(--ink-dim);margin-top:14px;">Six small rules from cooks who use a kilo a week — Pino Grasso at Quattro, the team at St. John, and a Marseille fishmonger with strong opinions about oil.</p>
+        <div class="byline" style="margin-top:12px;"><strong>Pino Grasso</strong> <span class="dot">·</span> <span class="timestamp">Nov 16</span></div>
+      </article>
+
+      <article class="col-rule">
+        <span class="kicker">From the archive · 2021</span>
+        <h3><a href="#" style="font-family:var(--display);font-weight:700;font-size:1.3rem;color:var(--ink);letter-spacing:-0.015em;line-height:1.15;display:block;">The pantry interview: Rachel Roddy on what a Roman kitchen actually keeps.</a></h3>
+        <p style="color:var(--ink-dim);margin-top:14px;">Two shelves, a hook for garlic, and the immovable jar of salted capers from Pantelleria. The author of <em>Five Quarters</em> on the case for buying less and using it up.</p>
+        <div class="byline" style="margin-top:12px;"><strong>Edward Lin</strong> <span class="dot">·</span> <span class="timestamp">May 2021</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="index-block">
+      <div class="index-label">
+        Recently added
+        <strong>The Index</strong>
+      </div>
+      <div class="index-list">
+        <div class="row"><a href="#">Colatura di alici</a><span class="meta">Liquid · Italy · 3 entries</span></div>
+        <div class="row"><a href="#">Doenjang</a><span class="meta">Ferment · Korea · 5 entries</span></div>
+        <div class="row"><a href="#">Saffron, La Mancha</a><span class="meta">Spice · Spain · 4 entries</span></div>
+        <div class="row"><a href="#">Smoked paprika</a><span class="meta">Spice · 7 entries</span></div>
+        <div class="row"><a href="#">Capers, salt-packed</a><span class="meta">Cured · Pantelleria · 6 entries</span></div>
+        <div class="row"><a href="#">Bonito flakes</a><span class="meta">Dried · Japan · 4 entries</span></div>
+        <div class="row"><a href="#">Pomegranate molasses</a><span class="meta">Liquid · Levant · 5 entries</span></div>
+        <div class="row"><a href="#">Lardo di Colonnata</a><span class="meta">Cured · Tuscany · 2 entries</span></div>
+        <div class="row"><a href="#">Buckwheat, kasha-grade</a><span class="meta">Grain · 3 entries</span></div>
+        <div class="row"><a href="#">Sherry vinegar, Jerez DO</a><span class="meta">Vinegar · Spain · 6 entries</span></div>
+        <div class="row"><a href="#">Bottarga di muggine</a><span class="meta">Cured · Sardinia · 3 entries</span></div>
+        <div class="row"><a href="#">Mustard, Tewkesbury</a><span class="meta">Condiment · England · 2 entries</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap recipe-strip">
+    <div class="section-h">
+      <h2>Recipes that lean on the pantry</h2>
+      <a class="see-all" href="section.html">All 41 recipes →</a>
+    </div>
+    <div class="three-up">
+      <div class="recipe-box">
+        <span class="kicker">Twenty minutes</span>
+        <h3><a href="#">Spaghetti with anchovy, brown butter &amp; lemon</a></h3>
+        <p style="color:var(--ink-dim);font-size:.94rem;">Six fillets, a stick of butter taken to hazelnut, a long stripe of zest. The dish a kitchen tests new cooks on for a reason.</p>
+        <div class="specs"><span><strong>Serves</strong> 2</span><span><strong>Time</strong> 22 min</span><span><strong>Skill</strong> Easy</span></div>
+      </div>
+      <div class="recipe-box">
+        <span class="kicker">A weekend project</span>
+        <h3><a href="#">Bagna càuda for a long table, with raw winter vegetables</a></h3>
+        <p style="color:var(--ink-dim);font-size:.94rem;">Piedmontese, communal, slow. Two heads of garlic poached in milk, a tin of good anchovies, and a candle to keep it warm for an hour.</p>
+        <div class="specs"><span><strong>Serves</strong> 8</span><span><strong>Time</strong> 1 hr 10</span><span><strong>Skill</strong> Medium</span></div>
+      </div>
+      <div class="recipe-box">
+        <span class="kicker">Make-ahead</span>
+        <h3><a href="#">Salsa verde, the version we keep coming back to</a></h3>
+        <p style="color:var(--ink-dim);font-size:.94rem;">Parsley, capers, anchovy, mustard, two vinegars. Keeps four days in the fridge and improves on the second.</p>
+        <div class="specs"><span><strong>Yields</strong> 240ml</span><span><strong>Time</strong> 15 min</span><span><strong>Skill</strong> Easy</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="longread-row">
+      <article class="feature">
+        <span class="kicker">The long read · 4,200 words</span>
+        <div class="ill" role="img" aria-label="Salt drying in shallow pans at the edge of the sea"></div>
+        <h2><a href="#">A year on the salt pans of Guérande, where the harvest is still measured in handfuls.</a></h2>
+        <p class="dek">The paludiers of Brittany still rake their fleur de sel from clay basins exactly as their grandparents did. We spent four trips with them to understand why the salt you finish a tomato with costs forty times the salt you cook the pasta in — and whether that is, finally, the point.</p>
+        <div class="byline" style="margin-top:14px;">By <strong>Hannah Wexler</strong> <span class="dot">·</span> Photographs by <strong>Sébastien Carré</strong> <span class="dot">·</span> <span class="timestamp">Issue Nº 06 · Spring 2024</span></div>
+      </article>
+
+      <aside class="most-read">
+        <div class="mr-head">Most read in Pantry, this month</div>
+        <ol>
+          <li><div><a href="#">The only three vinegars you need (and the four you don't)</a><span class="meta">Mira Halsall · 6 min</span></div></li>
+          <li><div><a href="#">How to read a tin of tomatoes — without trusting the front of the label</a><span class="meta">Edward Lin · 8 min</span></div></li>
+          <li><div><a href="#">A defence of the cheap supermarket olive oil for cooking</a><span class="meta">Pino Grasso · 5 min</span></div></li>
+          <li><div><a href="#">Storing flour, properly: a fridge, a freezer, and never a paper bag</a><span class="meta">Aoife Brennan · 4 min</span></div></li>
+          <li><div><a href="#">What a jar of Calabrian chillies in oil will do for the rest of your week</a><span class="meta">Mira Halsall · 7 min</span></div></li>
+          <li><div><a href="#">The peppercorn taste test: eleven varieties, blind, and the surprise winner</a><span class="meta">Niko Andersen · 9 min</span></div></li>
+        </ol>
+      </aside>
+    </div>
+  </section>
+
+  <section class="wrap glossary">
+    <h2>A small glossary, for the things we keep saying</h2>
+    <p class="sub">The pantry has its own vocabulary, and we'd rather you didn't have to Google in the middle of a recipe.</p>
+    <div class="gl-grid">
+      <dl>
+        <dt>Colatura <span class="pron">co·la·TOO·ra</span></dt>
+        <dd>An amber liquid drawn off barrels of salted anchovies aged in Cetara, on the Amalfi coast. Treat it like fish sauce's quieter, more expensive cousin — a few drops on pasta with garlic and chilli.</dd>
+      </dl>
+      <dl>
+        <dt>Fleur de sel <span class="pron">flur duh SELL</span></dt>
+        <dd>The thin, flaky crust that forms on the surface of evaporating sea-water pools. Harvested by hand. For finishing only; cooking with it is a small heresy.</dd>
+      </dl>
+      <dl>
+        <dt>Bottarga <span class="pron">bo·TAR·ga</span></dt>
+        <dd>The salted, pressed and air-dried roe of grey mullet or tuna. Grate sparingly over hot pasta, raw fennel, or buttered toast. A Sardinian luxury that lasts months in the fridge.</dd>
+      </dl>
+      <dl>
+        <dt>Saba <span class="pron">SAH·ba</span></dt>
+        <dd>Unfermented grape must reduced to a thick, dark, slightly bitter syrup. The pre-Roman ancestor of balsamic vinegar. Excellent over yoghurt, walnuts, or roast pumpkin.</dd>
+      </dl>
+      <dl>
+        <dt>Garum <span class="pron">GA·rum</span></dt>
+        <dd>Fermented fish sauce of the ancient Mediterranean, currently being revived by a handful of Spanish and Danish producers. Aged 12 to 36 months. Pungent, deep, savoury.</dd>
+      </dl>
+      <dl>
+        <dt>Pekmez <span class="pron">pek·MEZZ</span></dt>
+        <dd>A Turkish reduction of fruit juice — most often grape, mulberry, or carob — to a molasses-thick syrup. Used in dressings, on bread with tahini, or stirred into yoghurt at breakfast.</dd>
+      </dl>
+      <dl>
+        <dt>Verjuice <span class="pron">VAIR·joos</span></dt>
+        <dd>The pressed juice of unripe grapes. Sharp without being acidic in the way vinegar is. Medieval cooks lived on it; modern cooks should keep a small bottle.</dd>
+      </dl>
+      <dl>
+        <dt>Doenjang <span class="pron">DEN·jang</span></dt>
+        <dd>A Korean fermented soybean paste — earthier and funkier than miso, with a long, slow finish. The base for jjigae and a dozen weeknight stews.</dd>
+      </dl>
+      <dl>
+        <dt>Lardo <span class="pron">LAR·do</span></dt>
+        <dd>Back fat from pork, cured with salt, rosemary and pepper for at least six months in marble basins. Shaved thin on hot toast it melts on contact. The Tuscan version, from Colonnata, is the standard.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="wrap contrib">
+    <div class="c-head">
+      <h2>Who writes the Pantry</h2>
+      <a class="see-all" href="#" style="font-family:var(--body);font-style:italic;font-size:.9rem;color:var(--amber-bright);">All contributors →</a>
+    </div>
+    <div class="person">
+      <div class="av" data-initials="MH" aria-hidden="true"></div>
+      <div>
+        <h4>Mira Halsall</h4>
+        <div class="role">Pantry editor · since 2019</div>
+        <p>Trained at Ballymaloe, cooked at Spring and Quo Vadis, has been opening tins for a living since lockdown.</p>
+      </div>
+    </div>
+    <div class="person">
+      <div class="av" data-initials="EL" aria-hidden="true"></div>
+      <div>
+        <h4>Edward Lin</h4>
+        <div class="role">Contributing writer</div>
+        <p>Based between Taipei and Manchester. Writes about ferments, dried goods, and the long shelves of Chinese groceries.</p>
+      </div>
+    </div>
+    <div class="person">
+      <div class="av" data-initials="PG" aria-hidden="true"></div>
+      <div>
+        <h4>Pino Grasso</h4>
+        <div class="role">Roving correspondent</div>
+        <p>Chef and ex-fishmonger from Bari. Files from Italian markets, weighs in loudly on olive oil, refuses to discuss balsamic.</p>
+      </div>
+    </div>
+    <div class="person">
+      <div class="av" data-initials="AB" aria-hidden="true"></div>
+      <div>
+        <h4>Aoife Brennan</h4>
+        <div class="role">Storage &amp; staples desk</div>
+        <p>Food scientist and home baker. Answers reader questions about freezers, weevils, and how long honey really lasts (forever-ish).</p>
+      </div>
+    </div>
+    <div class="person">
+      <div class="av" data-initials="NA" aria-hidden="true"></div>
+      <div>
+        <h4>Niko Andersen</h4>
+        <div class="role">Staff photographer</div>
+        <p>Shoots almost everything on the Pantry pages. Owns more linen tablecloths than he is willing to admit.</p>
+      </div>
+    </div>
+    <div class="person">
+      <div class="av" data-initials="HW" aria-hidden="true"></div>
+      <div>
+        <h4>Hannah Wexler</h4>
+        <div class="role">Long-form, occasional</div>
+        <p>Three pieces a year, all of them too long. Last seen on the salt pans of Guérande; next, the saffron harvest in Castilla.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap promo">
+    <div class="left">
+      <span class="kicker">A note, twice-weekly</span>
+      <h2>The Pantry, in your inbox.</h2>
+      <p>One ingredient a week, one recipe to use it, one thing we got wrong before we got it right. Tuesdays and Fridays. Free. About 600 words. No tracking pixels, no &ldquo;just checking in.&rdquo;</p>
+      <form onsubmit="event.preventDefault();">
+        <input type="email" placeholder="you@kitchen.address" aria-label="Email">
+        <button type="submit">Subscribe</button>
+      </form>
+      <p style="font-family:var(--body);font-style:italic;color:var(--ink-mute);font-size:.82rem;margin-top:16px;margin-bottom:0;">Currently read by 41,800 people. Unsubscribing is one click and we will not be cross.</p>
+    </div>
+    <div class="right">
+      <h3>The editor, on what this column is for</h3>
+      <p>&ldquo;A pantry is a slow argument with yourself about what to cook tomorrow. We are just trying to make that argument a little better-informed.&rdquo;</p>
+      <div class="src">— Mira Halsall, in the foreword to <em>Issue Nº 05</em></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">Sandfork</a>
+        <p>A cooking journal, published on paper twice a year and online when there is something to say. Notes from the cooking class — recipes, technique, and the people who make food.</p>
+      </div>
+      <div>
+        <h5>Read</h5>
+        <ul>
+          <li><a href="section.html">Recipes</a></li>
+          <li><a href="section.html">Technique</a></li>
+          <li><a href="section.html">Profiles</a></li>
+          <li><a href="video.html">Video</a></li>
+          <li><a href="live-blog.html">Live blog</a></li>
+          <li><a href="topic.html">Topics A–Z</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>The Journal</h5>
+        <ul>
+          <li><a href="#">Issue Nº 07 — Autumn</a></li>
+          <li><a href="#">The archive</a></li>
+          <li><a href="#">Print subscription · £36</a></li>
+          <li><a href="#">Gift a year</a></li>
+          <li><a href="#">Stockists</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>About</h5>
+        <ul>
+          <li><a href="#">Who we are</a></li>
+          <li><a href="#">Masthead</a></li>
+          <li><a href="#">Contributors</a></li>
+          <li><a href="#">Pitch us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Follow</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Substack</a></li>
+          <li><a href="#">RSS · all stories</a></li>
+          <li><a href="#">Weekly letter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="colophon">© 2024 Sandfork Press Ltd. Set in Fraunces &amp; Source Serif. Printed in Norwich on Munken Pure 100gsm.</div>
+      <div><a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; <a href="#">Ethics &amp; corrections</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

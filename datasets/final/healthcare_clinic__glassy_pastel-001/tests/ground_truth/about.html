@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Cardinal Medical — Mission, History &amp; Leadership</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .about-hero { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 4rem; align-items: end; }
+  .about-hero-meta { padding: 1.75rem; border-radius: var(--radius-lg); }
+  .about-hero-meta dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0.55rem 1.25rem; font-size: 0.93rem; }
+  .about-hero-meta dt { color: var(--ink-soft); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.72rem; align-self: center; }
+  .about-hero-meta dd { margin: 0; color: var(--ink); font-weight: 500; }
+  @media (max-width: 880px) { .about-hero { grid-template-columns: 1fr; gap: 2rem; } }
+
+  .mission-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 4rem; align-items: start; }
+  .mission-grid .lede { font-size: 1.32rem; line-height: 1.5; color: var(--ink); }
+  @media (max-width: 880px) { .mission-grid { grid-template-columns: 1fr; gap: 1.5rem; } }
+
+  .story { display: grid; grid-template-columns: 0.32fr 0.68fr; gap: 3rem; }
+  .story-years { position: sticky; top: 120px; }
+  .story-years .year { font-size: 3.2rem; font-weight: 500; letter-spacing: -0.04em; color: var(--accent-deep); line-height: 1; }
+  .story-years .year + .year { margin-top: 1.25rem; opacity: 0.45; font-size: 1.6rem; }
+  .story-body p { font-size: 1.02rem; line-height: 1.65; color: var(--ink-muted); }
+  .story-body p:first-of-type::first-letter { font-size: 3.2rem; font-weight: 500; float: left; line-height: 0.9; padding: 0.3rem 0.55rem 0 0; color: var(--accent-deep); letter-spacing: -0.04em; }
+  @media (max-width: 880px) { .story { grid-template-columns: 1fr; gap: 1.5rem; } .story-years { position: static; display: flex; gap: 1rem; align-items: baseline; } }
+
+  .stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-radius: var(--radius-lg); overflow: hidden; }
+  .stat-strip .stat { padding: 1.75rem 1.5rem; border-right: 1px solid var(--glass-border-soft); }
+  .stat-strip .stat:last-child { border-right: 0; }
+  .stat-num { font-size: 2.2rem; font-weight: 500; letter-spacing: -0.035em; color: var(--ink); line-height: 1; }
+  .stat-num small { font-size: 1rem; color: var(--ink-soft); font-weight: 400; margin-left: 0.2rem; }
+  .stat-label { font-size: 0.85rem; color: var(--ink-muted); margin-top: 0.5rem; }
+  @media (max-width: 720px) { .stat-strip { grid-template-columns: repeat(2, 1fr); } .stat-strip .stat:nth-child(2) { border-right: 0; } .stat-strip .stat:nth-child(1), .stat-strip .stat:nth-child(2) { border-bottom: 1px solid var(--glass-border-soft); } }
+
+  .values-layout { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 3.5rem; align-items: start; }
+  .values-list { list-style: none; padding: 0; margin: 0; }
+  .values-list li { display: grid; grid-template-columns: auto 1fr; gap: 1.25rem; padding: 1.6rem 0; border-bottom: 1px solid var(--line); }
+  .values-list li:last-child { border-bottom: 0; }
+  .values-list .v-num { font-size: 0.78rem; font-weight: 500; color: var(--accent); letter-spacing: 0.1em; padding-top: 0.35rem; font-variant-numeric: tabular-nums; }
+  .values-list h3 { font-size: 1.15rem; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 0.3rem; }
+  .values-list p { margin: 0; font-size: 0.96rem; }
+  @media (max-width: 880px) { .values-layout { grid-template-columns: 1fr; gap: 1.5rem; } }
+
+  .team-head { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2.5rem; flex-wrap: wrap; }
+  .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+  @media (max-width: 980px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .team-grid { grid-template-columns: 1fr; } }
+  .leader-card { padding: 1.5rem; border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 0.85rem; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .leader-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+  .leader-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-soft), var(--accent-tint)); border: 1px solid var(--glass-border); overflow: hidden; }
+  .leader-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .leader-name { font-size: 1.02rem; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
+  .leader-role { font-size: 0.88rem; color: var(--ink-muted); margin-top: 0.15rem; }
+  .leader-cred { font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid var(--line); line-height: 1.45; }
+
+  .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2.5rem; }
+  .pillar { padding: 1.75rem; border-radius: var(--radius-lg); }
+  .pillar h3 { font-size: 1.05rem; font-weight: 500; margin-bottom: 0.5rem; }
+  .pillar p { font-size: 0.93rem; margin: 0; }
+  @media (max-width: 760px) { .pillars { grid-template-columns: 1fr; } }
+
+  .cta-band { padding: 2.5rem 3rem; border-radius: var(--radius-lg); display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; }
+  .cta-band h2 { font-size: 1.6rem; font-weight: 500; letter-spacing: -0.025em; }
+  .cta-band p { margin: 0.4rem 0 0; max-width: 52ch; }
+  .cta-actions { display: flex; gap: 0.6rem; }
+  @media (max-width: 760px) { .cta-band { grid-template-columns: 1fr; padding: 1.75rem; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a href="index.html" class="brand" aria-label="Cardinal Medical home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+      </span>
+      <span>Cardinal Medical<small>Academic Medical Centre</small></span>
+    </a>
+    <nav class="nav-primary" aria-label="Primary">
+      <a href="services.html">Care &amp; Services</a>
+      <a href="find-a-doctor.html">Find a Doctor</a>
+      <a href="locations.html">Locations</a>
+      <a href="about.html" class="active">About</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="patient-portal.html" class="nav-portal">Patient Portal</a>
+      <a href="appointment.html" class="btn btn-primary">Book appointment</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="section-hero">
+    <div class="wrap">
+      <div class="about-hero">
+        <div class="stack">
+          <span class="eyebrow">About Cardinal Medical</span>
+          <h1>Specialty medicine, practised with the patience of a teaching hospital.</h1>
+          <p class="lede">For sixty-one years, Cardinal Medical has cared for the people of southern Ohio the way an academic centre should — by pairing every diagnosis with the latest evidence, every patient with a named physician, and every procedure with a team that trains the next generation of clinicians.</p>
+        </div>
+        <aside class="glass about-hero-meta" aria-label="At a glance">
+          <dl>
+            <dt>Founded</dt><dd>1964, Greenfield, OH</dd>
+            <dt>Type</dt><dd>501(c)(3) teaching hospital</dd>
+            <dt>Beds</dt><dd>612 acute · 84 ICU</dd>
+            <dt>Faculty</dt><dd>418 attending physicians</dd>
+            <dt>Residents</dt><dd>206 across 14 programmes</dd>
+            <dt>Affiliation</dt><dd>Ohio Valley School of Medicine</dd>
+          </dl>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="glass-strong stat-strip">
+        <div class="stat">
+          <div class="stat-num">61<small>yrs</small></div>
+          <div class="stat-label">Caring for the region since 1964</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">187k</div>
+          <div class="stat-label">Patients seen across all clinics in 2024</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">94<small>%</small></div>
+          <div class="stat-label">Would recommend to family (HCAHPS, Q4 2024)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">312</div>
+          <div class="stat-label">Active clinical trials and research protocols</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="mission-grid">
+        <div>
+          <span class="eyebrow">Our mission</span>
+        </div>
+        <div>
+          <p class="lede">To advance the health of our region through specialty care that is rigorous, humane, and accessible — and to teach, in everything we do, the doctors and nurses who will carry that work forward.</p>
+          <p style="margin-top: 1.5rem;">We are deliberately not the largest hospital system in Ohio. We chose to remain a single-campus academic centre so that cardiology talks to oncology in the hallway, so that an orthopaedic resident can step into a neurosurgical conference, and so that a patient transferred from a community hospital meets the same attending on Tuesday morning that they met on Sunday night. Specialty medicine works better when the people doing it actually know each other.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-band" id="history">
+    <div class="wrap">
+      <div class="stack-lg" style="margin-bottom: 2.5rem;">
+        <span class="eyebrow">How we got here</span>
+        <h2 style="max-width: 22ch;">From a 40-bed cardiac ward to a regional academic centre.</h2>
+      </div>
+      <div class="story">
+        <div class="story-years">
+          <div class="year">1964</div>
+          <div class="year">1981</div>
+          <div class="year">2003</div>
+          <div class="year">2019</div>
+        </div>
+        <div class="story-body">
+          <p>Cardinal Medical opened on a wet October morning in 1964 as a forty-bed cardiac ward attached to Greenfield General. The founding physician, Dr. Eleanor Cardinal, had come home from a fellowship at the Cleveland Clinic convinced that rural Ohio deserved the same standard of cardiac care she had practised in the city. She convinced a sceptical hospital board, a more sceptical bank, and — eventually — three young cardiologists to join her. The first patient through the doors was a fifty-eight-year-old farmer named Wendell Pace, who lived another twenty-two years.</p>
+          <p>The ward became an institute. In 1981 Cardinal Medical affiliated with the Ohio Valley School of Medicine and accepted its first class of internal-medicine residents. Oncology followed in 1989, neurosciences in 1997, and a dedicated orthopaedic and spine programme in 2003. Each expansion was deliberate: we added a specialty only when we could recruit faculty who would teach as well as practise, and only when the volume of patients in our region genuinely needed it.</p>
+          <p>Today the campus on University Drive includes a 612-bed acute hospital, an outpatient pavilion, a research building shared with the medical school, and the Cardinal Family Cancer Centre, opened in 2019 with the largest single philanthropic gift in our history. Across all of it, the operating principle has not changed: meet the patient where they are, explain what you know and what you don't, and treat the disease with the best evidence available.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="values-layout">
+        <div class="stack">
+          <span class="eyebrow">What we hold ourselves to</span>
+          <h2>Six commitments that shape every clinical decision.</h2>
+          <p>These aren't slogans. They are the criteria our chiefs use to evaluate departments, the questions our ethics committee asks at every consult, and the standards we measure publicly in our quality reports.</p>
+        </div>
+        <ol class="values-list">
+          <li>
+            <span class="v-num">01</span>
+            <div>
+              <h3>Evidence before opinion</h3>
+              <p>Every treatment pathway is reviewed against current literature on a defined cadence. When the evidence changes, our protocols change — even when it's inconvenient.</p>
+            </div>
+          </li>
+          <li>
+            <span class="v-num">02</span>
+            <div>
+              <h3>Plain language, always</h3>
+              <p>If a patient or family member cannot repeat back, in their own words, what is happening and why, the conversation isn't finished.</p>
+            </div>
+          </li>
+          <li>
+            <span class="v-num">03</span>
+            <div>
+              <h3>The named physician</h3>
+              <p>Every admitted patient has a named attending who is accountable for their care from admission to discharge. Not a service. A person.</p>
+            </div>
+          </li>
+          <li>
+            <span class="v-num">04</span>
+            <div>
+              <h3>Teaching is patient care</h3>
+              <p>Residents and fellows learn at the bedside under supervision because that is how good doctors are made — and how attendings stay sharp.</p>
+            </div>
+          </li>
+          <li>
+            <span class="v-num">05</span>
+            <div>
+              <h3>Access is part of the treatment</h3>
+              <p>A referral that takes three months is, clinically, a worse referral. We publish our scheduling lead times and work to shorten them.</p>
+            </div>
+          </li>
+          <li>
+            <span class="v-num">06</span>
+            <div>
+              <h3>Quiet stewardship</h3>
+              <p>We are a non-profit. Margins return to the work — to recruiting, to research, to charity care — not to growth for its own sake.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="leadership">
+    <div class="wrap">
+      <div class="team-head">
+        <div class="stack">
+          <span class="eyebrow">Leadership</span>
+          <h2 style="max-width: 24ch;">The clinicians and administrators accountable for Cardinal Medical.</h2>
+        </div>
+        <a href="find-a-doctor.html" class="btn btn-ghost">Find a doctor by specialty</a>
+      </div>
+
+      <div class="team-grid">
+        <article class="glass leader-card">
+          <div class="leader-avatar"><img src="photo-portrait-1.jpg" alt=""></div>
+          <div>
+            <div class="leader-name">Marisol Tan, MD, MPH</div>
+            <div class="leader-role">President &amp; Chief Executive</div>
+          </div>
+          <span class="pill pill-accent pill-dot">Cardiology</span>
+          <div class="leader-cred">Internal medicine and cardiology. Joined Cardinal in 2006; CEO since 2021. Stanford, Johns Hopkins.</div>
+        </article>
+
+        <article class="glass leader-card">
+          <div class="leader-avatar"><img src="photo-portrait-1.jpg" alt=""></div>
+          <div>
+            <div class="leader-name">Daniel Okafor, MD</div>
+            <div class="leader-role">Chief Medical Officer</div>
+          </div>
+          <span class="pill pill-accent pill-dot">Neurology</span>
+          <div class="leader-cred">Vascular neurology and stroke care. Oversees clinical quality across all four specialty institutes.</div>
+        </article>
+
+        <article class="glass leader-card">
+          <div class="leader-avatar"><img src="photo-portrait-1.jpg" alt=""></div>
+          <div>
+            <div class="leader-name">Priya Raman, MD, PhD</div>
+            <div class="leader-role">Director, Cardinal Family Cancer Centre</div>
+          </div>
+          <span class="pill pill-accent pill-dot">Oncology</span>
+          <div class="leader-cred">Medical oncology, breast and thoracic. Principal investigator on 17 active trials.</div>
+        </article>
+
+        <article class="glass leader-card">
+          <div class="leader-avatar"><img src="photo-portrait-1.jpg" alt=""></div>
+          <div>
+            <div class="leader-name">James Whitfield, MD</div>
+            <div class="leader-role">Chief, Cardiac Institute</div>
+          </div>
+          <span class="pill pill-accent pill-dot">Cardiology</span>
+          <div class="leader-cred">Interventional cardiology and structural heart. Programme director, cardiology fellowship.</div>
+        </article>
+
+        <article class="glass leader-card">
+          <div class="leader-avatar"><img src="photo-portrait-1.jpg" alt=""></div>
+          <div>
+            <div class="leader-name">Hannah Berglund, MD</div>
+            <div class="leader-role">Chair, Orthopaedics &amp; Spine</div>
+          </div>
+          <span class="pill pill-accent pill-dot">Orthopaedics</span>
+          <div class="leader-cred">Adult reconstruction and complex revision. Recruited 2018 from Mayo Clinic.</div>
+        </article>
+
+        <article class="glass leader-card">
+          <div class="leader-avatar"><img src="photo-portrait-1.jpg" alt=""></div>
+          <div>
+            <div class="leader-name">Rev. Thomas Acevedo, MDiv</div>
+            <div class="leader-role">Director, Spiritual Care &amp; Ethics</div>
+          </div>
+          <span class="pill pill-dot">Patient experience</span>
+          <div class="leader-cred">Leads the ethics committee and the interfaith chaplaincy team across the campus.</div>
+        </article>
+
+        <article class="glass leader-card">
+          <div class="leader-avatar"><img src="photo-portrait-1.jpg" alt=""></div>
+          <div>
+            <div class="leader-name">Lena Kowalski, RN, DNP</div>
+            <div class="leader-role">Chief Nursing Officer</div>
+          </div>
+          <span class="pill pill-dot">Nursing</span>
+          <div class="leader-cred">Twenty-eight years in critical care nursing; leads a workforce of 1,840 RNs.</div>
+        </article>
+
+        <article class="glass leader-card">
+          <div class="leader-avatar"><img src="photo-portrait-1.jpg" alt=""></div>
+          <div>
+            <div class="leader-name">Wei-Lin Chen, PhD</div>
+            <div class="leader-role">Vice President, Research</div>
+          </div>
+          <span class="pill pill-dot">Research</span>
+          <div class="leader-cred">Translational neuroscience. Liaison to Ohio Valley School of Medicine and the NIH.</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" id="research">
+    <div class="wrap">
+      <div class="stack">
+        <span class="eyebrow">Three things we do that most regional hospitals don't</span>
+        <h2 style="max-width: 28ch;">Because we're a teaching centre, the work goes a little deeper.</h2>
+      </div>
+      <div class="pillars">
+        <div class="glass pillar" id="education">
+          <h3>Train the next physicians</h3>
+          <p>Fourteen ACGME-accredited residency and fellowship programmes, including a competitive cardiology fellowship and a combined neurology/neurosurgery track.</p>
+        </div>
+        <div class="glass pillar">
+          <h3>Run our own trials</h3>
+          <p>312 active protocols across our four institutes — from phase II oncology trials to device studies in structural heart, available to patients without leaving the region.</p>
+        </div>
+        <div class="glass pillar" id="newsroom">
+          <h3>Publish what we learn</h3>
+          <p>Quality outcomes, infection rates, and surgical volumes are reported publicly each quarter. We believe a teaching hospital should show its work.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="careers">
+    <div class="wrap">
+      <div class="glass-strong cta-band">
+        <div>
+          <h2>Considering Cardinal — as a patient, a physician, or a trainee?</h2>
+          <p>If you've been referred to one of our specialty institutes, request an appointment online. If you're a clinician interested in joining the faculty, our recruiting team would be glad to talk.</p>
+        </div>
+        <div class="cta-actions">
+          <a href="appointment.html" class="btn btn-primary">Request appointment</a>
+          <a href="#careers" class="btn btn-ghost">Careers at Cardinal</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-emergency">
+      <svg class="i i-lg" style="color: var(--warn);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      <div><strong>If this is a medical emergency, dial 911.</strong> For urgent but non-emergency concerns after hours, call our 24-hour nurse line at <a href="tel:18005550199">1-800-555-0199</a>.</div>
+    </div>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+          </span>
+          <span>Cardinal Medical</span>
+        </a>
+        <p>A regional academic medical centre advancing specialty care in cardiology, oncology, neurology, and orthopaedics — close to home, evidence-based at every step.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Care</h4>
+        <ul>
+          <li><a href="services.html">All specialties</a></li>
+          <li><a href="services.html#cardiac">Cardiac Institute</a></li>
+          <li><a href="services.html#oncology">Cancer Centre</a></li>
+          <li><a href="services.html#neurology">Neurosciences</a></li>
+          <li><a href="services.html#ortho">Orthopaedics</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Patients</h4>
+        <ul>
+          <li><a href="appointment.html">Request an appointment</a></li>
+          <li><a href="find-a-doctor.html">Find a doctor</a></li>
+          <li><a href="patient-portal.html">Patient portal</a></li>
+          <li><a href="locations.html">Locations &amp; hours</a></li>
+          <li><a href="#billing">Billing &amp; insurance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <ul>
+          <li><a href="about.html">Our mission</a></li>
+          <li><a href="about.html#research">Research &amp; trials</a></li>
+          <li><a href="about.html#education">Medical education</a></li>
+          <li><a href="about.html#careers">Careers</a></li>
+          <li><a href="about.html#newsroom">Newsroom</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:18005550140">1-800-555-0140</a></li>
+          <li><a href="mailto:hello@cardinalmedical.org">hello@cardinalmedical.org</a></li>
+          <li>2400 University Drive<br>Greenfield, OH 45123</li>
+          <li><a href="#language">Language assistance</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <small>© 2025 Cardinal Medical Centre. A 501(c)(3) non-profit teaching hospital.</small>
+      <div class="footer-legal">
+        <a href="#privacy">Privacy &amp; HIPAA</a>
+        <a href="#nondiscrimination">Non-discrimination</a>
+        <a href="#accessibility">Accessibility</a>
+        <a href="#terms">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

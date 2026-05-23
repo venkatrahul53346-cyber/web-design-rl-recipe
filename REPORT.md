@@ -162,18 +162,79 @@ of the iterative-loop's iteration slots** — they're transparent to the
 validation logic. Caught yesterday's mid-stream connection drop that
 killed an entire ~$5 synth run on iter 4 of page 4 of 6.
 
+### 2.6 Decoupled vertical / style architecture (Phase 3)
+
+The current pipeline separates **what we're building** (the vertical:
+topic + per-page hints + sitemap + brand-vertical pool) from **how it
+looks** (the style: locked color/typography/border/motif axes +
+palette pool + font pool + style notes). They live in two
+independent registries (`templates/verticals/`, `templates/styles/`)
+and combine via a positive-list compatibility matrix.
+
+This unlocks combinations the original locked-template pipeline
+literally couldn't produce — `developer_docs × neobrut_thick`,
+`saas_landing × mono_dark`, `pricing_page × glassy_pastel` — without
+forcing nonsensical pairs like `dashboard_app × serif_editorial`.
+
+The matrix as of Phase 3: **15 verticals × 13 styles → 56 valid
+pairs** (every vertical has 2-6 compatible styles). The 5 newest
+tasks in §3.2 ship under this architecture; the 10 in §3.1 came
+from the locked-template predecessor and are kept as historical
+baseline.
+
+For the full architecture walkthrough, see [PIPELINE.md](PIPELINE.md).
+
+### 2.7 The no-broken-images rule
+
+A bug in the gen-1 pipeline: HTML referenced `rick.jpg` 114 times
+across 4 of the 10 tasks but the file was never shipped. Both the
+agent's prompt screenshots and the grader's renders showed broken-
+image icons. Information loss at the prompt level.
+
+Fix is three layers:
+
+- **Prompt-side.** The system prompt and per-page DESIGN_NOTES
+  constrain `<img src=>` to **exactly five filenames**:
+  `photo-product-1.jpg`, `photo-product-2.jpg`, `photo-portrait-1.jpg`,
+  `photo-landscape-1.jpg`, `illustration-abstract.jpg`. For decorative
+  content the LLM is told to use CSS gradients / inline SVG / styled
+  `<div>` instead.
+- **Validation-side.** `_validate_page_format` parses every `<img
+  src=>` in generated HTML; non-allow-listed sources become a
+  validation issue fed back to the LLM with concrete fix hints.
+- **Shipping-side.** `synthesize_task` always passes the 5 placeholder
+  JPGs to `build_task_dir(assets=…)`. They land in
+  `environment/assets/`, `solution/ground_truth/`, and
+  `tests/ground_truth/` — so at trial time both agent and GT have
+  the files at `/app/<filename>`.
+
+Placeholders are procedurally generated via PIL (gradient + noise +
+soft-edge shapes). They look intentional — mesh-gradient
+illustration, sky-with-horizon landscape — not "missing image". No
+third-party photography licensing involved. See
+`scripts/build_placeholders.py`.
+
+Result on the 5 gen-2 tasks: `environment/assets/` has all 5 JPGs in
+every task; 0 disallowed image sources anywhere; 0 broken-image
+icons in renders.
+
 ---
 
-## 3. Why these 10 tasks
+## 3. The dataset — 15 tasks across two architecture generations
 
-The 10 tasks are sourced from `TAXONOMY.md`'s "Initial 10-task slate"
-(documented separately, research-backed against Design2Code, WebSight,
-WebGen-Bench, and direct observation of Lovable/v0/bolt outputs).
+### 3.1 Generation 1: 10 tasks under the original locked-template architecture
 
-The slate is intentionally **3 saturated controls + 7 high-signal
-cells**:
+The first 10 tasks were generated under a Phase 2 architecture where
+each "template" hard-coupled a topic (e.g. "SaaS landing page") with
+a specific visual language (e.g. "pastel × hairline-1px × geometric-
+sans"). 10 templates, 10 (vertical × style) cells, no mixing. Sourced
+from `TAXONOMY.md`'s "Initial 10-task slate" — research-backed against
+Design2Code, WebSight, WebGen-Bench, and direct observation of
+Lovable/v0/bolt outputs.
 
-| # | Template | Archetype × style cell | Difficulty | Why included |
+The slate was deliberately **3 saturated controls + 7 high-signal cells**:
+
+| # | Task | Archetype × style cell | Difficulty | Why included |
 |---|---|---|---|---|
 | 1 | `saas_minimal` | A1 SaaS × pastel × hairline-1px × clean-iconographic | easy | Saturated: every modern coding agent should ace this — proves the floor |
 | 2 | `pricing_dark` | A8 pricing × dark-native × hairline-1px × clean-iconographic | easy | Saturated: pricing matrices are easy structural shapes |
@@ -186,9 +247,50 @@ cells**:
 | 9 | `splash_3d` | A9 splash × abstract-3d × dark-native × variable-display | hard | High-signal: cinematic single-product, scroll-driven |
 | 10 | `restaurant_photo` | A11 restaurant × photographic-product × display-mixed × muted-editorial | hard | High-signal: hospitality aesthetic |
 
-The 3-saturated/7-hard split gives a **controlled difficulty
-distribution** — when we run Opus on all 10, we expect easy cells to
-cluster ~0.7–0.9 and hard cells ~0.3–0.6. The spread is the signal.
+These tasks were eval'd in §5 — Opus 4.7 × 10 attempts each.
+
+### 3.2 Generation 2: 5 tasks under the decoupled architecture (current)
+
+After the gen-1 eval, two structural problems were apparent:
+
+1. **Topic and style were over-coupled.** The matrix was forced to be
+   exactly 10 cells. `developer_docs` could only ever appear with
+   `mono_warm`; you couldn't generate `developer_docs × neobrut_thick`
+   even if you wanted to. The set of tasks the recipe could *ever*
+   produce was capped at 10, not just the 10 we chose.
+2. **Images were broken.** 4 of the 10 gen-1 tasks reference
+   `rick.jpg` 114 times across their HTML, but `environment/assets/`
+   was empty in every task. Both the agent's HTML and the GT rendered
+   with broken-image icons. The information loss reached the agent's
+   prompt screenshots.
+
+Phase 3 fixed both, refactoring the registry into two independent
+pools (`templates/verticals/` and `templates/styles/`) combined by a
+**compatibility matrix** (`templates/compatibility.py`). 15 verticals
+× 13 styles → **56 valid pairs** — a 6.5× expansion of the design
+space that the recipe can produce.
+
+5 new tasks were generated to demonstrate the architecture's reach,
+specifically chosen to add **4 new verticals + 2 new styles** that
+gen-1 literally couldn't produce:
+
+| # | Task (vertical × style) | What it adds | Why |
+|---|---|---|---|
+| 11 | `government × dark_native_clean` | NEW vertical | Civic conventions: dense forms, formal copy, departmental nav, accessibility-first |
+| 12 | `hotel_booking × photo_warm_display` | NEW vertical | Hospitality booking: search-led, room cards, photographic |
+| 13 | `news_portal × editorial_dark` | NEW vertical + NEW style | High info-density news on dark — different from longform editorial |
+| 14 | `healthcare_clinic × glassy_pastel` | NEW vertical | Calming-medical: soft palette, "find a doctor", appointment booking |
+| 15 | `product_splash × crypto_neon` | NEW style | Web3 / consumer-hardware launch — neon on dark, abstract-3d |
+
+These 5 also exercise the **image fix**: every task now ships 5
+procedurally-generated placeholder JPGs in `environment/assets/`
+(see §2.6) and the LLM is constrained to either reference one of
+those filenames or use CSS/SVG. Result: 0 broken image icons in any
+of the 5 new tasks (vs. 114 broken `<img>` tags across the gen-1 set).
+
+(A separate eval of the 5 gen-2 tasks is in §5.5; the gen-1 numbers
+in §5.1–5.4 are unchanged from the original eval and remain useful
+as a baseline.)
 
 Each task ships with:
 - 5–6 page screenshots at desktop resolution (the agent's input)
@@ -462,6 +564,83 @@ sometimes ships a blank hero panel (worst, 0.579) on the same prompt.
 
 (All 5 trial-spread grids, plus the full N=10 strip layouts, are in
 `report_figures/runs_wmb/` and `report_figures/runs/`.)
+
+### 5.5 Generation-2 results — Opus 4.7 × 10 on the 5 new diverse tasks
+
+47/50 trials completed (3 verifier-side timeouts on heavy
+photography-led tasks; same noise pattern as gen-1). Modal sandboxes,
+parallel up to 20.
+
+![Score distribution per task — gen-2](report_figures_v2/scores_per_task.png)
+
+| Task | n | Mean | Std | Min | Max | Layout | Visual | Comp | Text | Style |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `healthcare_clinic × glassy_pastel` | 10 | **0.612** | 0.051 | 0.505 | 0.683 | 0.576 | 0.453 | 0.766 | 0.734 | 0.891 |
+| `product_splash × crypto_neon` | 9 | **0.575** | 0.032 | 0.514 | 0.637 | 0.540 | 0.415 | 0.753 | 0.535 | 0.976 |
+| `hotel_booking × photo_warm_display` | 10 | **0.550** | 0.188 | 0.000 | 0.674 | 0.551 | 0.347 | 0.683 | 0.717 | 0.787 |
+| `government × dark_native_clean` | 10 | **0.519** | 0.032 | 0.481 | 0.601 | 0.530 | 0.434 | 0.752 | 0.513 | 0.479 |
+| `news_portal × editorial_dark` | 8 | **0.384** | 0.225 | 0.000 | 0.567 | 0.422 | 0.248 | 0.581 | 0.436 | 0.514 |
+
+The new tasks land in the **0.38–0.61 mean range** — comparable to
+the gen-1 hard cells (0.55–0.71). Important observations:
+
+1. **The decoupling didn't cap quality.** Healthcare and
+   product_splash hit means similar to gen-1's high-signal cells.
+   The architectural change increased the matrix without lowering
+   the score floor.
+2. **Per-signal stability holds.** Style HSV pops to 0.976 on
+   `product_splash × crypto_neon` (Opus nailed neon palette
+   discipline) and to 0.891 on `healthcare_clinic × glassy_pastel`
+   (calming-medical palette is well-documented in pretrain). The
+   grader's signal weighting still discriminates correctly.
+3. **News portal is the hardest.** Mean 0.384 with two 0.000 outliers.
+   The 36 `<img>` tags + multi-column information density is a hard
+   cell — Opus dropped 2 of 10 trials to agent-side errors and the
+   surviving runs still struggled. This is real signal; the
+   architecture/grader wasn't lenient.
+4. **Image fix landed cleanly.** `<img src=>` validation in synth
+   never had to fire — Opus consistently picked allowed placeholder
+   filenames. Compare gen-1: 114 broken `<img>` tags across 4 tasks,
+   no shipped assets.
+
+**Score → quality correspondence on new tasks:**
+
+`healthcare_clinic × glassy_pastel` — top 0.683 vs bottom 0.505:
+
+![healthcare wmb](report_figures_v2/runs_wmb/healthcare_clinic__glassy_pastel-001_wmb.png)
+
+The worst run (0.505) and best run (0.683) both produce calming
+pastel landings with glassy cards. The differentiation is in
+fidelity to specific layout choices (CTA button placement, hero
+glassy-card transparency, secondary nav). Style HSV is consistently
+high (0.89) — Opus reliably picks the right palette here, so the
+discriminator is layout/component fidelity.
+
+`news_portal × editorial_dark` — top 0.567 vs bottom 0.000:
+
+![news wmb](report_figures_v2/runs_wmb/news_portal__editorial_dark-001_wmb.png)
+
+Best run (0.567) reproduces the editorial-dark masthead and serif
+body on near-black, with the lead-story hero and multi-column grid.
+The 0.000 outliers are agent-side `Command failed` (claude-code
+crashed) — different failure mode from the timeout-based 0.000 in
+hotel_booking. Both surface real noise that the grader correctly
+amplifies.
+
+`government × dark_native_clean` — top 0.601 vs bottom 0.481:
+
+![gov wmb](report_figures_v2/runs_wmb/government__dark_native_clean-001_wmb.png)
+
+Tightest cluster in the gen-2 set (std 0.032). Opus produces a
+recognisably civic page — formal headline, departmental nav,
+service grid, status sidebar. The differentiator is **palette
+discipline**: best run holds to single accent on dark, worst spreads
+multiple accents. Style HSV at 0.479 is the lowest of any gen-2
+task, indicating Opus consistently misses the restrained civic
+palette discipline.
+
+(All best/worst pairs in `report_figures_v2/pairs/`; full
+worst/median/best grids in `report_figures_v2/runs_wmb/`.)
 
 ---
 

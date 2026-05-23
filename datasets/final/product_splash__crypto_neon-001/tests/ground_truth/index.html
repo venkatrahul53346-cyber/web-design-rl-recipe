@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pliny — An AI second pair of eyes for your code</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* page-specific compositions only */
+  .hero {
+    position: relative;
+    padding: 120px 0 80px;
+    overflow: hidden;
+  }
+  .hero .blob-violet { width: 720px; height: 720px; top: -260px; right: -200px; opacity: .55; max-width: 90vw; max-height: 90vw; }
+  .hero .blob-cyan { width: 480px; height: 480px; bottom: -240px; left: -160px; opacity: .35; max-width: 80vw; max-height: 80vw; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 80px;
+    align-items: end;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-kicker { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; flex-wrap: wrap; }
+  .hero-kicker .tag { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); padding: 6px 10px; border: 1px solid var(--line-bright); border-radius: 999px; }
+  .hero h1 .em { font-style: italic; font-weight: 300; color: var(--ink-dim); }
+  .hero-sub {
+    margin-top: 40px;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink-dim);
+    max-width: 520px;
+  }
+  .hero-cta { display: flex; gap: 14px; margin-top: 44px; align-items: center; flex-wrap: wrap; }
+  .hero-meta { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-left: 8px; }
+  .hero-right { display: flex; flex-direction: column; gap: 18px; padding-bottom: 12px; min-width: 0; }
+  .hero-stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .hero-stat { padding: 22px 18px 22px 0; border-right: 1px solid var(--line); min-width: 0; }
+  .hero-stat:last-child { border-right: 0; padding-right: 0; }
+  .hero-stat .n { font-family: var(--sans); font-weight: 700; font-size: 28px; letter-spacing: -0.03em; }
+  .hero-stat .l { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-faint); margin-top: 6px; }
+
+  /* PR review demo */
+  .pr-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .pr-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; border-bottom: 1px solid var(--line);
+    font-family: var(--mono); font-size: 12px; color: var(--ink-dim);
+    gap: 12px; flex-wrap: wrap;
+  }
+  .pr-head .left { display: flex; gap: 14px; align-items: center; min-width: 0; }
+  .pr-head .left span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pr-head .dots { display: flex; gap: 6px; flex-shrink: 0; }
+  .pr-head .dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--line-bright); }
+  .pr-title-row { padding: 22px 22px 18px; border-bottom: 1px solid var(--line); display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .pr-badge { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.16em; padding: 5px 9px; border-radius: 4px; background: rgba(124,91,255,0.15); color: var(--accent); border: 1px solid rgba(124,91,255,0.35); flex-shrink: 0; }
+  .pr-title { font-weight: 600; font-size: 16px; }
+  .pr-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-top: 6px; word-break: break-word; }
+  .pr-body { padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .pr-comment { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; align-items: flex-start; }
+  .pr-avatar { width: 28px; height: 28px; border-radius: 50%; background: conic-gradient(from 220deg, #7C5BFF, #21E0C8, #FF4FD8, #7C5BFF); position: relative; flex-shrink: 0; }
+  .pr-avatar::after { content:''; position: absolute; inset: 5px; border-radius: 50%; background: var(--bg-elev); }
+  .pr-bubble { background: #06060A; border: 1px solid var(--line); border-radius: 10px; min-width: 0; overflow: hidden; }
+  .pr-bubble .hdr { padding: 9px 14px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11.5px; color: var(--ink-dim); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .pr-bubble .hdr b { color: var(--ink); font-weight: 500; }
+  .pr-bubble .bdy { padding: 12px 14px; font-size: 13.5px; line-height: 1.55; word-wrap: break-word; overflow-wrap: break-word; }
+  .pr-bubble .bdy code { font-family: var(--mono); font-size: 12px; padding: 1px 6px; border-radius: 4px; background: rgba(124,91,255,0.12); color: var(--accent); word-break: break-word; }
+  .pr-diff { font-family: var(--mono); font-size: 12px; line-height: 1.7; margin: 10px 0 4px; border-top: 1px dashed var(--line); padding-top: 10px; overflow-x: auto; }
+  .pr-diff .l { display: block; padding: 1px 0; white-space: pre; }
+  .pr-diff .del { color: #ff8aa0; background: rgba(255,85,119,0.08); }
+  .pr-diff .add { color: #6cf0d4; background: rgba(33,224,200,0.07); }
+  .pr-diff .nul { color: var(--ink-faint); }
+
+  /* Demo section layout */
+  .demo-grid {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 64px; align-items: center;
+  }
+  .demo-side { min-width: 0; }
+  .demo-side .eyebrow { margin-bottom: 22px; }
+  .demo-side h2 { margin-bottom: 26px; }
+  .demo-side p.lede { color: var(--ink-dim); font-size: 17px; max-width: 460px; line-height: 1.55; }
+  .demo-bullets { margin-top: 32px; display: flex; flex-direction: column; gap: 18px; }
+  .demo-bullet { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 18px; align-items: flex-start; padding-top: 18px; border-top: 1px solid var(--line); }
+  .demo-bullet .num { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.16em; }
+  .demo-bullet h4 { margin-bottom: 6px; }
+  .demo-bullet p { color: var(--ink-dim); font-size: 14.5px; line-height: 1.55; }
+
+  /* Capability strip */
+  .cap-strip {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .cap {
+    padding: 38px 28px;
+    border-right: 1px solid var(--line);
+    position: relative;
+    min-width: 0;
+  }
+  .cap:last-child { border-right: 0; }
+  .cap .num { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.18em; }
+  .cap h4 { margin: 18px 0 10px; font-size: 17px; }
+  .cap p { font-size: 13.5px; color: var(--ink-dim); line-height: 1.55; }
+  .cap .glyph { width: 32px; height: 32px; margin-bottom: 28px; border-radius: 6px; border: 1px solid var(--line-bright); display: grid; place-items: center; font-family: var(--mono); font-size: 13px; color: var(--accent); }
+
+  /* Bug taxonomy */
+  .tax-wrap { position: relative; overflow: hidden; }
+  .tax-wrap .blob-pink { width: 380px; height: 380px; top: -120px; right: -100px; opacity: .35; max-width: 80vw; max-height: 80vw; }
+  .tax-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 56px; gap: 40px; flex-wrap: wrap; }
+  .tax-head h2 { max-width: 700px; }
+  .tax-head p { color: var(--ink-dim); max-width: 360px; font-size: 15px; }
+  .tax-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .tax-cell { padding: 28px 26px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; min-height: 220px; display: flex; flex-direction: column; min-width: 0; }
+  .tax-cell:nth-child(3n) { border-right: 0; }
+  .tax-cell:nth-last-child(-n+3) { border-bottom: 0; }
+  .tax-cell .id { font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); letter-spacing: 0.18em; }
+  .tax-cell h4 { margin: 14px 0 10px; font-size: 17px; }
+  .tax-cell p { color: var(--ink-dim); font-size: 13.5px; line-height: 1.55; }
+  .tax-cell .ex { margin-top: auto; font-family: var(--mono); font-size: 11.5px; color: var(--accent); padding-top: 18px; word-break: break-word; }
+
+  /* Integration band */
+  .integ {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 80px; align-items: center;
+  }
+  .integ > div { min-width: 0; }
+  .integ-stack { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+  .integ-row { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 20px; align-items: center; padding: 22px 0; border-bottom: 1px solid var(--line); }
+  .integ-row .name { font-weight: 500; font-size: 16px; }
+  .integ-row .desc { font-size: 13.5px; color: var(--ink-dim); }
+  .integ-row .status { font-family: var(--mono); font-size: 11px; color: var(--ok); white-space: nowrap; }
+  .integ-row .status.soon { color: var(--warn); }
+
+  /* Endorsement */
+  .endorse { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .endorse-cell { padding: 44px 36px; border-right: 1px solid var(--line); min-width: 0; }
+  .endorse-cell:last-child { border-right: 0; }
+  .endorse-cell blockquote { margin: 0; font-size: 17px; line-height: 1.45; letter-spacing: -0.01em; }
+  .endorse-cell .who { margin-top: 22px; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.14em; text-transform: uppercase; }
+
+  /* Closer */
+  .closer { position: relative; text-align: center; overflow: hidden; }
+  .closer .blob-violet { width: 700px; height: 700px; top: -200px; left: 50%; transform: translateX(-50%); opacity: .45; max-width: 90vw; max-height: 90vw; }
+  .closer .inner { position: relative; z-index: 2; }
+  .closer h2 { font-size: clamp(40px, 8vw, 124px); font-weight: 800; letter-spacing: -0.045em; line-height: 0.95; max-width: 900px; margin: 0 auto; }
+  .closer .em { font-style: italic; font-weight: 300; color: var(--ink-dim); }
+  .closer .sub { color: var(--ink-dim); margin: 32px auto 40px; max-width: 520px; }
+  .closer .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .closer .fineprint { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-top: 28px; letter-spacing: 0.12em; }
+
+  @media (max-width: 980px) {
+    .hero-grid, .demo-grid, .integ { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+    .cap-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cap:nth-child(2) { border-right: 0; }
+    .cap:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    .tax-grid { grid-template-columns: minmax(0, 1fr); }
+    .tax-cell, .tax-cell:nth-child(3n) { border-right: 0; }
+    .tax-cell { border-bottom: 1px solid var(--line); min-height: 0; }
+    .tax-cell:last-child { border-bottom: 0; }
+    .endorse { grid-template-columns: minmax(0, 1fr); }
+    .endorse-cell { border-right: 0; border-bottom: 1px solid var(--line); padding: 32px 24px; }
+    .endorse-cell:last-child { border-bottom: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .hero { padding: 72px 0 56px; }
+    .hero-stat-row { grid-template-columns: minmax(0, 1fr); }
+    .hero-stat { border-right: 0; border-bottom: 1px solid var(--line); padding: 18px 0; }
+    .hero-stat:last-child { border-bottom: 0; }
+    .hero-cta .hero-meta { margin-left: 0; }
+    .hero-cta .btn { width: 100%; justify-content: center; }
+    .cap-strip { grid-template-columns: minmax(0, 1fr); }
+    .cap { border-right: 0; border-bottom: 1px solid var(--line); padding: 32px 24px; }
+    .cap:last-child { border-bottom: 0; }
+    .integ-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; }
+    .integ-row > span:first-child { grid-column: 1 / -1; font-size: 10.5px; }
+    .pr-title-row { padding: 18px 18px 16px; }
+    .pr-body { padding: 16px 18px 18px; }
+    .pr-head { padding: 12px 14px; }
+    .pr-head .left { font-size: 11px; }
+    .closer .btn { width: 100%; justify-content: center; }
+    .demo-bullet { grid-template-columns: 40px minmax(0, 1fr); gap: 12px; }
+    .tax-cell { padding: 24px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="brand" aria-label="Pliny home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Pliny</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html" class="is-active">Overview</a>
+      <a href="story.html">Story</a>
+      <a href="specs.html">Specs</a>
+      <a href="faq.html">FAQ</a>
+      <a href="press.html">Press</a>
+    </nav>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <span class="nav-status"><span class="live"></span>v0.9 · public beta</span>
+      <a href="preorder.html" class="nav-cta">Get early access <span class="arr">→</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="blob blob-violet"></div>
+    <div class="blob blob-cyan"></div>
+    <div class="wrap">
+      <div class="hero-kicker">
+        <span class="eyebrow"><span class="dot"></span>PLINY · CODE REVIEW, AUTOMATED</span>
+        <span class="tag mono">2,184 PRs reviewed today</span>
+      </div>
+
+      <div class="hero-grid">
+        <div>
+          <h1 class="glow">
+            A second pair<br/>
+            of eyes <span class="em">that never</span><br/>
+            blinks.
+          </h1>
+          <p class="hero-sub">Pliny reads every pull request the moment it opens. It catches the regression buried three commits back, flags the unsafe migration, and leaves concrete suggestions — not vibes. Trained on your codebase, opinionated about the rest.</p>
+          <div class="hero-cta">
+            <a href="preorder.html" class="btn btn-primary btn-xl">Get early access <span class="mono" style="font-size:14px;">→</span></a>
+            <a href="story.html" class="btn btn-ghost btn-xl">Read the story</a>
+            <span class="hero-meta">no credit card · self-host available</span>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="hero-stat-row">
+            <div class="hero-stat">
+              <div class="n tnum">42<span style="color:var(--ink-faint); font-weight:500;">s</span></div>
+              <div class="l">Median time to first review</div>
+            </div>
+            <div class="hero-stat">
+              <div class="n tnum">73%</div>
+              <div class="l">Bugs caught before human review</div>
+            </div>
+            <div class="hero-stat">
+              <div class="n tnum">8.3<span style="color:var(--ink-faint); font-weight:500;">k</span></div>
+              <div class="l">Repos in beta · public &amp; private</div>
+            </div>
+          </div>
+          <p class="mono" style="font-size:11px; color: var(--ink-faint); letter-spacing: 0.14em; text-transform: uppercase;">// Benchmarks measured across 412 OSS repos, Jan 2025. <a href="specs.html" style="color:var(--ink-dim); text-decoration: underline; text-underline-offset: 3px;">methodology →</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO: Anatomy of a Pliny review -->
+  <section class="section">
+    <div class="wrap">
+      <div class="demo-grid">
+        <div class="demo-side">
+          <p class="eyebrow"><span class="dot"></span>01 · ANATOMY OF A REVIEW</p>
+          <h2>It comments<br/>like the engineer<br/>you wish you had.</h2>
+          <p class="lede">No "consider refactoring this for clarity." Pliny writes the suggestion in code, cites the file it would regress, and tells you when to ignore it.</p>
+
+          <div class="demo-bullets">
+            <div class="demo-bullet">
+              <span class="num">A.</span>
+              <div>
+                <h4>Reasoned, not pattern-matched</h4>
+                <p>Every comment links the upstream caller, the test that would fail, and the assumption it violates.</p>
+              </div>
+            </div>
+            <div class="demo-bullet">
+              <span class="num">B.</span>
+              <div>
+                <h4>Suggestions as commits</h4>
+                <p>Accept with a single click. Pliny opens a fixup commit against your branch — never force-pushes, never rewrites history.</p>
+              </div>
+            </div>
+            <div class="demo-bullet">
+              <span class="num">C.</span>
+              <div>
+                <h4>Severity it can defend</h4>
+                <p>Blocking, advisory, or nit — graded against your team's prior reviews, not a generic rubric.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="pr-card">
+            <div class="pr-head">
+              <div class="left">
+                <div class="dots"><span></span><span></span><span></span></div>
+                <span>github.com / acme-co / billing-svc</span>
+              </div>
+              <span>#4172 · 14s ago</span>
+            </div>
+            <div class="pr-title-row">
+              <div style="min-width:0;">
+                <div class="pr-title">Switch invoice totals to BigDecimal</div>
+                <div class="pr-meta">+218 −47 · 6 files · maya.kowalski → main</div>
+              </div>
+              <span class="pr-badge">Pliny · 2 issues</span>
+            </div>
+            <div class="pr-body">
+
+              <div class="pr-comment">
+                <div class="pr-avatar"></div>
+                <div class="pr-bubble">
+                  <div class="hdr"><b>pliny[bot]</b><span style="color:#ff8aa0;">● blocking</span></div>
+                  <div class="bdy">
+                    <code>InvoiceLine.subtotal()</code> still returns <code>float</code>. The new <code>BigDecimal</code> total in <code>Invoice.java:142</code> will silently truncate cents when the two are summed — your <code>refund_split_test.py</code> exercises exactly this path and currently asserts the wrong value.
+                    <div class="pr-diff">
+                      <span class="l nul">  invoice/InvoiceLine.java</span>
+                      <span class="l del">−   public float subtotal() {</span>
+                      <span class="l add">+   public BigDecimal subtotal() {</span>
+                      <span class="l nul">      return qty.multiply(unitPrice);</span>
+                      <span class="l nul">    }</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pr-comment">
+                <div class="pr-avatar"></div>
+                <div class="pr-bubble">
+                  <div class="hdr"><b>pliny[bot]</b><span style="color:var(--warn);">● advisory</span></div>
+                  <div class="bdy">
+                    The migration in <code>V0247__invoice_totals.sql</code> rewrites a 41M row table without <code>CONCURRENTLY</code>. Last time the team shipped a similar lock (PR #3811, Oct 2024), prod paged at 03:14 UTC. Suggest gating behind <code>pg_partman</code> or shipping in two deploys.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPABILITY STRIP -->
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="cap-strip">
+        <div class="cap">
+          <div class="glyph">∂</div>
+          <div class="num">// 001</div>
+          <h4>Whole-repo context</h4>
+          <p>Pliny indexes every file, every callgraph, every prior PR. It reviews the diff with the rest of your code in working memory.</p>
+        </div>
+        <div class="cap">
+          <div class="glyph">≈</div>
+          <div class="num">// 002</div>
+          <h4>Style learned, not enforced</h4>
+          <p>It reads your last 500 merged PRs and infers your team's conventions — naming, error handling, test density — without a config file.</p>
+        </div>
+        <div class="cap">
+          <div class="glyph">↯</div>
+          <div class="num">// 003</div>
+          <h4>Regression-aware</h4>
+          <p>Cross-references diffs against your incident log. If a change touches a file involved in past outages, you'll know before the merge button.</p>
+        </div>
+        <div class="cap">
+          <div class="glyph">⌘</div>
+          <div class="num">// 004</div>
+          <h4>Bring your own model</h4>
+          <p>Self-host on your GPUs. Route to Claude, GPT-5, or open weights. Your code never leaves your tenant unless you say so.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUG TAXONOMY -->
+  <section class="section-lg tax-wrap">
+    <div class="blob blob-pink"></div>
+    <div class="wrap">
+      <div class="tax-head">
+        <div>
+          <p class="eyebrow" style="margin-bottom:24px;"><span class="dot"></span>02 · WHAT IT ACTUALLY CATCHES</p>
+          <h2>The six classes<br/>of bug that pass<br/><span class="display-italic">human</span> review.</h2>
+        </div>
+        <p>Linters catch typos. Static analyzers catch nullability. Pliny is calibrated for the bugs that ship to prod because three reviewers all assumed someone else had read the other file.</p>
+      </div>
+
+      <div class="tax-grid">
+        <div class="tax-cell">
+          <span class="id mono">CLASS · 01</span>
+          <h4>Cross-file invariants</h4>
+          <p>A constant changed in one module that quietly breaks an assumption in another. The kind of bug a 400-line diff hides behind a thousand benign ones.</p>
+          <div class="ex mono">e.g. enum value renamed, switch un-exhaustive</div>
+        </div>
+        <div class="tax-cell">
+          <span class="id mono">CLASS · 02</span>
+          <h4>Concurrency regressions</h4>
+          <p>Races that only fire under load. Pliny re-runs the diff against a model of your runtime, not just the AST.</p>
+          <div class="ex mono">e.g. dropped lock, missing await, lost write</div>
+        </div>
+        <div class="tax-cell">
+          <span class="id mono">CLASS · 03</span>
+          <h4>Migration footguns</h4>
+          <p>Schema changes that lock prod tables, break replicas, or strand readers on the old version. Cross-referenced with your deploy history.</p>
+          <div class="ex mono">e.g. ALTER without CONCURRENTLY, NOT NULL backfill</div>
+        </div>
+        <div class="tax-cell">
+          <span class="id mono">CLASS · 04</span>
+          <h4>Silent contract changes</h4>
+          <p>Renaming a JSON field, changing a return shape, narrowing a type — the kind of break that compiles fine and pages your downstream team at 4am.</p>
+          <div class="ex mono">e.g. response field removed, public API drift</div>
+        </div>
+        <div class="tax-cell">
+          <span class="id mono">CLASS · 05</span>
+          <h4>Test-shaped holes</h4>
+          <p>New branches without coverage; assertions weakened to make CI green; mocks that hide the real failure mode.</p>
+          <div class="ex mono">e.g. assertTrue(true), commented-out test</div>
+        </div>
+        <div class="tax-cell">
+          <span class="id mono">CLASS · 06</span>
+          <h4>Security &amp; secrets</h4>
+          <p>SSRF surfaces, auth bypasses, IDOR patterns, and the API token someone pasted into a fixture file at 11:48pm on a Friday.</p>
+          <div class="ex mono">e.g. unscoped query, hardcoded JWT, open redirect</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTEGRATION -->
+  <section class="section">
+    <div class="wrap">
+      <div class="integ">
+        <div>
+          <p class="eyebrow" style="margin-bottom:24px;"><span class="dot"></span>03 · LIVES WHERE YOUR CODE LIVES</p>
+          <h2>One install.<br/>Then it just <span class="display-italic">shows up</span><br/>on the PR.</h2>
+          <p style="color:var(--ink-dim); font-size: 16px; max-width: 460px; margin-top: 28px; line-height: 1.55;">No new dashboard to check. No Slack channel to mute. Pliny posts where review already happens — and stays quiet on the ones that don't need it.</p>
+          <div style="margin-top: 36px; display:flex; gap: 12px; flex-wrap: wrap;">
+            <a href="specs.html" class="btn btn-ghost">See full integration matrix</a>
+          </div>
+        </div>
+
+        <div class="integ-stack">
+          <div class="integ-row">
+            <span class="mono" style="color:var(--ink-dim); font-size: 12px; letter-spacing: 0.14em;">GITHUB</span>
+            <div style="min-width:0;">
+              <div class="name">Cloud &amp; Enterprise Server</div>
+              <div class="desc">Checks API, draft-aware, mono-repo aware. Auto-skips lockfile churn.</div>
+            </div>
+            <span class="status">● ga</span>
+          </div>
+          <div class="integ-row">
+            <span class="mono" style="color:var(--ink-dim); font-size: 12px; letter-spacing: 0.14em;">GITLAB</span>
+            <div style="min-width:0;">
+              <div class="name">Self-managed 16.4+</div>
+              <div class="desc">Merge requests, approval rules, runner-side hooks.</div>
+            </div>
+            <span class="status">● ga</span>
+          </div>
+          <div class="integ-row">
+            <span class="mono" style="color:var(--ink-dim); font-size: 12px; letter-spacing: 0.14em;">BITBUCKET</span>
+            <div style="min-width:0;">
+              <div class="name">Cloud &amp; Data Center</div>
+              <div class="desc">Pipelines integration, inline diff comments.</div>
+            </div>
+            <span class="status">● ga</span>
+          </div>
+          <div class="integ-row">
+            <span class="mono" style="color:var(--ink-dim); font-size: 12px; letter-spacing: 0.14em;">GERRIT</span>
+            <div style="min-width:0;">
+              <div class="name">Change-set review</div>
+              <div class="desc">Labels, Code-Review +1/+2 votes, REST plugin.</div>
+            </div>
+            <span class="status soon">○ beta q2</span>
+          </div>
+          <div class="integ-row">
+            <span class="mono" style="color:var(--ink-dim); font-size: 12px; letter-spacing: 0.14em;">CLI</span>
+            <div style="min-width:0;">
+              <div class="name">pliny review &lt;ref&gt;</div>
+              <div class="desc">Local-first review for stacked diffs, jj, sapling.</div>
+            </div>
+            <span class="status">● ga</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENDORSEMENTS -->
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="endorse">
+        <div class="endorse-cell">
+          <blockquote>"It caught a race in our payments worker that two senior reviewers and CI all missed. I stopped arguing with it after week two."</blockquote>
+          <div class="who">— Priya R. · Staff Eng, fintech (~600 eng)</div>
+        </div>
+        <div class="endorse-cell">
+          <blockquote>"The first AI tool I've installed that respects my time. It doesn't comment on PRs it has nothing useful to say about."</blockquote>
+          <div class="who">— Tomás L. · Principal, infra platform</div>
+        </div>
+        <div class="endorse-cell">
+          <blockquote>"We deleted three internal lint rules because Pliny just learned them from the codebase. That's the bar."</blockquote>
+          <div class="who">— Jen W. · Tech Lead, dev productivity</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSER -->
+  <section class="section-lg closer">
+    <div class="blob blob-violet"></div>
+    <div class="wrap inner">
+      <p class="eyebrow" style="margin-bottom:36px;"><span class="dot"></span>READY WHEN YOU ARE</p>
+      <h2 class="glow">Stop reviewing<br/><span class="em">what the machine</span><br/>could've caught.</h2>
+      <p class="sub">Beta is open to teams of any size. Pliny ships read-only first — it comments, you watch — and earns its way to suggesting commits.</p>
+      <div class="cta-row">
+        <a href="preorder.html" class="btn btn-primary btn-xl">Request early access <span class="mono" style="font-size:14px;">→</span></a>
+        <a href="specs.html" class="btn btn-ghost btn-xl">Read the specs</a>
+      </div>
+      <div class="fineprint">// AVERAGE ONBOARDING: 14 MINUTES · NO CARD · CANCEL FROM THE CLI</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-wordmark" aria-hidden="true">Pliny</div>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="brand" style="font-size:18px;">
+          <span class="brand-mark"></span><span>Pliny</span>
+        </div>
+        <p class="footer-lede">A second pair of eyes for every pull request. Trained on your codebase, opinionated about the rest.</p>
+        <p class="footer-lede" style="margin-top:18px; font-family:var(--mono); font-size:12px; color:var(--ink-faint);">SOC 2 Type II · in audit<br/>Self-hostable · BYOM</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="specs.html">Specifications</a></li>
+          <li><a href="story.html">The story</a></li>
+          <li><a href="preorder.html">Request access</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Integration guide</a></li>
+          <li><a href="#">Security &amp; data</a></li>
+          <li><a href="press.html">Press kit</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">Engineering blog</a></li>
+          <li><a href="#">Careers — hiring</a></li>
+          <li><a href="mailto:hello@pliny.dev">hello@pliny.dev</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">X / Twitter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <div>© 2025 Pliny Labs, Inc. · Made in Brooklyn &amp; Lisbon</div>
+      <div class="legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Status — operational</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

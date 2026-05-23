@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News &amp; Notices — National Archive</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .news-hero-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0; border: 1px solid var(--border); }
+    .news-hero-grid > * { padding: 32px; min-width: 0; }
+    .news-hero-grid > * + * { border-left: 1px solid var(--border); }
+    @media (max-width: 880px) { .news-hero-grid { grid-template-columns: 1fr; } .news-hero-grid > * + * { border-left: 0; border-top: 1px solid var(--border); } .news-hero-grid > * { padding: 24px; } }
+    .feature-meta { font-family: var(--mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+    .feature-meta .accent { color: var(--accent); }
+    .feature-title { font-size: clamp(1.4rem, 3.2vw, 2.4rem); line-height: 1.1; letter-spacing: -0.025em; font-weight: 700; margin-bottom: 16px; }
+    .feature-lede { color: var(--text-muted); font-size: 16px; line-height: 1.55; margin-bottom: 22px; max-width: 60ch; }
+    .notice-stack { display: flex; flex-direction: column; gap: 0; }
+    .notice-item { border-left: 3px solid var(--accent); padding: 14px 16px; background: var(--bg-elevated); border-top: 1px solid var(--border); }
+    .notice-item:first-child { border-top: 0; }
+    .notice-item .meta { font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; display: flex; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+    .notice-item .meta .tag-closed { color: var(--accent); }
+    .notice-item .meta .tag-warn { color: var(--warn); }
+    .notice-item h3 { font-size: 14.5px; font-weight: 600; margin: 0 0 4px; line-height: 1.35; }
+    .notice-item p { font-size: 13px; color: var(--text-muted); margin: 0; }
+
+    .news-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 0 0; }
+    .news-toolbar .filter-group { display: flex; flex-wrap: wrap; gap: 0; border: 1px solid var(--border); max-width: 100%; }
+    .news-toolbar .filter-group button { background: transparent; border: 0; border-right: 1px solid var(--border); color: var(--text-muted); padding: 8px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+    .news-toolbar .filter-group button:last-child { border-right: 0; }
+    .news-toolbar .filter-group button.active { color: var(--text); background: var(--surface); border-bottom: 2px solid var(--accent); }
+    .news-toolbar .filter-group button:hover { color: var(--text); }
+    .news-toolbar .spacer { flex: 1; }
+    .news-toolbar .mono-label { font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; }
+
+    .news-list { border: 1px solid var(--border); border-bottom: 0; }
+    .news-item { display: grid; grid-template-columns: 180px 1fr 160px; gap: 28px; align-items: baseline; padding: 22px 24px; border-bottom: 1px solid var(--border); }
+    .news-item:hover { background: var(--bg-elevated); }
+    .news-item > * { min-width: 0; }
+    .news-item .date { font-family: var(--mono); font-size: 12px; color: var(--text-muted); letter-spacing: 0.04em; }
+    .news-item .date .doc { display: block; color: var(--text-dim); font-size: 10.5px; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.12em; word-break: break-word; }
+    .news-item h3 { font-size: 16px; font-weight: 600; line-height: 1.35; margin: 0 0 6px; }
+    .news-item h3 a { color: var(--text); text-decoration: none; }
+    .news-item h3 a:hover { color: var(--accent-hover); text-decoration: underline; text-decoration-color: var(--accent); }
+    .news-item .excerpt { font-size: 13.5px; color: var(--text-muted); margin: 0; max-width: 64ch; }
+    .news-item .tag { justify-self: end; font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); border: 1px solid var(--border); padding: 4px 9px; }
+    .news-item .tag.releases { color: var(--text); border-color: var(--border-strong); }
+    .news-item .tag.policy { color: var(--warn); border-color: rgba(245, 158, 11, 0.4); }
+    .news-item .tag.service { color: var(--accent); border-color: rgba(239, 68, 68, 0.4); }
+    .news-item .tag.exhibit { color: var(--ok); border-color: rgba(16, 185, 129, 0.4); }
+    @media (max-width: 1000px) { .news-item { grid-template-columns: 140px 1fr; gap: 20px; } .news-item .tag { grid-column: 2; justify-self: start; margin-top: 4px; } }
+    @media (max-width: 600px) { .news-item { grid-template-columns: 1fr; gap: 8px; padding: 18px 16px; } .news-item .tag { grid-column: 1; justify-self: start; } }
+
+    .news-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 56px; align-items: start; }
+    @media (max-width: 960px) { .news-layout { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
+    .side-panel { border: 1px solid var(--border); }
+    .side-panel-head { padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--bg-elevated); }
+    .side-panel-head .eyebrow { color: var(--text-muted); }
+    .side-panel-body { padding: 18px; }
+    .side-panel-body ul { list-style: none; margin: 0; padding: 0; }
+    .side-panel-body li { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .side-panel-body li:last-child { border-bottom: 0; }
+    .side-panel-body li a { text-decoration: none; color: var(--text); }
+    .side-panel-body li a:hover { color: var(--accent-hover); }
+    .side-panel-body li .meta { display: block; font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px; }
+    .subscribe-form { padding: 18px; }
+    .subscribe-form label { display: block; font-family: var(--mono); font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+    .subscribe-form input[type="email"] { width: 100%; background: var(--bg); border: 1px solid var(--border-strong); color: var(--text); padding: 10px 12px; font: inherit; font-size: 13.5px; margin-bottom: 12px; }
+    .subscribe-form input[type="email"]:focus { outline: none; border-color: var(--accent); }
+    .subscribe-form p { font-size: 12px; color: var(--text-dim); margin: 10px 0 0; }
+
+    .pagination { display: flex; align-items: center; gap: 6px; padding: 28px 0 0; font-family: var(--mono); font-size: 12px; flex-wrap: wrap; }
+    .pagination a, .pagination span { border: 1px solid var(--border); padding: 8px 12px; text-decoration: none; color: var(--text-muted); }
+    .pagination a:hover { color: var(--text); border-color: var(--border-strong); }
+    .pagination .current { color: var(--text); border-color: var(--accent); }
+    .pagination .gap { border: 0; color: var(--text-dim); padding: 8px 4px; }
+
+    .archive-ledger { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--border); }
+    .archive-ledger > div { padding: 22px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); min-width: 0; }
+    .archive-ledger > div:nth-child(4n) { border-right: 0; }
+    .archive-ledger > div:nth-last-child(-n+4) { border-bottom: 0; }
+    .archive-ledger a { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; text-decoration: none; color: var(--text); font-size: 14px; }
+    .archive-ledger a:hover { color: var(--accent-hover); }
+    .archive-ledger .count { font-family: var(--mono); font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+    @media (max-width: 900px) { .archive-ledger { grid-template-columns: repeat(2, minmax(0, 1fr)); } .archive-ledger > div { border-right: 1px solid var(--border) !important; border-bottom: 1px solid var(--border) !important; } .archive-ledger > div:nth-child(2n) { border-right: 0 !important; } .archive-ledger > div:nth-last-child(-n+2) { border-bottom: 0 !important; } }
+    @media (max-width: 480px) { .archive-ledger { grid-template-columns: minmax(0, 1fr); } .archive-ledger > div { border-right: 0 !important; border-bottom: 1px solid var(--border) !important; } .archive-ledger > div:last-child { border-bottom: 0 !important; } }
+
+    .hero-meta-row { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 32px; }
+    .hero-meta-right { font-family: var(--mono); font-size: 12px; color: var(--text-dim); text-align: right; line-height: 1.7; }
+    @media (max-width: 600px) { .hero-meta-right { text-align: left; } }
+
+    .corrections-row { border: 1px solid var(--border); padding: 28px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: center; }
+    @media (max-width: 760px) { .corrections-row { grid-template-columns: minmax(0, 1fr); padding: 22px; gap: 20px; } }
+  </style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+<div class="gov-ribbon">
+  <div class="container">
+    <span class="ribbon-flag">An official site of the National Government</span>
+    <span class="ribbon-sep">·</span>
+    <a href="#">How you know</a>
+    <span style="margin-left:auto;display:inline-flex;gap:14px;align-items:center;">
+      <a href="#" aria-label="Accessibility settings">Accessibility</a>
+      <span class="ribbon-sep">·</span>
+      <a href="#">EN</a> <span class="ribbon-sep">/</span> <a href="#">FR</a> <span class="ribbon-sep">/</span> <a href="#">ES</a>
+    </span>
+  </div>
+</div>
+<header class="site-header" role="banner">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">National Archive</span>
+        <span class="brand-sub">Records · Datasets · Heritage</span>
+      </span>
+    </a>
+    <form class="header-search" role="search" aria-label="Search the archive">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" placeholder="Search 14.2 million records, files, and datasets…" aria-label="Search records">
+      <kbd>⌘ K</kbd>
+    </form>
+    <div class="header-utils">
+      <a class="util-btn" href="forms.html">Request</a>
+      <a class="util-btn" href="#">Sign in</a>
+    </div>
+  </div>
+  <nav class="primary-nav" aria-label="Primary">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="departments.html">Departments</a></li>
+      <li><a href="forms.html">Forms &amp; Requests</a></li>
+      <li><a href="news.html" aria-current="page" class="active">News &amp; Notices</a></li>
+      <li><a href="about.html">About the Archive</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <span aria-current="page">News &amp; Notices</span>
+  </div>
+</nav>
+
+<main id="main">
+  <section class="section-hero">
+    <div class="container">
+      <div class="hero-meta-row">
+        <div>
+          <span class="eyebrow">PUB-2025 · ISSUE 41</span>
+          <h1 style="margin-top:14px;">News &amp; notices</h1>
+          <p style="color:var(--text-muted); max-width: 60ch; margin-top: 16px; font-size: 17px;">Official announcements, service notices, new releases from the catalogue, and updates from the reading rooms and digitisation programme.</p>
+        </div>
+        <div class="hero-meta-right">
+          <div>LAST UPDATED</div>
+          <div style="color: var(--text); font-size: 13px;">2025-03-14 · 16:42 UTC</div>
+          <div style="margin-top: 8px;"><a href="#" style="color: var(--text-muted);">RSS feed</a> · <a href="#" style="color: var(--text-muted);">Atom</a></div>
+        </div>
+      </div>
+
+      <div class="news-hero-grid">
+        <article>
+          <div class="feature-meta">
+            <span class="accent">FEATURED</span>
+            <span>2025-03-12</span>
+            <span>RELEASES</span>
+            <span>REF NA/2025/0341</span>
+          </div>
+          <h2 class="feature-title">Cabinet papers from 1995 released after thirty-year rule embargo</h2>
+          <p class="feature-lede">The Archive has published 18,402 Cabinet minutes, memoranda, and ministerial correspondence covering the calendar year 1995. The release includes 1,210 files previously withheld under sections 23 and 27 of the Public Records Act, now reviewed and opened in full. Files are searchable through the online catalogue and viewable in the Westminster reading room.</p>
+          <div style="display:flex; gap: 12px; flex-wrap: wrap;">
+            <a class="btn btn-primary" href="#">Read the release notice</a>
+            <a class="btn btn-ghost" href="services.html">Browse the 1995 series</a>
+          </div>
+        </article>
+        <aside aria-label="Current service notices">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <span class="eyebrow" style="color: var(--text-muted);">CURRENT NOTICES</span>
+            <span style="font-family: var(--mono); font-size: 11px; color: var(--text-dim);">3 ACTIVE</span>
+          </div>
+          <div class="notice-stack">
+            <div class="notice-item">
+              <div class="meta"><span class="tag-closed">● CLOSED</span><span>2025-03-15 → 2025-03-22</span></div>
+              <h3>Reading Room 2 closed for HVAC works</h3>
+              <p>Materials normally consulted in Room 2 will be available in Room 4 by prior arrangement.</p>
+            </div>
+            <div class="notice-item">
+              <div class="meta"><span class="tag-warn">● DELAY</span><span>FOI &amp; records requests</span></div>
+              <h3>Response times extended by 5 working days</h3>
+              <p>Due to elevated request volume around the March release, statutory clocks remain unchanged but acknowledgements may take longer.</p>
+            </div>
+            <div class="notice-item">
+              <div class="meta"><span style="color: var(--ok);">● RESTORED</span><span>2025-03-08</span></div>
+              <h3>Catalogue API service restored</h3>
+              <p>The /v3 endpoints are operating normally following the scheduled migration on 7 March.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="news-layout">
+        <div style="min-width: 0;">
+          <div class="section-header" style="margin-bottom: 16px; flex-wrap: wrap;">
+            <div>
+              <span class="eyebrow" style="color: var(--text-muted);">CHRONOLOGICAL INDEX</span>
+              <h2 style="margin-top: 8px;">All announcements</h2>
+            </div>
+            <div style="font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em;">SHOWING 12 OF 384</div>
+          </div>
+
+          <div class="news-toolbar" style="margin-bottom: 20px;">
+            <span class="mono-label">FILTER</span>
+            <div class="filter-group" role="tablist">
+              <button class="active" type="button">All</button>
+              <button type="button">Releases</button>
+              <button type="button">Service</button>
+              <button type="button">Policy</button>
+              <button type="button">Exhibitions</button>
+            </div>
+            <span class="spacer"></span>
+            <span class="mono-label">YEAR</span>
+            <div class="filter-group">
+              <button class="active" type="button">2025</button>
+              <button type="button">2024</button>
+              <button type="button">2023</button>
+              <button type="button">Archive</button>
+            </div>
+          </div>
+
+          <div class="news-list">
+            <article class="news-item">
+              <div class="date">12 Mar 2025<span class="doc">NA/2025/0341</span></div>
+              <div>
+                <h3><a href="#">Cabinet papers from 1995 released after thirty-year rule embargo</a></h3>
+                <p class="excerpt">18,402 files now open to public inspection. Includes 1,210 previously withheld papers reviewed under sections 23 and 27 of the Public Records Act.</p>
+              </div>
+              <span class="tag releases">Releases</span>
+            </article>
+            <article class="news-item">
+              <div class="date">10 Mar 2025<span class="doc">NA/2025/0337</span></div>
+              <div>
+                <h3><a href="#">Open Government Licence v3.0 now applied to all newly digitised photographic collections</a></h3>
+                <p class="excerpt">Reuse and redistribution permitted with attribution. Affects roughly 240,000 images digitised since January 2024.</p>
+              </div>
+              <span class="tag policy">Policy</span>
+            </article>
+            <article class="news-item">
+              <div class="date">07 Mar 2025<span class="doc">NA/2025/0329</span></div>
+              <div>
+                <h3><a href="#">Catalogue API v3 migration complete; v2 endpoints deprecated 30 June</a></h3>
+                <p class="excerpt">Developers using /v2/search and /v2/records should migrate to /v3 by the cut-off date. Migration guide and changelog published.</p>
+              </div>
+              <span class="tag service">Service</span>
+            </article>
+            <article class="news-item">
+              <div class="date">28 Feb 2025<span class="doc">NA/2025/0298</span></div>
+              <div>
+                <h3><a href="#">Exhibition opens: ‘Letters from the Coalfields, 1888–1939’</a></h3>
+                <p class="excerpt">A free display of mineworkers' correspondence drawn from MIN 14 and MIN 22 series, presented in the Heritage Gallery until 14 September.</p>
+              </div>
+              <span class="tag exhibit">Exhibition</span>
+            </article>
+            <article class="news-item">
+              <div class="date">24 Feb 2025<span class="doc">NA/2025/0281</span></div>
+              <div>
+                <h3><a href="#">Tribunal and court records 1974–1979 transferred from the Ministry of Justice</a></h3>
+                <p class="excerpt">A further 62 linear metres of files have been accessioned, catalogued at item level, and added to series J 87 and J 91.</p>
+              </div>
+              <span class="tag releases">Releases</span>
+            </article>
+            <article class="news-item">
+              <div class="date">19 Feb 2025<span class="doc">NA/2025/0254</span></div>
+              <div>
+                <h3><a href="#">Revised fee schedule for reproductions and certified copies takes effect 1 April</a></h3>
+                <p class="excerpt">Personal study copies remain free of charge. Commercial reproduction fees adjusted in line with the published cost-recovery review.</p>
+              </div>
+              <span class="tag policy">Policy</span>
+            </article>
+            <article class="news-item">
+              <div class="date">11 Feb 2025<span class="doc">NA/2025/0217</span></div>
+              <div>
+                <h3><a href="#">Census enumerators' books 1921 fully indexed by household</a></h3>
+                <p class="excerpt">Name-level search across 38 million records is now available without subscription, completing the indexing programme begun in 2022.</p>
+              </div>
+              <span class="tag releases">Releases</span>
+            </article>
+            <article class="news-item">
+              <div class="date">04 Feb 2025<span class="doc">NA/2025/0189</span></div>
+              <div>
+                <h3><a href="#">Reading room booking system to be replaced 22 February</a></h3>
+                <p class="excerpt">Existing bookings will migrate automatically. Users will be required to reset passwords on first sign-in to the new portal.</p>
+              </div>
+              <span class="tag service">Service</span>
+            </article>
+            <article class="news-item">
+              <div class="date">29 Jan 2025<span class="doc">NA/2025/0163</span></div>
+              <div>
+                <h3><a href="#">Public consultation: proposed revisions to the records appraisal policy</a></h3>
+                <p class="excerpt">Open to written responses until 28 March 2025. The Archive seeks views from records creators, researchers, and the public.</p>
+              </div>
+              <span class="tag policy">Policy</span>
+            </article>
+            <article class="news-item">
+              <div class="date">21 Jan 2025<span class="doc">NA/2025/0124</span></div>
+              <div>
+                <h3><a href="#">Two-day symposium on Commonwealth records announced for 6–7 May</a></h3>
+                <p class="excerpt">Hosted jointly with the Institute of Commonwealth Studies. Registration opens 17 March; bursaries available for early-career researchers.</p>
+              </div>
+              <span class="tag exhibit">Event</span>
+            </article>
+            <article class="news-item">
+              <div class="date">14 Jan 2025<span class="doc">NA/2025/0091</span></div>
+              <div>
+                <h3><a href="#">Annual digitisation report 2024 published: 4.1 million images added</a></h3>
+                <p class="excerpt">Programme delivered to schedule across maps, parish registers, and War Office personnel files. Full report available in HTML and PDF.</p>
+              </div>
+              <span class="tag releases">Releases</span>
+            </article>
+            <article class="news-item">
+              <div class="date">08 Jan 2025<span class="doc">NA/2025/0042</span></div>
+              <div>
+                <h3><a href="#">Westminster site reopens following winter conservation closure</a></h3>
+                <p class="excerpt">All reading rooms and the public catalogue terminals are operating to normal hours. The map room reopens with extended Saturday access.</p>
+              </div>
+              <span class="tag service">Service</span>
+            </article>
+          </div>
+
+          <nav class="pagination" aria-label="Pagination">
+            <a href="#">← Previous</a>
+            <span class="current">1</span>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <span class="gap">…</span>
+            <a href="#">32</a>
+            <a href="#">Next →</a>
+          </nav>
+        </div>
+
+        <aside style="min-width: 0;">
+          <div class="side-panel" style="margin-bottom: 24px;">
+            <div class="side-panel-head"><span class="eyebrow">SUBSCRIBE</span></div>
+            <form class="subscribe-form" action="#" method="post">
+              <label for="sub-email">Email address</label>
+              <input id="sub-email" type="email" placeholder="name@example.gov" required>
+              <button type="submit" class="btn btn-primary btn-sm" style="width:100%; justify-content:center;">Send me notices</button>
+              <p>The Archive publishes a fortnightly digest of releases and service notices. You can unsubscribe at any time.</p>
+            </form>
+          </div>
+
+          <div class="side-panel" style="margin-bottom: 24px;">
+            <div class="side-panel-head"><span class="eyebrow">RECENT RELEASES</span></div>
+            <div class="side-panel-body">
+              <ul>
+                <li><a href="#">Cabinet papers 1995 (CAB 128–129)</a><span class="meta">12 MAR · 18,402 FILES</span></li>
+                <li><a href="#">Justice tribunal records 1974–79</a><span class="meta">24 FEB · 62 LM</span></li>
+                <li><a href="#">Census 1921 — name index</a><span class="meta">11 FEB · 38M RECORDS</span></li>
+                <li><a href="#">Coalfield correspondence (MIN 14)</a><span class="meta">28 FEB · 4,210 ITEMS</span></li>
+                <li><a href="#">War Office personnel WO 376</a><span class="meta">14 JAN · 91,008 PAGES</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="side-panel">
+            <div class="side-panel-head"><span class="eyebrow">PRESS &amp; MEDIA</span></div>
+            <div class="side-panel-body" style="font-size: 13px; color: var(--text-muted);">
+              <p style="margin: 0 0 12px;">For interviews, image rights for editorial use, or factual enquiries from journalists:</p>
+              <p class="mono" style="font-family: var(--mono); font-size: 12px; color: var(--text); margin: 0 0 4px; word-break: break-word;">press@archive.gov</p>
+              <p class="mono" style="font-family: var(--mono); font-size: 12px; color: var(--text); margin: 0;">+44 (0)20 7946 0411</p>
+              <p style="margin: 14px 0 0; font-size: 12px; color: var(--text-dim);">Office hours Mon–Fri 09:00–17:30. Out-of-hours duty press officer available for urgent matters.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container">
+      <div class="section-header" style="margin-bottom: 20px; flex-wrap: wrap;">
+        <div>
+          <span class="eyebrow" style="color: var(--text-muted);">BY TOPIC</span>
+          <h2 style="margin-top: 6px; font-size: 1.25rem;">Browse notices by subject area</h2>
+        </div>
+        <a href="departments.html" style="font-size: 13px; color: var(--text-muted);">All departments →</a>
+      </div>
+      <div class="archive-ledger">
+        <div><a href="#">Cabinet &amp; government<span class="count">84</span></a></div>
+        <div><a href="#">Census &amp; population<span class="count">36</span></a></div>
+        <div><a href="#">Courts &amp; tribunals<span class="count">52</span></a></div>
+        <div><a href="#">Defence &amp; military<span class="count">71</span></a></div>
+        <div><a href="#">Diplomatic correspondence<span class="count">29</span></a></div>
+        <div><a href="#">Education &amp; schools<span class="count">18</span></a></div>
+        <div><a href="#">Health &amp; medicine<span class="count">24</span></a></div>
+        <div><a href="#">Maps &amp; cartography<span class="count">41</span></a></div>
+        <div><a href="#">Maritime &amp; shipping<span class="count">33</span></a></div>
+        <div><a href="#">Parish registers<span class="count">19</span></a></div>
+        <div><a href="#">Photographic collections<span class="count">47</span></a></div>
+        <div><a href="#">Treaties &amp; legislation<span class="count">22</span></a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm" style="border-bottom: 0;">
+    <div class="container">
+      <div class="corrections-row">
+        <div>
+          <span class="eyebrow">CORRECTIONS &amp; CLARIFICATIONS</span>
+          <p style="margin: 12px 0 0; color: var(--text-muted); max-width: 70ch;">The Archive records and publishes all corrections to previously issued notices. If you believe a published notice contains a factual error, or if a release reference number resolves incorrectly, please notify us at the address below — we will investigate and amend the public record where appropriate.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; align-items: stretch;">
+          <a class="btn" href="contact.html">Report a correction</a>
+          <a class="btn btn-ghost" href="#">View corrections log</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">National Archive</span>
+            <span class="brand-sub">Est. 1934</span>
+          </span>
+        </a>
+        <p>The custodian of the nation's permanent public record. Open to researchers, journalists, and the public — in person and online.</p>
+        <p class="mono" style="font-size:12px;color:var(--text-dim);margin-top:14px;">Reading rooms · Tue–Sat 09:00–17:00</p>
+      </div>
+      <div class="footer-col">
+        <h5>Research</h5>
+        <ul>
+          <li><a href="services.html">Catalogue search</a></li>
+          <li><a href="#">Digitised collections</a></li>
+          <li><a href="#">Open datasets</a></li>
+          <li><a href="#">Finding aids</a></li>
+          <li><a href="#">Citation guidance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Requests</h5>
+        <ul>
+          <li><a href="forms.html">Records request (FOI)</a></li>
+          <li><a href="forms.html">Reading room booking</a></li>
+          <li><a href="forms.html">Reproduction order</a></li>
+          <li><a href="forms.html">Restricted access</a></li>
+          <li><a href="forms.html">Transfer of records</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="about.html">Mission &amp; mandate</a></li>
+          <li><a href="departments.html">Departments</a></li>
+          <li><a href="#">Leadership</a></li>
+          <li><a href="news.html">News &amp; notices</a></li>
+          <li><a href="#">Annual reports</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Help</h5>
+        <ul>
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a href="#">Accessibility</a></li>
+          <li><a href="#">Languages</a></li>
+          <li><a href="#">Sitemap</a></li>
+          <li><a href="#">Status &amp; outages</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 1934–2025 National Archive. Open content licensed under the Open Government Licence v3.0 unless otherwise noted.</span>
+      <span class="legal">
+        <a href="#">Privacy notice</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Cookies</a>
+        <a href="#">FOI disclosures</a>
+      </span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

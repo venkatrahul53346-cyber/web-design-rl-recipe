@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live: 36 Hours at Saint-Jean Bakery, Lyon — Sandfork</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific: live blog layout */
+  .live-hero { border-bottom: 1px solid var(--bg-rule); padding: 36px 0 28px; }
+  .live-hero .kicker-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+  .live-indicator { display: inline-flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 700; font-style: italic; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: var(--live); }
+  .live-indicator::before { content: ''; width: 9px; height: 9px; background: var(--live); display: inline-block; border-radius: 50%; animation: livepulse 1.6s ease-in-out infinite; }
+  @keyframes livepulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(200,81,58,.55); } 50% { opacity: .55; box-shadow: 0 0 0 7px rgba(200,81,58,0); } }
+  .live-hero h1 { max-width: 22ch; margin-bottom: 14px; }
+  .live-hero h1 em { font-style: italic; font-weight: 800; color: var(--ink); }
+  .live-hero .dek { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 1.32rem; line-height: 1.4; color: var(--ink-dim); max-width: 62ch; margin-bottom: 18px; }
+  .live-hero .meta-row { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; padding-top: 14px; border-top: 1px solid var(--bg-rule); }
+  .live-hero .meta-row .stat { font-family: var(--body); font-size: .85rem; color: var(--ink-dim); }
+  .live-hero .meta-row .stat strong { font-family: var(--display); font-weight: 700; color: var(--amber-bright); font-size: 1.1rem; display: block; letter-spacing: -.01em; }
+
+  .live-banner { position: relative; aspect-ratio: 21/9; overflow: hidden; margin: 0 0 40px; background: #1a1611; }
+  .live-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,13,11,.1) 40%, rgba(14,13,11,.85) 100%); z-index: 1; }
+  .live-banner img { width: 100%; height: 100%; object-fit: cover; }
+  .live-banner .caption { position: absolute; bottom: 18px; left: 28px; right: 28px; font-family: var(--body); font-style: italic; font-size: .88rem; color: var(--ink-dim); z-index: 2; }
+  .live-banner .caption strong { color: var(--ink); font-style: normal; font-weight: 600; margin-right: 8px; }
+
+  /* Two-column main layout */
+  .live-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 56px; padding: 16px 0 80px; }
+  @media (max-width: 980px) { .live-layout { grid-template-columns: 1fr; gap: 40px; } }
+
+  /* Update entries */
+  .updates { position: relative; min-width: 0; }
+  .updates::before { content: ''; position: absolute; left: 7px; top: 14px; bottom: 0; width: 1px; background: var(--bg-rule); }
+  .entry { position: relative; padding: 0 0 44px 36px; }
+  .entry::before { content: ''; position: absolute; left: 0; top: 8px; width: 15px; height: 15px; background: var(--bg); border: 2px solid var(--amber); }
+  .entry.is-live::before { background: var(--live); border-color: var(--live); animation: livepulse 1.6s ease-in-out infinite; }
+  .entry-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+  .entry-time { font-family: var(--display); font-weight: 700; font-size: 1.18rem; color: var(--amber-bright); letter-spacing: -.01em; }
+  .entry-date { font-family: var(--body); font-style: italic; font-size: .82rem; color: var(--ink-mute); letter-spacing: .02em; }
+  .entry-author { font-family: var(--body); font-size: .82rem; color: var(--ink-dim); margin-left: auto; }
+  .entry-author strong { color: var(--ink); font-weight: 600; }
+  .entry h2 { font-family: var(--display); font-weight: 700; font-size: 1.55rem; letter-spacing: -.02em; line-height: 1.15; margin-bottom: 10px; }
+  .entry h2.italic { font-style: italic; }
+  .entry p { color: var(--ink); font-size: 1.02rem; line-height: 1.6; max-width: 64ch; }
+  .entry p + p { margin-top: .2em; }
+  .entry .entry-img { margin: 16px 0; aspect-ratio: 3/2; overflow: hidden; background: var(--bg-elev); max-width: 100%; position: relative; }
+  .entry .entry-img img { width: 100%; height: 100%; object-fit: cover; }
+  .entry .entry-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,13,11,0) 60%, rgba(14,13,11,.55) 100%); pointer-events: none; }
+  .entry .img-caption { font-family: var(--body); font-style: italic; font-size: .82rem; color: var(--ink-mute); margin-top: -10px; margin-bottom: 16px; max-width: 60ch; }
+
+  /* Pull-quote inside entry */
+  .pull { border-left: 2px solid var(--amber); padding: 8px 0 8px 22px; margin: 18px 0; font-family: var(--display); font-style: italic; font-weight: 500; font-size: 1.32rem; line-height: 1.3; color: var(--ink); max-width: 50ch; }
+  .pull cite { display: block; font-family: var(--body); font-style: normal; font-size: .82rem; color: var(--ink-dim); margin-top: 8px; letter-spacing: .04em; text-transform: uppercase; }
+
+  /* Recipe / sidebar boxes */
+  .recipe-box { background: var(--bg-elev); border-left: 3px solid var(--amber); padding: 22px 24px; margin: 18px 0; max-width: 60ch; }
+  .recipe-box .kicker { margin-bottom: 8px; }
+  .recipe-box h4 { font-family: var(--display); font-weight: 700; font-size: 1.12rem; margin-bottom: 10px; }
+  .recipe-box ul { margin: 0; padding: 0; list-style: none; font-size: .94rem; color: var(--ink-dim); }
+  .recipe-box ul li { padding: 5px 0; border-top: 1px solid var(--bg-rule); display: flex; justify-content: space-between; gap: 12px; }
+  .recipe-box ul li:first-child { border-top: 0; }
+  .recipe-box ul li span { color: var(--ink); }
+
+  /* Sidebar */
+  .sidebar { font-family: var(--body); min-width: 0; }
+  .sidebar .side-block { padding: 0 0 32px; margin-bottom: 32px; border-bottom: 1px solid var(--bg-rule); }
+  .sidebar .side-block:last-child { border-bottom: 0; }
+  .sidebar h4.side-head { font-family: var(--display); font-weight: 700; font-style: italic; font-size: 1.02rem; letter-spacing: .04em; text-transform: uppercase; color: var(--ink); border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 16px; }
+
+  /* Most-read list */
+  .most-read { list-style: none; padding: 0; margin: 0; }
+  .most-read li { display: grid; grid-template-columns: 44px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--bg-rule); align-items: start; }
+  .most-read li:first-child { border-top: 0; padding-top: 4px; }
+  .most-read .num { font-family: var(--display); font-weight: 800; font-style: italic; font-size: 2rem; color: var(--amber-bright); line-height: 1; letter-spacing: -.04em; }
+  .most-read a { color: var(--ink); font-family: var(--display); font-weight: 500; font-size: 1.02rem; line-height: 1.2; letter-spacing: -.01em; }
+  .most-read a:hover { color: var(--amber-bright); text-decoration: none; }
+  .most-read .meta { display: block; font-family: var(--body); font-style: italic; font-size: .78rem; color: var(--ink-mute); margin-top: 4px; }
+
+  /* Live participants */
+  .reporters { list-style: none; padding: 0; margin: 0; }
+  .reporters li { display: grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid var(--bg-rule); }
+  .reporters li:first-child { border-top: 0; }
+  .reporters .avatar { width: 38px; height: 38px; background: var(--amber); color: var(--bg); font-family: var(--display); font-weight: 800; font-size: 1rem; display: flex; align-items: center; justify-content: center; letter-spacing: -.02em; }
+  .reporters strong { display: block; color: var(--ink); font-family: var(--display); font-weight: 600; font-size: .98rem; }
+  .reporters span { font-family: var(--body); font-style: italic; font-size: .8rem; color: var(--ink-dim); }
+
+  /* Promo */
+  .promo { border: 1px solid var(--amber); padding: 22px 22px 24px; }
+  .promo .kicker { margin-bottom: 6px; }
+  .promo h4 { font-family: var(--display); font-weight: 700; font-style: italic; font-size: 1.32rem; line-height: 1.15; letter-spacing: -.015em; margin-bottom: 8px; }
+  .promo p { font-size: .88rem; color: var(--ink-dim); margin-bottom: 14px; }
+  .promo form { display: flex; flex-direction: column; gap: 8px; }
+  .promo input { background: transparent; border: 0; border-bottom: 1px solid var(--bg-rule); padding: 8px 0; font-family: var(--body); font-size: .92rem; color: var(--ink); outline: none; }
+  .promo input:focus { border-bottom-color: var(--amber-bright); }
+  .promo button { font-family: var(--display); font-weight: 700; font-style: italic; background: var(--honey); color: var(--bg); border: 0; padding: 9px 14px; cursor: pointer; font-size: .92rem; letter-spacing: .02em; align-self: flex-start; margin-top: 4px; }
+  .promo button:hover { background: var(--amber-bright); }
+
+  /* Schedule list */
+  .schedule { list-style: none; padding: 0; margin: 0; font-family: var(--body); }
+  .schedule li { display: grid; grid-template-columns: 72px 1fr; gap: 14px; padding: 10px 0; border-top: 1px solid var(--bg-rule); font-size: .92rem; }
+  .schedule li:first-child { border-top: 0; }
+  .schedule .when { font-family: var(--display); font-weight: 600; color: var(--amber-bright); letter-spacing: -.01em; }
+  .schedule .what { color: var(--ink); }
+  .schedule .what em { font-style: italic; color: var(--ink-dim); display: block; font-size: .82rem; margin-top: 2px; }
+
+  /* End-of-blog footer note */
+  .updates-end { padding: 0 0 0 36px; border-top: 1px solid var(--bg-rule); margin-top: 16px; padding-top: 24px; }
+  .updates-end p { font-family: var(--display); font-style: italic; color: var(--ink-dim); max-width: 56ch; }
+
+  /* Tag row in hero */
+  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  @media (max-width: 600px) {
+    .live-hero { padding: 24px 0 22px; }
+    .live-banner { aspect-ratio: 4/3; margin-bottom: 28px; }
+    .live-banner .caption { left: 16px; right: 16px; bottom: 12px; font-size: .78rem; }
+    .entry { padding-left: 26px; padding-bottom: 36px; }
+    .entry-author { margin-left: 0; width: 100%; }
+    .updates-end { padding-left: 26px; }
+    .live-hero .meta-row .tag-row { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="masthead">
+    <a href="index.html" class="brand">Sandfork<sup>№ 07</sup></a>
+    <div class="masthead-meta">
+      <span class="issue">Saturday, 18 November · Issue Nº 07 in print</span>
+      <span>—</span>
+      <a href="#">Sign in</a>
+      <a href="#" class="subscribe-btn">Subscribe</a>
+    </div>
+  </div>
+  <nav class="section-nav">
+    <div class="section-nav-inner">
+      <a href="index.html">Today</a>
+      <a href="section.html">Recipes</a>
+      <a href="section.html">Technique</a>
+      <a href="topic.html">Pantry</a>
+      <a href="video.html">Video</a>
+      <a href="live-blog.html" class="current">Live</a>
+      <a href="section.html">Bakery</a>
+      <a href="section.html">Profiles</a>
+      <a href="section.html">Letters</a>
+      <a href="section.html">The Print Journal</a>
+    </div>
+  </nav>
+  <div class="ticker">
+    <span class="ticker-label">In the kitchen</span>
+    <div class="ticker-items">
+      <span><a href="live-blog.html">Live: 36 hours at Saint-Jean bakery, Lyon</a></span>
+      <span>Quince paste is back — three recipes from the new issue</span>
+      <span>Why your stock tastes flat (and the 14-minute fix)</span>
+      <span>Reader letters: the great salt cod debate</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="live-hero">
+      <div class="kicker-row">
+        <span class="live-indicator">Live · updating</span>
+        <span class="kicker" style="margin: 0;">The Bakery Files · Dispatch 03</span>
+        <span class="timestamp">Started Friday 17 Nov, 03:40 CET · Day 2 of 2</span>
+      </div>
+      <h1>Thirty-six hours at <em>Saint-Jean</em>, the Lyon bakery that refuses to open before dawn</h1>
+      <p class="dek">Marguerite Vasseur bakes 240 loaves a day from a basement oven her grandfather built in 1953. We are following her from the first mix through Sunday lunch service — flour temperatures, sleep deprivation, an unexpected delivery of chestnut flour, and the queue that has formed every morning since 1971.</p>
+      <div class="meta-row">
+        <div class="stat"><strong>34</strong> Updates so far</div>
+        <div class="stat"><strong>3</strong> Reporters on the ground</div>
+        <div class="stat"><strong>17.2°C</strong> Levain temperature</div>
+        <div class="stat"><strong>240</strong> Loaves expected by 7 a.m.</div>
+        <div class="tag-row" style="margin-left:auto;">
+          <span class="tag">Bread</span>
+          <span class="tag">Lyon</span>
+          <span class="tag">Profiles</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="live-banner">
+      <img src="photo-landscape-1.jpg" alt="Marguerite Vasseur scoring loaves under a hanging lamp in the Saint-Jean basement bakery">
+      <div class="caption"><strong>04:12 CET</strong> Marguerite scoring the morning's first batch of pain de campagne. Photograph by Claire Bénichou for Sandfork.</div>
+    </div>
+
+    <div class="live-layout">
+      <!-- ============== UPDATES STREAM ============== -->
+      <section class="updates">
+
+        <article class="entry is-live">
+          <header class="entry-head">
+            <span class="entry-time">06:48</span>
+            <span class="entry-date">Saturday — just now</span>
+            <span class="entry-author">By <strong>Claire Bénichou</strong></span>
+          </header>
+          <h2 class="italic">The queue starts forming in the dark, as it always does.</h2>
+          <p>It is still twenty minutes before the door opens and there are already nine people on the cobbles outside, hands buried in coat sleeves, breath visible. The man at the front — Henri, retired, comes every Saturday since his wife died — has been here since five forty. He doesn't talk about the bread. He talks about the rain.</p>
+          <p>Inside, Marguerite is loading the third batch. The oven has been running since one a.m. and the bakery now smells the way only a working bakery in the small hours smells: hot stone, caramelised crust, and something faintly sweet from yesterday's brioche dough fermenting in the corner.</p>
+          <div class="pull">“If they come before the door is open, that is their business. The bread is ready when it is ready.”<cite>— Marguerite Vasseur</cite></div>
+        </article>
+
+        <article class="entry">
+          <header class="entry-head">
+            <span class="entry-time">05:30</span>
+            <span class="entry-date">Saturday</span>
+            <span class="entry-author">By <strong>Tom Ardoin</strong></span>
+          </header>
+          <h2>An unexpected delivery: 12 kilos of chestnut flour from the Ardèche</h2>
+          <p>A van pulled up on Rue des Trois-Maries at five fifteen — earlier than expected — carrying a sack of stone-milled chestnut flour from a producer in Vals-les-Bains. Marguerite hadn't planned for it. She does now. The Sunday loaves, she tells me, will go 15% chestnut, 85% T80. “It will be sweet. People will think I have added sugar. I have not added sugar.”</p>
+          <div class="entry-img"><img src="photo-product-1.jpg" alt="Open paper sack of chestnut flour on the bakery counter"></div>
+          <p class="img-caption">The chestnut flour, milled four days ago. It smells, improbably, of toasted hazelnut and damp wood.</p>
+          <div class="recipe-box">
+            <span class="kicker">Recipe sidebar · added 05:42</span>
+            <h4>Chestnut & honey loaf — Marguerite's working ratio</h4>
+            <ul>
+              <li>T80 wheat flour <span>850 g</span></li>
+              <li>Chestnut flour, stone-milled <span>150 g</span></li>
+              <li>Stiff levain (overnight) <span>220 g</span></li>
+              <li>Water, 26°C <span>720 g</span></li>
+              <li>Sea salt <span>20 g</span></li>
+              <li>Chestnut honey, optional <span>1 tbsp</span></li>
+            </ul>
+            <p style="margin-top:12px; font-size:.86rem; color: var(--ink-dim);">Autolyse 45 min. Three folds at 30 min intervals. Bulk 4–5 hours at 23°C. Shape, retard overnight at 6°C. Bake 250°C falling to 220°C, 38 minutes, dark.</p>
+          </div>
+        </article>
+
+        <article class="entry">
+          <header class="entry-head">
+            <span class="entry-time">04:12</span>
+            <span class="entry-date">Saturday</span>
+            <span class="entry-author">By <strong>Claire Bénichou</strong></span>
+          </header>
+          <h2 class="italic">First batch is in. Twenty-four kilos of dough, four minutes of total silence.</h2>
+          <p>There is a particular calm at four in the morning when the oven door comes down. Marguerite scored each loaf with two parallel cuts and a third diagonal — the Saint-Jean signature, unchanged since her grandfather — then loaded twelve at a time onto the peel. Nobody spoke. Étienne, her one apprentice, watched from the doorway with a clipboard.</p>
+          <p>The crust will set in seven minutes. After that there's nothing to do but wait, and Marguerite uses the time the way she always uses it: she makes coffee, sits on the upturned crate by the flour bin, and reads two pages of whatever book is on the shelf. Tonight: Colette.</p>
+        </article>
+
+        <article class="entry">
+          <header class="entry-head">
+            <span class="entry-time">02:55</span>
+            <span class="entry-date">Saturday</span>
+            <span class="entry-author">By <strong>Tom Ardoin</strong></span>
+          </header>
+          <h2>The levain is reading 17.2°C — a degree colder than she'd like</h2>
+          <p>Marguerite keeps her starter in a covered ceramic crock on a shelf above the proving oven, which radiates a gentle warmth. The target is 18.5°C at this stage of bulk fermentation. Tonight, the November cold has got into the basement faster than expected and the crock is reading 17.2°C on the probe thermometer.</p>
+          <p>Her response is unhurried: she pulls the dough tubs six inches closer to the oven, drapes them with a second linen cloth, and adjusts her schedule by twenty-three minutes. “It will catch up,” she says, without looking up. “It always catches up.”</p>
+        </article>
+
+        <article class="entry">
+          <header class="entry-head">
+            <span class="entry-time">01:18</span>
+            <span class="entry-date">Saturday</span>
+            <span class="entry-author">By <strong>Claire Bénichou</strong></span>
+          </header>
+          <h2>Pre-shaping the country loaves, by hand, in the half-dark</h2>
+          <p>Saint-Jean has no dough divider. Marguerite weighs each piece on a brass scale her father bought at a flea market in 1968 — 920 grams, every time, to within five grams. She has been doing this for thirty-one years. Her hands know it before the scale confirms it.</p>
+          <p>The dough is loose, very hydrated, and her shaping is brief: a single fold, a quarter turn, a gentle round. She works under one bulb. The basement is forty square metres. The whole operation, including the oven, lives in this room.</p>
+        </article>
+
+        <article class="entry">
+          <header class="entry-head">
+            <span class="entry-time">23:40</span>
+            <span class="entry-date">Friday</span>
+            <span class="entry-author">By <strong>Tom Ardoin</strong></span>
+          </header>
+          <h2 class="italic">She lights the wood-fire oven the same way every Friday: with yesterday's bread.</h2>
+          <p>The oven is a deck oven built in 1953 by Marguerite's grandfather and a mason from Vienne, brick by brick, in this same basement. It takes four hours to reach temperature. Marguerite starts the fire with the heels of the previous week's unsold loaves, broken into kindling and stacked dry. “Nothing is wasted,” she says. “Not even me.”</p>
+          <div class="entry-img"><img src="photo-product-2.jpg" alt="Glow of the wood-fired oven mouth at midnight"></div>
+          <p class="img-caption">The oven mouth, eleven forty p.m. Friday. Stone temperature: 142°C, climbing.</p>
+        </article>
+
+        <article class="entry">
+          <header class="entry-head">
+            <span class="entry-time">22:10</span>
+            <span class="entry-date">Friday</span>
+            <span class="entry-author">By <strong>Eli Park</strong></span>
+          </header>
+          <h2>Mixing the levain refresh — 1:2:2, by feel and by smell</h2>
+          <p>Tonight's refresh is one part mother, two parts water, two parts flour. Marguerite doesn't measure the water; she pours from a tin pitcher until the dough "sounds right" against the wooden spoon. The first time I asked her what "sounds right" meant, she laughed for a long time and then refused to answer.</p>
+          <p>The starter is fed and covered. It will triple by one a.m. We will know when it is ready because a small dot of starter, dropped into a glass of room-temperature water, will float. This is the only test she trusts.</p>
+        </article>
+
+        <article class="entry">
+          <header class="entry-head">
+            <span class="entry-time">21:30</span>
+            <span class="entry-date">Friday — Day 1 begins</span>
+            <span class="entry-author">By <strong>Eli Park</strong></span>
+          </header>
+          <h2>We arrive at Saint-Jean. Marguerite is already three hours into the day.</h2>
+          <p>The bakery has no sign on Rue des Trois-Maries. You find it by the queue, or by the smell, or because someone has told you. We came down a narrow stone staircase past two recycling bins and a bicycle, and there she was at the wooden bench, sleeves to the elbow, weighing flour by the kilogram into a galvanised tub.</p>
+          <p>She did not look up. She said, "You're early. The bread isn't." Then she handed Eli a brush and asked him to oil the proving baskets. That is how the next thirty-six hours began.</p>
+        </article>
+
+        <div class="updates-end">
+          <p>Coverage continues until Sunday 19 November, approximately 14:00 CET, when the last loaf of Issue Nº 07's accompanying bread feature is pulled from the oven. Reporters Claire Bénichou, Tom Ardoin and Eli Park are on rotation. Refresh for new entries.</p>
+        </div>
+      </section>
+
+      <!-- ============== SIDEBAR ============== -->
+      <aside class="sidebar">
+
+        <div class="side-block">
+          <h4 class="side-head">On the ground</h4>
+          <ul class="reporters">
+            <li>
+              <div class="avatar">CB</div>
+              <div>
+                <strong>Claire Bénichou</strong>
+                <span>Lead reporter & photographer · in the bakery</span>
+              </div>
+            </li>
+            <li>
+              <div class="avatar">TA</div>
+              <div>
+                <strong>Tom Ardoin</strong>
+                <span>Senior editor · taking notes by the oven</span>
+              </div>
+            </li>
+            <li>
+              <div class="avatar">EP</div>
+              <div>
+                <strong>Eli Park</strong>
+                <span>Recipe testing · oiling the bannetons</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="side-block">
+          <h4 class="side-head">What happens next</h4>
+          <ul class="schedule">
+            <li>
+              <span class="when">07:00</span>
+              <span class="what">Doors open · first sale<em>If they sell out by 9:30, that's it — no more bread today.</em></span>
+            </li>
+            <li>
+              <span class="when">10:15</span>
+              <span class="what">Brioche & viennoiseries pulled<em>The Saturday-only butter brioche, made with a 36-hour cold ferment.</em></span>
+            </li>
+            <li>
+              <span class="when">13:00</span>
+              <span class="what">Sleep · 4 hours<em>The only sleep Marguerite gets in the 36-hour window.</em></span>
+            </li>
+            <li>
+              <span class="when">18:00</span>
+              <span class="what">Sunday mix begins<em>Chestnut-flour loaves enter bulk fermentation.</em></span>
+            </li>
+            <li>
+              <span class="when">Sun 06:30</span>
+              <span class="what">Sunday bake-off<em>Including pain au levain for the lunch service at Café Modeste.</em></span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="side-block">
+          <h4 class="side-head">Most read this week</h4>
+          <ol class="most-read">
+            <li>
+              <span class="num">01</span>
+              <div>
+                <a href="#">Why your stock tastes flat (and the 14-minute fix)</a>
+                <span class="meta">Tom Ardoin · 9 min read</span>
+              </div>
+            </li>
+            <li>
+              <span class="num">02</span>
+              <div>
+                <a href="#">Quince paste, three ways, from the new issue</a>
+                <span class="meta">Eli Park · 12 min read</span>
+              </div>
+            </li>
+            <li>
+              <span class="num">03</span>
+              <div>
+                <a href="#">The great salt cod debate: 47 reader letters</a>
+                <span class="meta">Letters desk · 18 min read</span>
+              </div>
+            </li>
+            <li>
+              <span class="num">04</span>
+              <div>
+                <a href="#">A defence of the boring weeknight chicken</a>
+                <span class="meta">Claire Bénichou · 7 min read</span>
+              </div>
+            </li>
+            <li>
+              <span class="num">05</span>
+              <div>
+                <a href="#">Notes on a tin of anchovies, after midnight</a>
+                <span class="meta">From Issue Nº 06 · 5 min read</span>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="side-block">
+          <div class="promo">
+            <span class="kicker">The weekly letter</span>
+            <h4>Get the next dispatch in your inbox, Sunday morning.</h4>
+            <p>One letter a week from the Sandfork desk: what we cooked, what we read, and what's coming in Issue Nº 08. Free, no fuss, occasionally recipes.</p>
+            <form>
+              <input type="email" placeholder="your@email" aria-label="Email address">
+              <button type="submit">Subscribe →</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="side-block">
+          <h4 class="side-head">Earlier live blogs</h4>
+          <ul class="most-read">
+            <li>
+              <span class="num">↻</span>
+              <div>
+                <a href="#">Salt harvest, Guérande — 22 hours in the marais</a>
+                <span class="meta">Dispatch 02 · September 2024</span>
+              </div>
+            </li>
+            <li>
+              <span class="num">↻</span>
+              <div>
+                <a href="#">A Sicilian olive press at the end of October</a>
+                <span class="meta">Dispatch 01 · October 2024</span>
+              </div>
+            </li>
+            <li>
+              <span class="num">↻</span>
+              <div>
+                <a href="#">Three days at a Tokyo dashi maker</a>
+                <span class="meta">Pilot · June 2024</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">Sandfork</a>
+        <p>A cooking journal, published on paper twice a year and online when there is something to say. Notes from the cooking class — recipes, technique, and the people who make food.</p>
+      </div>
+      <div>
+        <h5>Read</h5>
+        <ul>
+          <li><a href="section.html">Recipes</a></li>
+          <li><a href="section.html">Technique</a></li>
+          <li><a href="section.html">Profiles</a></li>
+          <li><a href="video.html">Video</a></li>
+          <li><a href="live-blog.html">Live blog</a></li>
+          <li><a href="topic.html">Topics A–Z</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>The Journal</h5>
+        <ul>
+          <li><a href="#">Issue Nº 07 — Autumn</a></li>
+          <li><a href="#">The archive</a></li>
+          <li><a href="#">Print subscription · £36</a></li>
+          <li><a href="#">Gift a year</a></li>
+          <li><a href="#">Stockists</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>About</h5>
+        <ul>
+          <li><a href="#">Who we are</a></li>
+          <li><a href="#">Masthead</a></li>
+          <li><a href="#">Contributors</a></li>
+          <li><a href="#">Pitch us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Follow</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Substack</a></li>
+          <li><a href="#">RSS · all stories</a></li>
+          <li><a href="#">Weekly letter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="colophon">© 2024 Sandfork Press Ltd. Set in Fraunces &amp; Source Serif. Printed in Norwich on Munken Pure 100gsm.</div>
+      <div><a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; <a href="#">Ethics &amp; corrections</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

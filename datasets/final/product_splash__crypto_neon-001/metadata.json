@@ -1,0 +1,65 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "product_splash__crypto_neon-0000",
+    "archetype": "A9",
+    "vertical": "ai-product",
+    "style": {
+      "density": "balanced",
+      "color_regime": "neon",
+      "typography": "geometric-sans",
+      "border_language": "hairline-1px",
+      "motif": "abstract-3d"
+    },
+    "palette_seed": "#7C5BFF",
+    "font_pair": [
+      "Inter",
+      "Inter",
+      null
+    ],
+    "difficulty": "hard",
+    "sitemap": [
+      "index",
+      "press",
+      "faq",
+      "specs",
+      "preorder",
+      "story"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Pliny",
+      "tagline": "An AI second pair of eyes for your code",
+      "value_prop": "Pliny reviews every pull request the moment it opens \u2014 finds bugs, spots regressions, files concrete suggestions. Trained on your codebase.",
+      "product_category": "AI code review",
+      "target_audience": "senior engineers and tech leads"
+    },
+    "notes": "WHAT WE'RE BUILDING (product_splash):\nA cinematic single-product splash page \u2014 usually for an AI hardware device or a flagship consumer product launch. The page IS the product. Index is hero + scroll-driven feature beats (each section = one image + one short copy block). Story page is long-form narrative. Specs page is a specification table. Preorder is minimal (email + country). FAQ is a vertical accordion. Press has logos + media mentions. Avoid feature-grid cards; this is intentionally low-density.\n\nBRAND: Pliny \u2014 \"An AI second pair of eyes for your code\"\nPliny reviews every pull request the moment it opens \u2014 finds bugs, spots regressions, files concrete suggestions. Trained on your codebase.\n\nVISUAL LANGUAGE (crypto_neon):\nBackground near-pure-black (#000 / #08080C). High-saturation neon accent (palette anchor) used for primary CTAs, glowing data points, animated decorations. Hairline 1px borders (#1A1A22) for cards. Display headlines large with optional neon glow (text-shadow). Body type clean sans at high contrast (#F0F0F8). Decorative motif: abstract 3D blobs / iridescent gradients in palette colors. CTA buttons neon-filled. \"Connect wallet\" or similar action button prominent. Numerals tabular for chart data. Avoid: warm muted palettes, serif body, default-Tailwind dark-mode (this is louder).\n\nDESIGN REFERENCES (style + topic): rabbit.tech, humane.com, teenage.engineering, uniswap.org, ledger.com, magiceden.io\n\nPER-PAGE GUIDANCE:\n- index: Hero is product image + 1-2 line tagline, NO CTA above the fold (the page itself is the CTA). Below: scroll-revealed feature beats \u2014 each section a single image + short copy, alternating image-left / image-right.\n- press: Press logos cluster + recent media mentions list + press contact.\n- faq: Vertical accordion. ~10 questions, concise answers.\n- specs: Technical spec table \u2014 dimensions, weight, battery, materials. Tabular figures, hairline dividers, no decorations.\n- preorder: Minimal form \u2014 email + (optional) shipping country, oversized CTA, FAQ link.\n- story: Long-form narrative about the product. Oversized type, photographic interludes. Reads like an essay.\n\nIMAGE POLICY (HARD CONSTRAINT):\n- For purely decorative content (hero illustrations, abstract section   dividers, decorative blobs): use NO `<img>` tags. Use CSS gradients,   inline SVG, or styled `<div>` blocks with `background-color` /   `aspect-ratio` instead.\n- For content-essential photography (product photos, dish photos, hotel   rooms, portrait avatars, editorial leads), use `<img src=\"X\">` where   X is EXCLUSIVELY one of these five filenames:\n    photo-product-1.jpg     (generic product / object \u2014 warm tones)\n    photo-product-2.jpg     (cooler product variant \u2014 for grids)\n    photo-portrait-1.jpg    (generic person \u2014 for avatars / team / bylines)\n    photo-landscape-1.jpg   (generic scene \u2014 for hero / hospitality leads)\n    illustration-abstract.jpg (mesh-gradient \u2014 for splash / decorative hero)\n- Repeating a filename across multiple `<img>` tags is fine.\n- ANY OTHER `src=` value will be rejected at validation time. No external\n  URLs, no other filenames, no svg files."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "faq",
+    "index",
+    "preorder",
+    "press",
+    "specs",
+    "story"
+  ],
+  "files": [
+    "faq.html",
+    "index.html",
+    "preorder.html",
+    "press.html",
+    "specs.html",
+    "story.html",
+    "styles.css"
+  ],
+  "has_external_css": true,
+  "assets": [
+    "illustration-abstract.jpg",
+    "photo-landscape-1.jpg",
+    "photo-portrait-1.jpg",
+    "photo-product-1.jpg",
+    "photo-product-2.jpg"
+  ]
+}

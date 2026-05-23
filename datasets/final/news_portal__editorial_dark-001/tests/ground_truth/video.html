@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video — Sandfork</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* page-specific: video index */
+  .video-hero { position: relative; margin-bottom: 64px; }
+  .video-hero .hero-img { position: relative; aspect-ratio: 21/9; overflow: hidden; background:#16140F; }
+  .video-hero .hero-img img { width:100%; height:100%; object-fit:cover; }
+  .video-hero .hero-img::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(14,13,11,.05) 0%, rgba(14,13,11,.45) 55%, rgba(14,13,11,.96) 100%); }
+  .video-hero .play-btn { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:92px; height:92px; background:var(--honey); color:var(--bg); display:flex; align-items:center; justify-content:center; z-index:3; font-family:var(--display); font-weight:900; font-size:2rem; }
+  .video-hero .play-btn::after { content:'▶'; }
+  .video-hero .hero-text { position:absolute; bottom:0; left:0; right:0; padding: 0 48px 44px; z-index:2; max-width: 1440px; margin: 0 auto; }
+  .video-hero .hero-text h1 { max-width: 22ch; font-style: italic; font-weight: 800; }
+  .video-hero .hero-text .dek { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 1.3rem; line-height:1.4; color: var(--ink); max-width: 58ch; margin-top: 14px; }
+  .video-hero .meta-row { display:flex; gap:24px; align-items:center; margin-top:18px; color:var(--ink-dim); font-size:.88rem; font-family:var(--body); flex-wrap:wrap; }
+  .video-hero .meta-row strong { color: var(--ink); font-weight:600; }
+  .runtime-chip { background: rgba(14,13,11,.8); border:1px solid var(--amber); color:var(--amber-bright); font-family:var(--body); font-size:.78rem; letter-spacing:.08em; padding:4px 10px; text-transform:uppercase; }
+
+  /* decorative thumb fallbacks — used when an <img> would be too heavy */
+  .thumb-deco { width:100%; height:100%; position:absolute; inset:0; }
+  .deco-1 { background: radial-gradient(120% 80% at 30% 70%, #3a2616 0%, #1a120b 55%, #0E0D0B 100%), linear-gradient(180deg, #2a1d12, #0E0D0B); }
+  .deco-2 { background: linear-gradient(135deg, #1d1812 0%, #2e2418 45%, #5a3a22 100%); }
+  .deco-3 { background: radial-gradient(80% 60% at 70% 40%, #6b4426 0%, #2a1c11 60%, #0E0D0B 100%); }
+  .deco-4 { background: linear-gradient(180deg, #0E0D0B 0%, #1f1812 50%, #4a2f1c 100%); }
+  .deco-5 { background: radial-gradient(60% 80% at 40% 50%, #8a5a36 0%, #3a2515 55%, #0E0D0B 100%); }
+  .deco-6 { background: linear-gradient(45deg, #16140F 0%, #2a1f15 50%, #16140F 100%); }
+
+  /* series strip */
+  .series-rail { display:grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin-bottom: 72px; }
+  .series-card { border:1px solid var(--bg-rule); padding: 22px 22px 24px; background: var(--bg-elev); border-left: 3px solid var(--amber); }
+  .series-card .num { font-family:var(--display); font-weight:900; font-size:2.2rem; color:var(--amber-bright); letter-spacing:-0.04em; line-height:1; margin-bottom:8px; display:block; }
+  .series-card h3 { font-size: 1.18rem; font-style: italic; margin-bottom: 8px; }
+  .series-card p { color: var(--ink-dim); font-size:.9rem; margin-bottom: 14px; }
+  .series-card .series-meta { font-family:var(--body); font-style:italic; color:var(--ink-mute); font-size:.82rem; }
+  @media (max-width: 1000px) { .series-rail { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .series-rail { grid-template-columns: 1fr; } }
+
+  /* section heads */
+  .sec-head { display:flex; align-items:baseline; justify-content:space-between; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 36px; gap: 18px; flex-wrap:wrap; }
+  .sec-head h2 { font-style: italic; font-weight: 700; margin: 0; }
+  .sec-head .sec-link { font-family: var(--body); font-style: italic; font-size: .92rem; color: var(--amber-bright); }
+
+  .video-main { display:grid; grid-template-columns: 2fr 1fr; gap: 56px 48px; margin-bottom: 88px; }
+  @media (max-width: 1000px) { .video-main { grid-template-columns: 1fr; } }
+
+  .ep-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 44px 32px; }
+  @media (max-width: 700px) { .ep-grid { grid-template-columns: 1fr; } }
+
+  .ep .thumb { position: relative; aspect-ratio: 16/9; overflow:hidden; margin-bottom: 14px; background:#16140F; display:block; }
+  .ep .thumb img { width:100%; height:100%; object-fit:cover; }
+  .ep .thumb .dur { position:absolute; bottom:10px; right:10px; background: rgba(14,13,11,.85); color: var(--ink); font-family: var(--body); font-size:.78rem; padding: 3px 8px; letter-spacing:.04em; z-index:2; }
+  .ep .thumb .play { position:absolute; top:50%; left:50%; transform: translate(-50%,-50%); width:54px; height:54px; background:rgba(14,13,11,.78); border:1px solid var(--amber-bright); color:var(--amber-bright); display:flex; align-items:center; justify-content:center; font-size:1.1rem; z-index:2; }
+  .ep .thumb .play::after { content:'▶'; }
+  .ep h3 { font-size: 1.26rem; line-height:1.18; margin-bottom: 8px; }
+  .ep h3 a { color: var(--ink); }
+  .ep h3 a:hover { color: var(--amber-bright); text-decoration: none; }
+  .ep p { color: var(--ink-dim); font-size: .94rem; margin-bottom: 10px; }
+
+  /* sidebar */
+  .most-watched { border-top: 2px solid var(--ink); padding-top: 14px; }
+  .most-watched h4 { font-family: var(--display); font-style: italic; font-weight: 700; font-size: 1rem; letter-spacing:.04em; text-transform: uppercase; color: var(--amber-bright); margin-bottom: 22px; }
+  .mw-item { display:grid; grid-template-columns: 56px 1fr; gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--bg-rule); align-items: start; }
+  .mw-item:last-child { border-bottom: 0; }
+  .mw-item .mw-num { font-family: var(--display); font-weight: 900; font-size: 2.6rem; line-height: .85; color: var(--amber); letter-spacing: -0.04em; }
+  .mw-item .mw-body h5 { font-family: var(--display); font-weight: 600; font-size: 1.02rem; line-height: 1.22; margin-bottom: 6px; }
+  .mw-item .mw-body h5 a { color: var(--ink); }
+  .mw-item .mw-body .mw-meta { font-family: var(--body); font-style: italic; font-size: .8rem; color: var(--ink-mute); }
+
+  /* hosts */
+  .hosts { display:grid; grid-template-columns: repeat(3, 1fr); gap: 40px; padding: 56px 0 72px; border-top: 1px solid var(--bg-rule); border-bottom: 1px solid var(--bg-rule); margin-bottom: 72px; }
+  .host { display:grid; grid-template-columns: 96px 1fr; gap: 20px; align-items: start; }
+  .host .ph { aspect-ratio: 1/1; background:#16140F; overflow:hidden; }
+  .host .ph img { width:100%; height:100%; object-fit:cover; filter: saturate(.85) contrast(1.05); }
+  .host h4 { font-family: var(--display); font-style: italic; font-weight: 700; font-size: 1.18rem; margin-bottom: 4px; }
+  .host .role { font-family: var(--display); font-style: italic; font-size: .82rem; letter-spacing:.06em; text-transform: uppercase; color: var(--amber-bright); margin-bottom: 8px; display:block; }
+  .host p { color: var(--ink-dim); font-size:.9rem; margin: 0; }
+  @media (max-width: 900px) { .hosts { grid-template-columns: 1fr; gap: 28px; } }
+
+  /* shorts band */
+  .shorts-band { display:grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 36px 28px; margin-bottom: 84px; }
+  .shorts-band .feature .thumb { aspect-ratio: 4/5; }
+  .shorts-band .feature h3 { font-size: 1.9rem; font-style: italic; line-height: 1.05; }
+  .shorts-band .short .thumb { aspect-ratio: 9/16; }
+  .shorts-band .short h3 { font-size: 1.02rem; }
+  @media (max-width: 900px) { .shorts-band { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .shorts-band { grid-template-columns: 1fr; } }
+
+  /* archive list */
+  .archive { margin-bottom: 96px; }
+  .arc-row { display:grid; grid-template-columns: 90px 1fr 180px 90px; gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--bg-rule); align-items: baseline; }
+  .arc-row .arc-date { font-family: var(--body); font-style: italic; color: var(--ink-mute); font-size:.86rem; }
+  .arc-row .arc-title { font-family: var(--display); font-weight: 600; font-size: 1.14rem; line-height:1.22; }
+  .arc-row .arc-title a { color: var(--ink); }
+  .arc-row .arc-title em { color: var(--amber-bright); font-weight: 500; }
+  .arc-row .arc-series { font-family: var(--display); font-style: italic; color: var(--ink-dim); font-size: .92rem; }
+  .arc-row .arc-dur { font-family: var(--body); color: var(--ink-dim); font-size:.86rem; text-align:right; }
+  @media (max-width: 700px) { .arc-row { grid-template-columns: 1fr 80px; } .arc-row .arc-date, .arc-row .arc-series { grid-column: 1 / -1; } }
+
+  /* promo */
+  .promo-video { border: 1px solid var(--amber); padding: 44px 44px; display:grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; margin-bottom: 88px; background: linear-gradient(180deg, #16140F 0%, #0E0D0B 100%); }
+  .promo-video h2 { font-style: italic; font-weight: 700; font-size: clamp(1.8rem, 3vw, 2.6rem); margin-bottom: 12px; }
+  .promo-video p { color: var(--ink-dim); margin-bottom: 0; }
+  .promo-video form { display:flex; gap: 0; border: 1px solid var(--ink); }
+  .promo-video input { flex:1; background: transparent; border: 0; padding: 14px 16px; color: var(--ink); font-family: var(--body); font-size: 1rem; }
+  .promo-video input:focus { outline: none; background: rgba(208,152,112,.06); }
+  .promo-video button { background: var(--honey); color: var(--bg); border: 0; padding: 14px 22px; font-family: var(--display); font-style: italic; font-weight: 700; font-size: 1rem; cursor: pointer; }
+  .promo-video button:hover { background: var(--amber-bright); }
+  @media (max-width: 800px) { .promo-video { grid-template-columns: 1fr; padding: 28px; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="masthead">
+    <a href="index.html" class="brand">Sandfork<sup>№ 07</sup></a>
+    <div class="masthead-meta">
+      <span class="issue">Saturday, 18 November · Issue Nº 07 in print</span>
+      <span>—</span>
+      <a href="#">Sign in</a>
+      <a href="#" class="subscribe-btn">Subscribe</a>
+    </div>
+  </div>
+  <nav class="section-nav">
+    <div class="section-nav-inner">
+      <a href="index.html">Today</a>
+      <a href="section.html">Recipes</a>
+      <a href="section.html">Technique</a>
+      <a href="topic.html">Pantry</a>
+      <a href="video.html" class="current">Video</a>
+      <a href="live-blog.html">Live</a>
+      <a href="section.html">Bakery</a>
+      <a href="section.html">Profiles</a>
+      <a href="section.html">Letters</a>
+      <a href="section.html">The Print Journal</a>
+    </div>
+  </nav>
+  <div class="ticker">
+    <span class="ticker-label">In the kitchen</span>
+    <div class="ticker-items">
+      <span><a href="live-blog.html">Live: 36 hours at Saint-Jean bakery, Lyon</a></span>
+      <span>Quince paste is back — three recipes from the new issue</span>
+      <span>Why your stock tastes flat (and the 14-minute fix)</span>
+      <span>Reader letters: the great salt cod debate</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO FEATURE -->
+  <section class="video-hero">
+    <div class="hero-img">
+      <img src="photo-landscape-1.jpg" alt="A cast iron pan over a low flame, a slick of browned butter foaming around three sage leaves">
+      <a href="#" class="play-btn" aria-label="Play feature"></a>
+    </div>
+    <div class="hero-text">
+      <span class="kicker">The feature · 38 min</span>
+      <h1><em>The Browning</em> — what we mean when we say <em>caramelised</em></h1>
+      <p class="dek">For our longest film yet, Marielle Chen takes a single onion, a single shallot and a single leek through six pans, four temperatures, and one very patient afternoon. Watch the Maillard reaction happen in real time.</p>
+      <div class="meta-row">
+        <span class="runtime-chip">New this week</span>
+        <span>With <strong>Marielle Chen</strong> &amp; <strong>Idris Hale</strong></span>
+        <span>Filmed at the Sandfork kitchen, Norwich</span>
+        <span>Released 15 November</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap-wide">
+
+    <!-- SERIES RAIL -->
+    <section>
+      <div class="sec-head">
+        <h2>The series</h2>
+        <a href="#" class="sec-link">All twenty-two films &rsaquo;</a>
+      </div>
+      <div class="series-rail">
+        <article class="series-card">
+          <span class="num">01</span>
+          <h3>Under the Knife</h3>
+          <p>One ingredient, ten minutes, no recipe. A daily standing-up film made before the kitchen opens.</p>
+          <div class="series-meta">48 episodes · weekdays</div>
+        </article>
+        <article class="series-card">
+          <span class="num">02</span>
+          <h3>Slow Sundays</h3>
+          <p>A single long cook — stock, braise, dough — filmed in something close to real time. No cuts.</p>
+          <div class="series-meta">14 episodes · monthly</div>
+        </article>
+        <article class="series-card">
+          <span class="num">03</span>
+          <h3>Stockists</h3>
+          <p>We visit the millers, mongers, growers and makers behind the food on the table. Subtitled in English.</p>
+          <div class="series-meta">9 episodes · seasonal</div>
+        </article>
+        <article class="series-card">
+          <span class="num">04</span>
+          <h3>After the Service</h3>
+          <p>The conversation that happens when the last plate is out. Restaurant kitchens, off the clock.</p>
+          <div class="series-meta">6 episodes · quarterly</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- LATEST + MOST WATCHED -->
+    <section class="video-main">
+      <div>
+        <div class="sec-head">
+          <h2>Latest episodes</h2>
+          <a href="#" class="sec-link">RSS &nbsp;·&nbsp; Browse by series &rsaquo;</a>
+        </div>
+        <div class="ep-grid">
+          <article class="ep">
+            <a href="#" class="thumb">
+              <span class="thumb-deco deco-1"></span>
+              <span class="play"></span>
+              <span class="dur">22:14</span>
+            </a>
+            <span class="kicker">Slow Sundays · ep. 14</span>
+            <h3><a href="#">Three days of rye — a sour, a soak, a long cold proof</a></h3>
+            <p>Baker Lucy Pell walks through her 72-hour pan loaf without skipping the boring bits. Especially the boring bits.</p>
+            <div class="byline">With <strong>Lucy Pell</strong> <span class="dot">·</span> 14 Nov</div>
+          </article>
+
+          <article class="ep">
+            <a href="#" class="thumb">
+              <span class="thumb-deco deco-2"></span>
+              <span class="play"></span>
+              <span class="dur">08:41</span>
+            </a>
+            <span class="kicker">Under the Knife · ep. 48</span>
+            <h3><a href="#">Cavolo nero, the gentle way — and why you should stop blanching it</a></h3>
+            <p>A short, opinionated film about the dark winter leaf nobody quite knows what to do with.</p>
+            <div class="byline">With <strong>Idris Hale</strong> <span class="dot">·</span> 12 Nov</div>
+          </article>
+
+          <article class="ep">
+            <a href="#" class="thumb">
+              <span class="thumb-deco deco-3"></span>
+              <span class="play"></span>
+              <span class="dur">17:52</span>
+            </a>
+            <span class="kicker">Stockists · ep. 09</span>
+            <h3><a href="#">Hodmedod's, Suffolk — the man who put British peas back on the menu</a></h3>
+            <p>Josiah Meldrum on fava beans, why we stopped eating them, and what we lose when a crop disappears for a century.</p>
+            <div class="byline">With <strong>Aoife Donnelly</strong> <span class="dot">·</span> 09 Nov</div>
+          </article>
+
+          <article class="ep">
+            <a href="#" class="thumb">
+              <span class="thumb-deco deco-4"></span>
+              <span class="play"></span>
+              <span class="dur">31:06</span>
+            </a>
+            <span class="kicker">After the Service · ep. 06</span>
+            <h3><a href="#">11pm at Brawn — three cooks, one bottle, the menu that didn't make it</a></h3>
+            <p>An honest, unhurried conversation about the dishes we cut, the dishes we kept, and the dish that nearly broke us.</p>
+            <div class="byline">With <strong>The Brawn kitchen</strong> <span class="dot">·</span> 04 Nov</div>
+          </article>
+
+          <article class="ep">
+            <a href="#" class="thumb">
+              <span class="thumb-deco deco-5"></span>
+              <span class="play"></span>
+              <span class="dur">11:30</span>
+            </a>
+            <span class="kicker">Under the Knife · ep. 47</span>
+            <h3><a href="#">Quince — the fruit that wants you to slow down</a></h3>
+            <p>Why this knobbly, perfumed thing rewards a long, lazy oven and a heavy hand with sugar.</p>
+            <div class="byline">With <strong>Marielle Chen</strong> <span class="dot">·</span> 02 Nov</div>
+          </article>
+
+          <article class="ep">
+            <a href="#" class="thumb">
+              <span class="thumb-deco deco-6"></span>
+              <span class="play"></span>
+              <span class="dur">26:18</span>
+            </a>
+            <span class="kicker">Slow Sundays · ep. 13</span>
+            <h3><a href="#">A stock, start to finish — and the 14 minutes that change everything</a></h3>
+            <p>The film that's been forwarded to us most. The thing we kept missing, it turns out, was a slow first hour.</p>
+            <div class="byline">With <strong>Marielle Chen</strong> <span class="dot">·</span> 27 Oct</div>
+          </article>
+        </div>
+      </div>
+
+      <aside>
+        <div class="most-watched">
+          <h4>Most watched · this month</h4>
+          <div class="mw-item">
+            <span class="mw-num">1</span>
+            <div class="mw-body">
+              <h5><a href="#">How to read a recipe properly — and when to stop reading it</a></h5>
+              <div class="mw-meta">Under the Knife · 9:04 · 184k views</div>
+            </div>
+          </div>
+          <div class="mw-item">
+            <span class="mw-num">2</span>
+            <div class="mw-body">
+              <h5><a href="#">Salt, in five forms — a primer for the home kitchen</a></h5>
+              <div class="mw-meta">Under the Knife · 12:21 · 142k views</div>
+            </div>
+          </div>
+          <div class="mw-item">
+            <span class="mw-num">3</span>
+            <div class="mw-body">
+              <h5><a href="#">A confit duck leg with very little fuss</a></h5>
+              <div class="mw-meta">Slow Sundays · 24:50 · 121k views</div>
+            </div>
+          </div>
+          <div class="mw-item">
+            <span class="mw-num">4</span>
+            <div class="mw-body">
+              <h5><a href="#">Why your knife is dull, by a man who sharpens for a living</a></h5>
+              <div class="mw-meta">Stockists · 18:33 · 109k views</div>
+            </div>
+          </div>
+          <div class="mw-item">
+            <span class="mw-num">5</span>
+            <div class="mw-body">
+              <h5><a href="#">The shallot, eight ways — Idris in the prep kitchen</a></h5>
+              <div class="mw-meta">Under the Knife · 14:09 · 94k views</div>
+            </div>
+          </div>
+          <div class="mw-item">
+            <span class="mw-num">6</span>
+            <div class="mw-body">
+              <h5><a href="#">Aïoli, made by hand, made on purpose</a></h5>
+              <div class="mw-meta">Under the Knife · 10:42 · 87k views</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- HOSTS -->
+    <section class="hosts">
+      <article class="host">
+        <div class="ph"><img src="photo-portrait-1.jpg" alt="Marielle Chen"></div>
+        <div>
+          <h4>Marielle Chen</h4>
+          <span class="role">Editor &amp; principal host</span>
+          <p>Formerly of Spring; now spends her mornings testing recipes in a small Norwich kitchen and her afternoons explaining them to a camera.</p>
+        </div>
+      </article>
+      <article class="host">
+        <div class="ph"><img src="photo-portrait-1.jpg" alt="Idris Hale"></div>
+        <div>
+          <h4>Idris Hale</h4>
+          <span class="role">Resident cook</span>
+          <p>Twelve years on professional lines from Lyon to Margate. Hosts <em>Under the Knife</em>, the daily film. Believes in salt and good light.</p>
+        </div>
+      </article>
+      <article class="host">
+        <div class="ph"><img src="photo-portrait-1.jpg" alt="Aoife Donnelly"></div>
+        <div>
+          <h4>Aoife Donnelly</h4>
+          <span class="role">Field correspondent</span>
+          <p>Travels with a small camera and a notebook, and is responsible for almost everything you see in <em>Stockists</em>.</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- SHORTS BAND -->
+    <section>
+      <div class="sec-head">
+        <h2><em>Two-minute</em> technique</h2>
+        <a href="#" class="sec-link">All 84 shorts &rsaquo;</a>
+      </div>
+      <div class="shorts-band">
+        <article class="ep feature">
+          <a href="#" class="thumb">
+            <span class="thumb-deco deco-5"></span>
+            <span class="play"></span>
+            <span class="dur">02:48</span>
+          </a>
+          <span class="kicker">Short of the week</span>
+          <h3>How to butterfly a shallot in three cuts</h3>
+          <p>Idris demonstrates, with patience, the cut that turns one shallot into a fan of soft, even petals.</p>
+        </article>
+        <article class="ep short">
+          <a href="#" class="thumb">
+            <span class="thumb-deco deco-2"></span>
+            <span class="play"></span>
+            <span class="dur">01:54</span>
+          </a>
+          <h3>Mounting a sauce with cold butter, properly</h3>
+        </article>
+        <article class="ep short">
+          <a href="#" class="thumb">
+            <span class="thumb-deco deco-3"></span>
+            <span class="play"></span>
+            <span class="dur">02:11</span>
+          </a>
+          <h3>Scoring a whole fish so it cooks evenly</h3>
+        </article>
+      </div>
+    </section>
+
+    <!-- PROMO -->
+    <section class="promo-video">
+      <div>
+        <span class="kicker">The newsletter</span>
+        <h2>A film, a recipe, a small idea — every Friday at six.</h2>
+        <p>We send one short letter a week with the new film, the recipe it came from, and one thing we noticed in the kitchen. No tracking. No more than 600 words. You can leave whenever you like.</p>
+      </div>
+      <form onsubmit="event.preventDefault();">
+        <input type="email" placeholder="your@email" aria-label="email">
+        <button type="submit">Subscribe</button>
+      </form>
+    </section>
+
+    <!-- ARCHIVE LIST -->
+    <section class="archive">
+      <div class="sec-head">
+        <h2>From the archive</h2>
+        <a href="#" class="sec-link">Browse all 312 films &rsaquo;</a>
+      </div>
+      <div>
+        <div class="arc-row">
+          <div class="arc-date">18 Oct</div>
+          <div class="arc-title"><a href="#">The <em>egg yolk ravioli</em> you stop being afraid of after the second try</a></div>
+          <div class="arc-series">Slow Sundays</div>
+          <div class="arc-dur">28:42</div>
+        </div>
+        <div class="arc-row">
+          <div class="arc-date">11 Oct</div>
+          <div class="arc-title"><a href="#">A pot of beans, a head of garlic, and a long Sunday afternoon</a></div>
+          <div class="arc-series">Slow Sundays</div>
+          <div class="arc-dur">19:55</div>
+        </div>
+        <div class="arc-row">
+          <div class="arc-date">06 Oct</div>
+          <div class="arc-title"><a href="#">Anchovies, dressed three ways — at the bar at <em>Brutto</em></a></div>
+          <div class="arc-series">After the Service</div>
+          <div class="arc-dur">23:11</div>
+        </div>
+        <div class="arc-row">
+          <div class="arc-date">29 Sep</div>
+          <div class="arc-title"><a href="#">A visit to the salt pans at Maldon — five generations, one flake</a></div>
+          <div class="arc-series">Stockists</div>
+          <div class="arc-dur">21:08</div>
+        </div>
+        <div class="arc-row">
+          <div class="arc-date">22 Sep</div>
+          <div class="arc-title"><a href="#">A roast chicken, the only one you need to know how to do</a></div>
+          <div class="arc-series">Under the Knife</div>
+          <div class="arc-dur">14:36</div>
+        </div>
+        <div class="arc-row">
+          <div class="arc-date">15 Sep</div>
+          <div class="arc-title"><a href="#">Stewed tomatoes, the late-summer way — over toast, off the heat</a></div>
+          <div class="arc-series">Under the Knife</div>
+          <div class="arc-dur">09:50</div>
+        </div>
+        <div class="arc-row">
+          <div class="arc-date">08 Sep</div>
+          <div class="arc-title"><a href="#">A morning at Neal's Yard — turning the wheels, tasting the rinds</a></div>
+          <div class="arc-series">Stockists</div>
+          <div class="arc-dur">25:42</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">Sandfork</a>
+        <p>A cooking journal, published on paper twice a year and online when there is something to say. Notes from the cooking class — recipes, technique, and the people who make food.</p>
+      </div>
+      <div>
+        <h5>Read</h5>
+        <ul>
+          <li><a href="section.html">Recipes</a></li>
+          <li><a href="section.html">Technique</a></li>
+          <li><a href="section.html">Profiles</a></li>
+          <li><a href="video.html">Video</a></li>
+          <li><a href="live-blog.html">Live blog</a></li>
+          <li><a href="topic.html">Topics A–Z</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>The Journal</h5>
+        <ul>
+          <li><a href="#">Issue Nº 07 — Autumn</a></li>
+          <li><a href="#">The archive</a></li>
+          <li><a href="#">Print subscription · £36</a></li>
+          <li><a href="#">Gift a year</a></li>
+          <li><a href="#">Stockists</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>About</h5>
+        <ul>
+          <li><a href="#">Who we are</a></li>
+          <li><a href="#">Masthead</a></li>
+          <li><a href="#">Contributors</a></li>
+          <li><a href="#">Pitch us</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Follow</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Substack</a></li>
+          <li><a href="#">RSS · all stories</a></li>
+          <li><a href="#">Weekly letter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="colophon">© 2024 Sandfork Press Ltd. Set in Fraunces &amp; Source Serif. Printed in Norwich on Munken Pure 100gsm.</div>
+      <div><a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; <a href="#">Ethics &amp; corrections</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

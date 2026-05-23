@@ -1,0 +1,28 @@
+schema_version = "1.1"
+
+[task]
+name = "web-design/healthcare_clinic__glassy_pastel-001"
+description = "Replicate a synthesised A2 website (Cardinal Medical) from screenshots."
+authors = []
+keywords = ["web", "html", "css", "visual", "synth", "A2"]
+
+[metadata]
+source = "synthesised"
+archetype = "A2"
+vertical = "healthcare"
+difficulty = "medium"
+category = "synth"
+
+[verifier]
+timeout_sec = 600.0
+
+[agent]
+timeout_sec = 1200.0
+
+[environment]
+build_timeout_sec = 1200.0
+cpus = 2
+memory_mb = 4096
+storage_mb = 10240
+gpus = 0
+allow_internet = true

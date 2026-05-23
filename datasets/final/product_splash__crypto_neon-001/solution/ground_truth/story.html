@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Story — Pliny, an AI second pair of eyes</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* Page-specific rhythm for story.html */
+  .story-hero { position: relative; padding: 120px 0 80px; overflow: hidden; }
+  .story-hero .blob-a { width: 520px; height: 520px; top: -120px; right: -120px; }
+  .story-hero .blob-b { width: 360px; height: 360px; bottom: -160px; left: -80px; }
+  .story-hero .kicker { display:flex; align-items:center; gap:18px; margin-bottom:40px; }
+  .story-hero .kicker .rule { flex: 0 0 80px; height:1px; background: var(--line-bright); }
+  .story-hero h1 { max-width: 1200px; }
+  .story-hero .lede { max-width: 640px; font-size: 20px; color: var(--ink-dim); margin-top: 36px; line-height: 1.45; }
+  .story-hero .lede em { color: var(--ink); font-style: italic; font-weight: 300; }
+
+  .byline { display:flex; flex-wrap: wrap; gap:32px; align-items:baseline; margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 12px; color: var(--ink-faint); letter-spacing: 0.04em; }
+  .byline strong { color: var(--ink-dim); font-weight: 500; }
+
+  /* Chapter markers */
+  .chapter { display:grid; grid-template-columns: 200px 1fr; gap: 80px; align-items: start; }
+  .chapter-mark { position: sticky; top: 120px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); padding-top: 12px; }
+  .chapter-mark .num { display:block; color: var(--accent); font-size: 14px; margin-bottom: 8px; }
+  .chapter-body h2 { max-width: 18ch; margin-bottom: 36px; }
+  .chapter-body p { color: var(--ink-dim); font-size: 18px; line-height: 1.65; max-width: 62ch; }
+  .chapter-body p + p { margin-top: 22px; }
+  .chapter-body p strong { color: var(--ink); font-weight: 500; }
+
+  /* Pull quote */
+  .pullquote { padding: 100px 0; text-align: left; }
+  .pullquote blockquote { margin: 0; max-width: 1100px; }
+  .pullquote q { font-size: clamp(40px, 5.6vw, 88px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 700; quotes: none; }
+  .pullquote q::before, .pullquote q::after { content: ''; }
+  .pullquote .attribution { margin-top: 40px; font-family: var(--mono); font-size: 12px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; }
+  .pullquote .attribution strong { color: var(--ink-dim); font-weight: 500; }
+
+  /* Decorative interlude (no <img>) */
+  .interlude { position: relative; padding: 40px 0 96px; }
+  .interlude figure { margin: 0; }
+  .interlude .frame { aspect-ratio: 16/8; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; position: relative; }
+  .interlude .frame-a {
+    background:
+      radial-gradient(600px 300px at 20% 30%, rgba(124,91,255,0.45), transparent 60%),
+      radial-gradient(500px 280px at 80% 70%, rgba(33,224,200,0.35), transparent 60%),
+      radial-gradient(400px 200px at 60% 20%, rgba(255,79,216,0.25), transparent 60%),
+      linear-gradient(180deg, #0A0A12, #06060A);
+  }
+  .interlude .frame-b {
+    background:
+      radial-gradient(500px 300px at 70% 40%, rgba(124,91,255,0.35), transparent 60%),
+      radial-gradient(400px 250px at 25% 75%, rgba(255,79,216,0.3), transparent 60%),
+      linear-gradient(135deg, #0A0A12 0%, #0E0E18 50%, #06060A 100%);
+  }
+  .interlude .frame::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(124,91,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,91,255,0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  .interlude .frame .stamp {
+    position: absolute; left: 32px; top: 28px;
+    font-family: var(--mono); font-size: 11px; color: var(--ink-dim);
+    letter-spacing: 0.18em; text-transform: uppercase;
+    border: 1px solid var(--line-bright); padding: 6px 12px; border-radius: 999px;
+    background: rgba(8,8,12,0.6); backdrop-filter: blur(8px);
+  }
+  .interlude .frame .marker {
+    position: absolute; right: 32px; bottom: 28px;
+    font-family: var(--mono); font-size: 10px; color: var(--ink-faint);
+    letter-spacing: 0.16em; text-transform: uppercase;
+  }
+  .interlude .frame .core {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 180px; height: 180px; border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255,255,255,0.65), transparent 35%),
+      conic-gradient(from 140deg, #7C5BFF, #21E0C8, #FF4FD8, #7C5BFF);
+    box-shadow: inset -20px -28px 60px rgba(0,0,0,0.7), 0 30px 90px -10px rgba(124,91,255,0.5);
+  }
+  .interlude figcaption { display:flex; justify-content: space-between; align-items: baseline; margin-top: 18px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); gap: 16px; flex-wrap: wrap; }
+
+  /* The list, the manifesto */
+  .manifest { display:grid; grid-template-columns: 1fr; gap: 0; border-top: 1px solid var(--line); }
+  .manifest .row { display:grid; grid-template-columns: 80px 1fr 2fr; gap: 40px; padding: 36px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .manifest .row .n { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: 0.1em; }
+  .manifest .row h3 { font-size: 26px; letter-spacing: -0.02em; }
+  .manifest .row p { color: var(--ink-dim); font-size: 16px; line-height: 1.6; }
+
+  /* Timeline */
+  .timeline { display:grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .timeline .col { padding: 32px 28px; border-right: 1px solid var(--line); }
+  .timeline .col:last-child { border-right: 0; }
+  .timeline .when { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 16px; }
+  .timeline h4 { font-size: 18px; margin-bottom: 10px; }
+  .timeline p { font-size: 14px; color: var(--ink-dim); line-height: 1.55; }
+
+  /* Closing */
+  .closer { position: relative; padding: 160px 0 140px; text-align: center; overflow: hidden; }
+  .closer .blob-c { width: 700px; height: 700px; left: 50%; top: 0; transform: translateX(-50%); opacity: 0.5; }
+  .closer .display { max-width: 1200px; margin: 0 auto; }
+  .closer .display em { font-style: italic; font-weight: 300; color: var(--ink-dim); }
+  .closer .cta-row { display:flex; gap: 14px; justify-content: center; margin-top: 48px; flex-wrap: wrap; }
+  .closer .sig { margin-top: 80px; font-family: var(--mono); font-size: 12px; color: var(--ink-faint); letter-spacing: 0.1em; }
+
+  @media (max-width: 880px) {
+    .story-hero { padding: 64px 0 48px; }
+    .chapter { grid-template-columns: 1fr; gap: 24px; }
+    .chapter-mark { position: static; }
+    .manifest .row { grid-template-columns: 60px 1fr; }
+    .manifest .row p { grid-column: 1 / -1; }
+    .timeline { grid-template-columns: 1fr 1fr; }
+    .timeline .col:nth-child(2n) { border-right: 0; }
+    .interlude .frame .core { width: 120px; height: 120px; }
+    .closer { padding: 96px 0 80px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="brand" aria-label="Pliny home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Pliny</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html">Overview</a>
+      <a href="story.html" class="is-active">Story</a>
+      <a href="specs.html">Specs</a>
+      <a href="faq.html">FAQ</a>
+      <a href="press.html">Press</a>
+    </nav>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <span class="nav-status"><span class="live"></span>v0.9 · public beta</span>
+      <a href="preorder.html" class="nav-cta">Get early access <span class="arr">→</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="story-hero">
+    <div class="blob blob-violet blob-a" aria-hidden="true"></div>
+    <div class="blob blob-cyan blob-b" aria-hidden="true"></div>
+    <div class="wrap" style="position:relative; z-index:1;">
+      <div class="kicker">
+        <span class="rule" aria-hidden="true"></span>
+        <span class="eyebrow"><span class="dot"></span>Chapter 00 · The origin of Pliny</span>
+      </div>
+      <h1 class="display glow">We built Pliny because <span class="display-italic accent">good code review</span> was the first thing teams quietly stopped doing.</h1>
+      <p class="lede">This is the long version. How a tool that sits inside your pull requests came to exist, what we learned shipping it to seventy engineering teams, and <em>why we think the next decade of software belongs to the reviewers</em>.</p>
+      <div class="byline">
+        <span>Written by <strong>Anya Petrov</strong>, co-founder</span>
+        <span>March 14, 2025</span>
+        <span>Brooklyn, NY</span>
+        <span>18 min read</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline" />
+
+  <!-- CHAPTER 1 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="chapter">
+        <aside class="chapter-mark">
+          <span class="num">01 ⁄ 06</span>
+          The empty inbox
+        </aside>
+        <div class="chapter-body">
+          <h2>By 2023, nobody on our team was reviewing pull requests anymore.</h2>
+          <p>Not really. We approved them. We left the polite emoji. Occasionally, on a Tuesday, someone with a free afternoon would leave a comment about variable naming and we'd all pretend that was the point of code review.</p>
+          <p><strong>The actual point — catching the dumb regression, the off-by-one, the auth check you forgot, the migration that locks the table for four minutes in production — was happening less and less.</strong> Not because we were lazy. Because we were shipping forty PRs a day and a senior engineer's attention is a finite, expensive thing.</p>
+          <p>The numbers were ugly when we finally looked. Mean time-to-review at our previous company had crept from 47 minutes to 6 hours and 12 minutes over eighteen months. Comments-per-PR was down 71%. Approval-without-comment was up to 64%. Reviews had become a ritual we performed to keep CI green.</p>
+          <p>That was the moment Pliny started, though we didn't call it that yet. We called it <span class="mono accent">the_intern.py</span> and it lived on Marc's laptop.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERLUDE 1 (decorative, no img) -->
+  <section class="interlude">
+    <div class="wrap">
+      <figure>
+        <div class="frame frame-a" role="img" aria-label="Abstract illustration: the origin of the Pliny prototype, October 2023.">
+          <span class="stamp">Fig. 01 · the_intern.py</span>
+          <div class="core" aria-hidden="true"></div>
+          <span class="marker">v0.0.1 — 312 lines</span>
+        </div>
+        <figcaption>
+          <span>Fig. 01 — A weekend prototype, Brooklyn, October 2023</span>
+          <span>“the intern thinks:”</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- CHAPTER 2 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="chapter">
+        <aside class="chapter-mark">
+          <span class="num">02 ⁄ 06</span>
+          A weekend hack
+        </aside>
+        <div class="chapter-body">
+          <h2>The first version was 312 lines of Python and embarrassingly useful.</h2>
+          <p>Marc wired GPT-4 to a GitHub webhook over a long weekend in October. The bot read the diff, the surrounding files, and the last twenty commits to the same paths. It posted one comment per PR with the heading <span class="mono">// the intern thinks:</span>. Half of what it said was wrong, fifteen percent was obvious, and thirty-five percent was the kind of catch a senior engineer would have made on their best day.</p>
+          <p>Within a week, our team had started waiting on the intern before merging. <strong>Not because it was right, but because reading its take forced you to look at your own PR with fresh eyes.</strong> It was a rubber duck that could read.</p>
+          <p>Then someone outside the team asked if they could install it. Then a friend at another company. Then a stranger from the internet. By December the bot was running on forty-one repositories and we had a Stripe account and a problem: the_intern.py was, in fact, very bad software, and people were starting to depend on it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline" />
+
+  <!-- PULLQUOTE -->
+  <section class="pullquote">
+    <div class="wrap">
+      <blockquote>
+        <q>We didn't want to build <em class="display-italic accent">another copilot.</em> We wanted to build the colleague who reads your PR at 11pm and quietly asks <em class="display-italic">are you sure about line 84?</em></q>
+        <div class="attribution">— <strong>Marc Helou</strong> · co-founder, CTO · ex-Stripe, ex-Linear</div>
+      </blockquote>
+    </div>
+  </section>
+
+  <hr class="hairline" />
+
+  <!-- CHAPTER 3 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="chapter">
+        <aside class="chapter-mark">
+          <span class="num">03 ⁄ 06</span>
+          Things we got wrong
+        </aside>
+        <div class="chapter-body">
+          <h2>We spent six months building the wrong product, three times.</h2>
+          <p>The first wrong version tried to <strong>fix the code itself</strong>. We'd post a PR-on-a-PR with the bug rewritten. Engineers hated it. It felt like a junior taking over the keyboard. Worse, the suggestions were stylistically wrong in ways that revealed Pliny didn't actually know the codebase — it knew Python, not <em>your</em> Python.</p>
+          <p>The second wrong version tried to <strong>rank PRs by risk</strong>, a single number 0–100. Engineers ignored the number. The number was either obviously high (everyone already knew the migration was scary) or obviously wrong.</p>
+          <p>The third wrong version tried to <strong>chat</strong>. You could @-mention the bot. Nobody @-mentioned the bot. People want a reviewer who shows up unprompted, not one they have to summon.</p>
+          <p>The version that worked — the version that became Pliny — does one thing. It posts concrete, line-anchored suggestions the moment a PR opens, and shuts up if it has nothing useful to add. The hardest engineering problem turned out to be teaching it when to stay quiet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE MANIFEST -->
+  <section class="section-sm">
+    <div class="wrap">
+      <div style="display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+        <h3 style="font-size:14px; font-family:var(--mono); letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-dim); font-weight:500;">Six rules we wrote on the wall</h3>
+        <span class="mono" style="font-size:11px; color:var(--ink-faint); letter-spacing:0.12em;">PLINY ⁄ INTERNAL ⁄ 2024-02-09</span>
+      </div>
+      <div class="manifest">
+        <div class="row">
+          <span class="n">RULE 01</span>
+          <h3>Silence is a feature.</h3>
+          <p>A reviewer who comments on every PR is noise. Pliny is allowed — encouraged — to approve without speaking. We measure the ratio of useful comments to total comments, and we throw away anything that drops it.</p>
+        </div>
+        <div class="row">
+          <span class="n">RULE 02</span>
+          <h3>Line numbers, not paragraphs.</h3>
+          <p>Every suggestion is anchored to a specific line, with a one-sentence rationale and, where possible, a diff. We do not write essays in the comments. Senior engineers don't read essays in the comments.</p>
+        </div>
+        <div class="row">
+          <span class="n">RULE 03</span>
+          <h3>The codebase is the ground truth.</h3>
+          <p>Pliny indexes your repository — every function, every test, every commit — and is fine-tuned per-customer. A suggestion that doesn't match your idioms is a suggestion we shouldn't have made.</p>
+        </div>
+        <div class="row">
+          <span class="n">RULE 04</span>
+          <h3>Wrong is worse than late.</h3>
+          <p>We will hold a comment for ninety seconds to verify it against the test suite rather than ship a confident hallucination. Bug reports about false positives are P0 internally.</p>
+        </div>
+        <div class="row">
+          <span class="n">RULE 05</span>
+          <h3>The human still merges.</h3>
+          <p>Pliny does not approve, does not block, does not gate CI. It is a reviewer with opinions and no merge rights. Authority belongs to the engineer with the cursor.</p>
+        </div>
+        <div class="row">
+          <span class="n">RULE 06</span>
+          <h3>Earn the next review.</h3>
+          <p>Every comment is a small bet on the engineer's attention. If we waste it, they will stop reading us, and then we are worse than nothing. Each review must earn the next one.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline" />
+
+  <!-- CHAPTER 4 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="chapter">
+        <aside class="chapter-mark">
+          <span class="num">04 ⁄ 06</span>
+          The seventy teams
+        </aside>
+        <div class="chapter-body">
+          <h2>By mid-2024, Pliny was reviewing roughly nine thousand pull requests a week.</h2>
+          <p>We sat with seventy engineering teams during the closed beta. A small fintech in Berlin where every PR touches money. A games studio in Montreal where the codebase is half C++, half a custom scripting language nobody else uses. A Series C SaaS company where the median tenure is fourteen months and tribal knowledge evaporates every quarter.</p>
+          <p>The same patterns kept showing up. <strong>The catches that mattered most weren't the clever ones.</strong> They were the boring ones — the env var you forgot to add, the feature flag you didn't gate, the index you didn't create on a column you were about to query a million times a day.</p>
+          <p>One team in Stockholm shipped a payment regression that would have cost them an estimated €180,000 in failed transactions over a weekend. Pliny had flagged it on the PR, in the third comment down, with the text <span class="mono">amount is in cents on line 41 but euros on line 67 — likely off by 100×</span>. The reviewer had marked the comment resolved without addressing it. We learned a lot from that one. We changed how Pliny escalates when a comment is dismissed without code change.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="section-tight">
+    <div class="wrap">
+      <div style="margin-bottom: 32px;">
+        <span class="eyebrow"><span class="dot"></span>Timeline · 18 months from script to series A</span>
+      </div>
+      <div class="timeline">
+        <div class="col">
+          <div class="when">OCT 2023</div>
+          <h4>the_intern.py</h4>
+          <p>Marc writes the first version on a Saturday. 312 lines of Python, one webhook, no UI. Used internally by eight engineers.</p>
+        </div>
+        <div class="col">
+          <div class="when">JAN 2024</div>
+          <h4>First paying team</h4>
+          <p>A four-person infrastructure team in Toronto installs the bot and offers to pay us. We charge them $200 a month. We are stunned.</p>
+        </div>
+        <div class="col">
+          <div class="when">MAY 2024</div>
+          <h4>Closed beta opens</h4>
+          <p>Pliny rebuilds from scratch on a per-customer fine-tuning pipeline. Seventy teams join the waitlist within nine days.</p>
+        </div>
+        <div class="col">
+          <div class="when">MAR 2025</div>
+          <h4>Public beta · v0.9</h4>
+          <p>9,000+ PRs reviewed per week. Self-hostable build ships to two enterprise design partners. You are reading this page.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERLUDE 2 (decorative, no img) -->
+  <section class="interlude" style="padding-top: 96px;">
+    <div class="wrap">
+      <figure>
+        <div class="frame frame-b" role="img" aria-label="Abstract illustration: the Pliny team and operating cadence, February 2025.">
+          <span class="stamp">Fig. 02 · the team</span>
+          <div class="core" aria-hidden="true" style="width: 140px; height: 140px;"></div>
+          <span class="marker">11 eng · 2 design · 1 cat</span>
+        </div>
+        <figcaption>
+          <span>Fig. 02 — Williamsburg, February 2025</span>
+          <span>Eleven engineers · two designers · one cat (Goose)</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- CHAPTER 5 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="chapter">
+        <aside class="chapter-mark">
+          <span class="num">05 ⁄ 06</span>
+          What we believe
+        </aside>
+        <div class="chapter-body">
+          <h2>The interesting question is no longer can the model write the code. It's who reads it.</h2>
+          <p>Generation is a solved problem in the sense that matters. Every team we talk to is now producing more code than they can responsibly review. The constraint has moved one step downstream: not <em>can you make it</em>, but <em>do you trust what you just made</em>.</p>
+          <p><strong>We think the next decade of software belongs to the reviewers.</strong> The teams who ship with confidence will be the ones who have built the most rigorous, the most patient, the most institutionally-paranoid review culture. And review at the volume modern engineering organizations produce is not a problem you solve by hiring more humans. It is a problem you solve by giving every human a tireless second pair of eyes.</p>
+          <p>That's it. That's the whole thesis. Pliny is the tool that makes review possible again at the velocity of 2025 engineering. Not a replacement for the reviewer. The reviewer's caffeine.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline" />
+
+  <!-- CHAPTER 6 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="chapter">
+        <aside class="chapter-mark">
+          <span class="num">06 ⁄ 06</span>
+          What's next
+        </aside>
+        <div class="chapter-body">
+          <h2>We are not finished. We are barely started.</h2>
+          <p>The current version of Pliny reads a pull request the way a careful senior engineer would on a good morning. The version we are building next will read the pull request the way a careful senior engineer would on a good morning <em>with the entire history of every incident your team has ever had loaded into their head</em>.</p>
+          <p>We're working on tighter integrations with incident tooling, so Pliny can connect a diff to the postmortem it should have learned from. We're working on team-level review patterns, so Pliny can surface the kinds of bugs <em>your</em> team specifically ships, not the kinds of bugs the internet at large ships. We're working on a self-hosted build that runs entirely inside your VPC, because we are tired of hearing that the most security-conscious teams cannot use the tool that would help them most.</p>
+          <p>If any of that sounds like something you'd want to try, the beta is open. We read every signup form. We write back, usually within a day, usually with too many questions.</p>
+          <p style="margin-top:40px; font-family:var(--mono); font-size:14px; color: var(--ink-faint);">— A.P. &amp; M.H., March 2025</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSER -->
+  <section class="closer">
+    <div class="blob blob-violet blob-c" aria-hidden="true"></div>
+    <div class="wrap" style="position:relative; z-index:1;">
+      <h2 class="display glow">A second pair of eyes,<br/><em class="display-italic">for every line you ship.</em></h2>
+      <div class="cta-row">
+        <a class="btn btn-primary btn-xl" href="preorder.html">Request beta access <span class="mono">→</span></a>
+        <a class="btn btn-ghost btn-xl" href="specs.html">Read the specs</a>
+      </div>
+      <div class="sig">PLINY · v0.9 · PUBLIC BETA · BROOKLYN ⁄ LISBON</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-wordmark" aria-hidden="true">Pliny</div>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="brand" style="font-size:18px;">
+          <span class="brand-mark"></span><span>Pliny</span>
+        </div>
+        <p class="footer-lede">A second pair of eyes for every pull request. Trained on your codebase, opinionated about the rest.</p>
+        <p class="footer-lede" style="margin-top:18px; font-family:var(--mono); font-size:12px; color:var(--ink-faint);">SOC 2 Type II · in audit<br/>Self-hostable · BYOM</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="specs.html">Specifications</a></li>
+          <li><a href="story.html">The story</a></li>
+          <li><a href="preorder.html">Request access</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Integration guide</a></li>
+          <li><a href="#">Security &amp; data</a></li>
+          <li><a href="press.html">Press kit</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">Engineering blog</a></li>
+          <li><a href="#">Careers — hiring</a></li>
+          <li><a href="mailto:hello@pliny.dev">hello@pliny.dev</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">X / Twitter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <div>© 2025 Pliny Labs, Inc. · Made in Brooklyn &amp; Lisbon</div>
+      <div class="legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Status — operational</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

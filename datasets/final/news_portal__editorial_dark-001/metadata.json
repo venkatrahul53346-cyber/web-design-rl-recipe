@@ -1,0 +1,65 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "news_portal__editorial_dark-0000",
+    "archetype": "A6",
+    "vertical": "media",
+    "style": {
+      "density": "balanced",
+      "color_regime": "editorial-dark",
+      "typography": "humanist-serif-body",
+      "border_language": "flat",
+      "motif": "photographic-product"
+    },
+    "palette_seed": "#B07C5A",
+    "font_pair": [
+      "Fraunces",
+      "Source Serif 4",
+      null
+    ],
+    "difficulty": "hard",
+    "sitemap": [
+      "index",
+      "video",
+      "topic",
+      "article",
+      "live-blog",
+      "section"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Sandfork",
+      "tagline": "Notes from the cooking class",
+      "value_prop": "Sandfork is a cooking newsletter and journal \u2014 recipes, technique, and the people who make food. Published on paper twice a year.",
+      "product_category": "food publication",
+      "target_audience": "serious home cooks"
+    },
+    "notes": "WHAT WE'RE BUILDING (news_portal):\nA news organisation's homepage and section pages \u2014 different from longform editorial. Density is the characteristic feature: multiple stories per fold, ticker or breaking-news strip, section nav across the top, ads/promotions in the gutter, multiple typographic scales co-existing. This is read-by-everyone, throughout-the-day publication. The aesthetic is news-of-record, formal but high-energy. AVOID: long-form-only treatment, single-hero minimalism.\n\nBRAND: Sandfork \u2014 \"Notes from the cooking class\"\nSandfork is a cooking newsletter and journal \u2014 recipes, technique, and the people who make food. Published on paper twice a year.\n\nVISUAL LANGUAGE (editorial_dark):\nNear-black background (#0E0D0B), warm-cream text (#F4EDE0 primary, #B5AB97 muted). Serif body type ~17-18px, line-height 1.55. Section headers in display serif at heavier weight. Hero photography full-bleed, treated with a dark gradient overlay so headline text reads white on top. Accent: warm amber / honey (palette anchor) for tag chips, links, byline accents. Pull quotes set in italic at oversized weight. NO sidebars; reading flow is top-down. NO sans-serif body, NO bright neon accents. The aesthetic is 'longform after midnight'.\n\nDESIGN REFERENCES (style + topic): theguardian.com, nytimes.com, ft.com, nytimes.com night mode, longreads.com, theatavist.com\n\nPER-PAGE GUIDANCE:\n- index: Top: section nav bar + breaking-news ticker. Hero: 1 lead story (large image + huge headline + dek). Below: multi-column news grid \u2014 6-9 secondary stories at varying sizes, mixing image + headline + category tag. Sidebar with most-read list.\n- video: Video story landing \u2014 large player placeholder + transcript / summary below + related video grid.\n- topic: A topic page (gathering coverage of a story over time). Topic mast, latest stories, 'background' explainer link.\n- article: An individual news article. Less narrow than longform \u2014 measure ~70-75ch. Photo, headline, dek, byline, body, 'read more' related-stories block.\n- live-blog: A live-blog page. Reverse-chronological updates with timestamps, latest at top, sticky 'live' indicator.\n- section: A section landing page (e.g. 'Politics', 'Tech'). Section masthead, lead story for the section, then grid of 8-12 stories within the section.\n\nIMAGE POLICY (HARD CONSTRAINT):\n- For purely decorative content (hero illustrations, abstract section   dividers, decorative blobs): use NO `<img>` tags. Use CSS gradients,   inline SVG, or styled `<div>` blocks with `background-color` /   `aspect-ratio` instead.\n- For content-essential photography (product photos, dish photos, hotel   rooms, portrait avatars, editorial leads), use `<img src=\"X\">` where   X is EXCLUSIVELY one of these five filenames:\n    photo-product-1.jpg     (generic product / object \u2014 warm tones)\n    photo-product-2.jpg     (cooler product variant \u2014 for grids)\n    photo-portrait-1.jpg    (generic person \u2014 for avatars / team / bylines)\n    photo-landscape-1.jpg   (generic scene \u2014 for hero / hospitality leads)\n    illustration-abstract.jpg (mesh-gradient \u2014 for splash / decorative hero)\n- Repeating a filename across multiple `<img>` tags is fine.\n- ANY OTHER `src=` value will be rejected at validation time. No external\n  URLs, no other filenames, no svg files."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "article",
+    "index",
+    "live-blog",
+    "section",
+    "topic",
+    "video"
+  ],
+  "files": [
+    "article.html",
+    "index.html",
+    "live-blog.html",
+    "section.html",
+    "styles.css",
+    "topic.html",
+    "video.html"
+  ],
+  "has_external_css": true,
+  "assets": [
+    "illustration-abstract.jpg",
+    "photo-landscape-1.jpg",
+    "photo-portrait-1.jpg",
+    "photo-product-1.jpg",
+    "photo-product-2.jpg"
+  ]
+}

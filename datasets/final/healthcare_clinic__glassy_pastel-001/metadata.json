@@ -1,0 +1,68 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "healthcare_clinic__glassy_pastel-0000",
+    "archetype": "A2",
+    "vertical": "healthcare",
+    "style": {
+      "density": "sparse",
+      "color_regime": "glassy",
+      "typography": "geometric-sans",
+      "border_language": "glassy-blurred",
+      "motif": "clean-iconographic"
+    },
+    "palette_seed": "#60A5FA",
+    "font_pair": [
+      "Inter",
+      "Inter",
+      null
+    ],
+    "difficulty": "medium",
+    "sitemap": [
+      "index",
+      "about",
+      "locations",
+      "appointment",
+      "find-a-doctor",
+      "patient-portal",
+      "services"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Cardinal Medical",
+      "tagline": "Specialised care, evidence-based",
+      "value_prop": "Cardinal Medical is a regional academic medical centre. Cardiac, oncology, neurology, and orthopaedics. Find a doctor, schedule an appointment, access patient portal.",
+      "product_category": "academic medical centre",
+      "target_audience": "patients seeking specialty care and referrals"
+    },
+    "notes": "WHAT WE'RE BUILDING (healthcare_clinic):\nA healthcare provider site \u2014 could be a clinic, hospital system, or telehealth service. The aesthetic is calming (soft blue / teal palette), professional, photography-led but with natural / human imagery (not stock-doctor). The primary jobs are: explain what services we offer, find a doctor, book an appointment, log into the patient portal. Tone is reassuring, plain-language. AVOID: aggressive marketing, high-saturation accents, busy layouts.\n\nBRAND: Cardinal Medical \u2014 \"Specialised care, evidence-based\"\nCardinal Medical is a regional academic medical centre. Cardiac, oncology, neurology, and orthopaedics. Find a doctor, schedule an appointment, access patient portal.\n\nVISUAL LANGUAGE (glassy_pastel):\nBackgrounds are soft gradient fields (palette anchor at 8-12% saturation, blending to a light neutral). Content lives in centered cards (~420px wide for forms) with a frosted-glass effect: subtle backdrop-filter blur, semi-transparent white background (rgba(255,255,255,0.7)), 1px translucent border. Buttons primary-filled with the palette anchor. Avoid: heavy shadows, busy backgrounds, opaque white cards (defeats glassy).\n\nDESIGN REFERENCES (style + topic): clevelandclinic.org, mayoclinic.org, onemedical.com, clerk.dev, vercel.com/login, supabase.com/dashboard/sign-in\n\nPER-PAGE GUIDANCE:\n- index: Calming hero \u2014 natural human image + headline like 'Better care, closer to home' + primary CTA ('Book an appointment'). Below: services-grid (3-4 categories), 'find a doctor' block, recent-news / patient-stories section, locations strip.\n- about: Mission paragraph, leadership / quality stats (awards, accreditations), patient-experience pillars.\n- locations: Map/list of locations. Each entry: address, phone, hours, services available, accepting-new-patients flag.\n- appointment: Appointment-request form: provider, type, preferred date/time, contact info, notes.\n- find-a-doctor: Search filters (specialty, location, language, accepting-new-patients) + grid of doctor cards (photo, name, specialty, link).\n- patient-portal: Login-card pattern (similar to auth_flow): email + password + login + 'don't have an account?' link. Brand reassurance copy.\n- services: List of services / specialties \u2014 cards by category (cardiology, pediatrics, etc.) with brief description and 'learn more' link.\n\nIMAGE POLICY (HARD CONSTRAINT):\n- For purely decorative content (hero illustrations, abstract section   dividers, decorative blobs): use NO `<img>` tags. Use CSS gradients,   inline SVG, or styled `<div>` blocks with `background-color` /   `aspect-ratio` instead.\n- For content-essential photography (product photos, dish photos, hotel   rooms, portrait avatars, editorial leads), use `<img src=\"X\">` where   X is EXCLUSIVELY one of these five filenames:\n    photo-product-1.jpg     (generic product / object \u2014 warm tones)\n    photo-product-2.jpg     (cooler product variant \u2014 for grids)\n    photo-portrait-1.jpg    (generic person \u2014 for avatars / team / bylines)\n    photo-landscape-1.jpg   (generic scene \u2014 for hero / hospitality leads)\n    illustration-abstract.jpg (mesh-gradient \u2014 for splash / decorative hero)\n- Repeating a filename across multiple `<img>` tags is fine.\n- ANY OTHER `src=` value will be rejected at validation time. No external\n  URLs, no other filenames, no svg files."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "about",
+    "appointment",
+    "find-a-doctor",
+    "index",
+    "locations",
+    "patient-portal",
+    "services"
+  ],
+  "files": [
+    "about.html",
+    "appointment.html",
+    "find-a-doctor.html",
+    "index.html",
+    "locations.html",
+    "patient-portal.html",
+    "services.html",
+    "styles.css"
+  ],
+  "has_external_css": true,
+  "assets": [
+    "illustration-abstract.jpg",
+    "photo-landscape-1.jpg",
+    "photo-portrait-1.jpg",
+    "photo-product-1.jpg",
+    "photo-product-2.jpg"
+  ]
+}

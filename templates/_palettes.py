@@ -75,3 +75,26 @@ BRAND_SATURATED: List[str] = [
 PALETTES_BY_REGIME["glassy"]                       = GLASSY
 PALETTES_BY_REGIME["neobrutalist-high-contrast"]   = NEOBRUTALIST_HIGH_CONTRAST
 PALETTES_BY_REGIME["brand-saturated"]              = BRAND_SATURATED
+
+
+# Editorial-dark: warm neutrals on near-black for night-mode longform.
+EDITORIAL_DARK: List[str] = [
+    "#C9A36E",   # warm amber
+    "#A88A5C",   # ochre
+    "#D4B07C",   # honey
+    "#B07C5A",   # terracotta
+    "#8E7344",   # olive-mustard
+]
+
+# Neon (crypto / web3): glowing accents on near-black surfaces.
+NEON: List[str] = [
+    "#7DF9FF",   # electric cyan
+    "#FF61D2",   # magenta neon
+    "#A6FF7E",   # acid green
+    "#7C5BFF",   # ultraviolet
+    "#FFD24A",   # amber neon
+]
+
+
+PALETTES_BY_REGIME["editorial-dark"] = EDITORIAL_DARK
+PALETTES_BY_REGIME["neon"]           = NEON

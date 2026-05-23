@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request an Appointment — Cardinal Medical</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .appt-shell { display: grid; grid-template-columns: 1.45fr 1fr; gap: 2rem; align-items: start; }
+  .appt-form { padding: 2.25rem 2.25rem 2rem; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem 1.25rem; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .field label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--ink); margin-bottom: 0.4rem; letter-spacing: -0.005em; }
+  .field .hint { font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.35rem; }
+  .input, .select, .textarea { width: 100%; max-width: 100%; padding: 0.7rem 0.9rem; font: inherit; font-size: 0.94rem; color: var(--ink); background: rgba(255,255,255,0.55); border: 1px solid var(--glass-border-soft); border-radius: var(--radius); backdrop-filter: blur(8px); transition: border-color 0.15s, box-shadow 0.15s; }
+  .input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--accent-soft); box-shadow: 0 0 0 4px var(--accent-tint); }
+  .textarea { min-height: 110px; resize: vertical; font-family: inherit; }
+  .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+  .choice { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.85rem 0.95rem; border: 1px solid var(--glass-border-soft); border-radius: var(--radius); background: rgba(255,255,255,0.45); cursor: pointer; transition: all 0.15s; min-width: 0; }
+  .choice:hover { background: rgba(255,255,255,0.7); }
+  .choice input { margin-top: 3px; accent-color: var(--accent); flex-shrink: 0; }
+  .choice-body { min-width: 0; }
+  .choice .title { font-size: 0.9rem; font-weight: 500; color: var(--ink); display: block; }
+  .choice .sub { font-size: 0.78rem; color: var(--ink-soft); margin-top: 2px; display: block; }
+  .choice input:checked + .choice-body .title { color: var(--accent-deep); }
+  .form-section + .form-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px dashed var(--line); }
+  .form-section h3 { font-size: 1.05rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.6rem; }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-tint); color: var(--accent-deep); display: inline-flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 600; flex-shrink: 0; }
+  .submit-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); flex-wrap: wrap; }
+  .submit-row small { color: var(--ink-soft); max-width: 38ch; font-size: 0.8rem; }
+  .aside-stack > * + * { margin-top: 1.25rem; }
+  .aside-card { padding: 1.5rem 1.6rem; }
+  .aside-card h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+  .aside-card p { font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 0.9rem; font-size: 0.88rem; }
+  .kv dt { color: var(--ink-soft); }
+  .kv dd { margin: 0; color: var(--ink); font-weight: 500; word-break: break-word; }
+  .urgent { padding: 1.1rem 1.3rem; border-radius: var(--radius); border: 1px solid rgba(194, 65, 12, 0.25); background: rgba(254, 235, 220, 0.5); display: flex; gap: 0.8rem; }
+  .urgent svg { color: var(--warn); flex-shrink: 0; margin-top: 2px; }
+  .urgent strong { display: block; color: var(--warn); margin-bottom: 0.2rem; font-size: 0.92rem; }
+  .urgent p { font-size: 0.85rem; margin: 0; }
+  .i { width: 18px; height: 18px; stroke-width: 1.5; }
+  .i-lg { width: 22px; height: 22px; }
+  .timeline { list-style: none; padding: 0; margin: 0; }
+  .timeline li { display: flex; gap: 0.85rem; padding: 0.55rem 0; font-size: 0.88rem; color: var(--ink-muted); }
+  .timeline .num { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line-strong); display: inline-flex; align-items: center; justify-content: center; font-size: 0.74rem; color: var(--ink); background: rgba(255,255,255,0.6); flex-shrink: 0; }
+  .hero-appt { padding: 64px 0 40px; }
+  .hero-appt h1 { max-width: 18ch; }
+  .hero-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.25rem; }
+  .stats-strip { padding: 2rem 2.25rem; display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 2rem; align-items: center; }
+  .stats-strip .stat-num { font-size: 2rem; font-weight: 500; letter-spacing: -0.03em; color: var(--accent-deep); }
+  .stats-strip .stat-sub { font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.25rem; }
+  .faq-shell { display: grid; grid-template-columns: 1fr 1.4fr; gap: 3rem; align-items: start; }
+
+  @media (max-width: 960px) {
+    .appt-shell { grid-template-columns: 1fr; }
+    .faq-shell { grid-template-columns: 1fr; gap: 1.75rem; }
+    .stats-strip { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .appt-form { padding: 1.5rem 1.25rem 1.5rem; }
+    .form-grid { grid-template-columns: 1fr; }
+    .choice-grid { grid-template-columns: 1fr; }
+    .stats-strip { grid-template-columns: 1fr; gap: 1.25rem; padding: 1.5rem 1.4rem; }
+    .aside-card { padding: 1.25rem 1.3rem; }
+    .submit-row { flex-direction: column; align-items: stretch; }
+    .submit-row .btn { justify-content: center; }
+    .hero-appt h1 { font-size: clamp(2rem, 8vw, 2.6rem); }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a href="index.html" class="brand" aria-label="Cardinal Medical home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+      </span>
+      <span>Cardinal Medical<small>Academic Medical Centre</small></span>
+    </a>
+    <nav class="nav-primary" aria-label="Primary">
+      <a href="services.html">Care &amp; Services</a>
+      <a href="find-a-doctor.html">Find a Doctor</a>
+      <a href="locations.html">Locations</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="patient-portal.html" class="nav-portal">Patient Portal</a>
+      <a href="appointment.html" class="btn btn-primary">Book appointment</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="hero-appt">
+  <div class="wrap">
+    <span class="eyebrow">Schedule a visit</span>
+    <h1 style="margin-top: 0.9rem;">Request an appointment with a Cardinal specialist.</h1>
+    <p class="lede" style="margin-top: 1rem;">Tell us a little about your concern and a scheduling coordinator will confirm a time within one business day. Most specialty visits are scheduled within 7–10 days; urgent referrals are routed same-day.</p>
+    <div class="hero-meta">
+      <span class="pill pill-good pill-dot">Average response: under 4 hours</span>
+      <span class="pill">Most major insurance accepted</span>
+      <span class="pill">Referral optional for most specialties</span>
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="appt-shell">
+
+      <form class="glass appt-form" autocomplete="on">
+
+        <div class="form-section">
+          <h3><span class="step-num">1</span> What kind of care do you need?</h3>
+          <div class="choice-grid">
+            <label class="choice">
+              <input type="radio" name="specialty" value="cardiac" checked>
+              <span class="choice-body"><span class="title">Cardiac Institute</span><span class="sub">Heart rhythm, valves, prevention, structural</span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="specialty" value="oncology">
+              <span class="choice-body"><span class="title">Cancer Centre</span><span class="sub">Medical, radiation, surgical oncology</span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="specialty" value="neuro">
+              <span class="choice-body"><span class="title">Neurosciences</span><span class="sub">Stroke, epilepsy, movement, headache</span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="specialty" value="ortho">
+              <span class="choice-body"><span class="title">Orthopaedics</span><span class="sub">Joint, spine, sports medicine, hand</span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="specialty" value="unsure">
+              <span class="choice-body"><span class="title">I'm not sure</span><span class="sub">A nurse navigator will help triage</span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="specialty" value="secondopinion">
+              <span class="choice-body"><span class="title">Second opinion</span><span class="sub">Review of an existing diagnosis or plan</span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3><span class="step-num">2</span> Tell us about you</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label for="first">Legal first name</label>
+              <input id="first" class="input" type="text" autocomplete="given-name">
+            </div>
+            <div class="field">
+              <label for="last">Legal last name</label>
+              <input id="last" class="input" type="text" autocomplete="family-name">
+            </div>
+            <div class="field">
+              <label for="dob">Date of birth</label>
+              <input id="dob" class="input" type="date">
+            </div>
+            <div class="field">
+              <label for="phone">Mobile phone</label>
+              <input id="phone" class="input" type="tel" placeholder="(555) 123-4567" autocomplete="tel">
+              <div class="hint">We'll text only to confirm your appointment.</div>
+            </div>
+            <div class="field full">
+              <label for="email">Email address</label>
+              <input id="email" class="input" type="email" autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="zip">ZIP code</label>
+              <input id="zip" class="input" type="text" inputmode="numeric" maxlength="10" autocomplete="postal-code">
+            </div>
+            <div class="field">
+              <label for="patient">Are you a current patient?</label>
+              <select id="patient" class="select">
+                <option>Yes — I have an MRN</option>
+                <option selected>No — first visit to Cardinal</option>
+                <option>Returning after more than 3 years</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3><span class="step-num">3</span> The reason for your visit</h3>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="reason">Briefly describe your symptoms or concern</label>
+              <textarea id="reason" class="textarea" placeholder="For example: shortness of breath when climbing stairs, started about 6 weeks ago…"></textarea>
+              <div class="hint">This goes directly to the clinical team — no marketing use. Avoid sharing sensitive information you wouldn't put in your chart.</div>
+            </div>
+            <div class="field">
+              <label for="referrer">Referring physician (optional)</label>
+              <input id="referrer" class="input" type="text" placeholder="Dr. Name, practice">
+            </div>
+            <div class="field">
+              <label for="insurance">Primary insurance</label>
+              <select id="insurance" class="select">
+                <option>Aetna</option>
+                <option>Anthem Blue Cross Blue Shield</option>
+                <option>Cigna</option>
+                <option>Humana</option>
+                <option>Medicare</option>
+                <option>Medicaid (Ohio)</option>
+                <option>UnitedHealthcare</option>
+                <option>Self-pay / uninsured</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3><span class="step-num">4</span> When works for you?</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label for="location">Preferred location</label>
+              <select id="location" class="select">
+                <option>Greenfield Main Campus — University Dr.</option>
+                <option>Cardinal North — Westfield</option>
+                <option>Cardinal East Imaging &amp; Heart Centre</option>
+                <option>Telehealth (video visit)</option>
+                <option>No preference — earliest available</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="when">Time of day</label>
+              <select id="when" class="select">
+                <option>Mornings (8 a.m. – noon)</option>
+                <option>Afternoons (noon – 5 p.m.)</option>
+                <option>Early evenings (after 5 p.m.)</option>
+                <option>Any — flexible</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="earliest">Earliest date you can come in</label>
+              <input id="earliest" class="input" type="date">
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <small>By submitting, you agree to our Notice of Privacy Practices. This form is HIPAA-compliant and transmitted over an encrypted connection.</small>
+          <button type="submit" class="btn btn-primary">
+            Submit request
+            <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+
+      </form>
+
+      <aside class="aside-stack" aria-label="Appointment help">
+
+        <div class="urgent" role="note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="i i-lg"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          <div>
+            <strong>Not for emergencies.</strong>
+            <p>Chest pain, stroke symptoms, severe injury, or trouble breathing? Call 911 or go to the nearest emergency department.</p>
+          </div>
+        </div>
+
+        <div class="glass aside-card">
+          <h3>Prefer to speak with someone?</h3>
+          <p>Our scheduling team answers from 7 a.m. to 7 p.m. ET, Monday through Saturday.</p>
+          <dl class="kv" style="margin-top: 1rem;">
+            <dt>General</dt><dd><a href="tel:18005550140">1-800-555-0140</a></dd>
+            <dt>Heart line</dt><dd><a href="tel:18005550155">1-800-555-0155</a></dd>
+            <dt>Cancer Centre</dt><dd><a href="tel:18005550162">1-800-555-0162</a></dd>
+            <dt>Nurse line (24h)</dt><dd><a href="tel:18005550199">1-800-555-0199</a></dd>
+          </dl>
+        </div>
+
+        <div class="glass-quiet aside-card">
+          <h3>What happens next</h3>
+          <ol class="timeline">
+            <li><span class="num">1</span><span>A coordinator reviews your request within one business day.</span></li>
+            <li><span class="num">2</span><span>We confirm your time by phone or secure message and verify benefits.</span></li>
+            <li><span class="num">3</span><span>You'll receive intake forms and prep instructions through the Patient Portal.</span></li>
+            <li><span class="num">4</span><span>Arrive 15 minutes early on the day of your visit.</span></li>
+          </ol>
+        </div>
+
+        <div class="glass-quiet aside-card">
+          <h3>Bring with you</h3>
+          <ul style="padding-left: 1.1rem; margin: 0; color: var(--ink-muted); font-size: 0.9rem; line-height: 1.7;">
+            <li>Photo ID and insurance card</li>
+            <li>A list of current medications and dosages</li>
+            <li>Recent imaging or test results (CD or portal share)</li>
+            <li>Referral letter, if your plan requires one</li>
+          </ul>
+        </div>
+
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="glass-strong stats-strip">
+      <div>
+        <span class="eyebrow">By the numbers</span>
+        <h2 style="margin-top: 0.75rem; font-size: 1.4rem;">Scheduling, transparent.</h2>
+        <p style="margin-top: 0.5rem; font-size: 0.92rem;">We publish our wait times monthly. These reflect October 2025.</p>
+      </div>
+      <div>
+        <div class="stat-num">8.2 days</div>
+        <div class="stat-sub">Median time to first specialty visit</div>
+      </div>
+      <div>
+        <div class="stat-num">94%</div>
+        <div class="stat-sub">Urgent referrals scheduled same day</div>
+      </div>
+      <div>
+        <div class="stat-num">3h 48m</div>
+        <div class="stat-sub">Average response to web requests</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="faq-shell">
+      <div>
+        <span class="eyebrow">Frequent questions</span>
+        <h2 style="margin-top: 0.9rem;">Before you submit</h2>
+        <p class="lede" style="margin-top: 1rem; font-size: 1.02rem;">A few things patients ask most often when booking their first visit at Cardinal.</p>
+      </div>
+      <div class="stack">
+        <details class="glass-quiet" style="padding: 1.1rem 1.3rem; border-radius: var(--radius);">
+          <summary style="font-weight: 500; cursor: pointer; color: var(--ink);">Do I need a referral from my primary care doctor?</summary>
+          <p style="margin-top: 0.75rem; font-size: 0.92rem;">For most specialties at Cardinal — including cardiology, neurology, and orthopaedics — a referral is helpful but not required. Some insurance plans (HMOs in particular) require a referral for coverage; check with your plan or ask us to verify when we confirm your appointment. Oncology second-opinion visits do not require a referral.</p>
+        </details>
+        <details class="glass-quiet" style="padding: 1.1rem 1.3rem; border-radius: var(--radius);">
+          <summary style="font-weight: 500; cursor: pointer; color: var(--ink);">How quickly will I hear back?</summary>
+          <p style="margin-top: 0.75rem; font-size: 0.92rem;">Most requests are returned within four business hours. Urgent oncology and cardiac concerns are flagged on intake and routed to a nurse navigator for same-day follow-up. If you submit on a weekend, expect a call by mid-morning Monday.</p>
+        </details>
+        <details class="glass-quiet" style="padding: 1.1rem 1.3rem; border-radius: var(--radius);">
+          <summary style="font-weight: 500; cursor: pointer; color: var(--ink);">Can I request a specific doctor?</summary>
+          <p style="margin-top: 0.75rem; font-size: 0.92rem;">Yes — note the physician's name in the symptoms field, or use <a href="find-a-doctor.html">Find a Doctor</a> to review profiles and request directly from their page. We'll do our best to honor preferences while keeping your wait time short.</p>
+        </details>
+        <details class="glass-quiet" style="padding: 1.1rem 1.3rem; border-radius: var(--radius);">
+          <summary style="font-weight: 500; cursor: pointer; color: var(--ink);">What if I'm uninsured or between plans?</summary>
+          <p style="margin-top: 0.75rem; font-size: 0.92rem;">Cardinal is a non-profit teaching hospital, and financial counselors are available to discuss sliding-scale rates, charity care eligibility, and payment plans before your visit. Choose "Self-pay" on the insurance field and a counselor will reach out alongside scheduling.</p>
+        </details>
+        <details class="glass-quiet" style="padding: 1.1rem 1.3rem; border-radius: var(--radius);">
+          <summary style="font-weight: 500; cursor: pointer; color: var(--ink);">Are telehealth visits available?</summary>
+          <p style="margin-top: 0.75rem; font-size: 0.92rem;">Yes — most follow-ups and many initial consultations in neurology, medical oncology, and cardiology can be conducted by video through the Patient Portal. Select "Telehealth" as your preferred location and we'll confirm whether your visit type is eligible.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-emergency">
+      <svg class="i i-lg" style="color: var(--warn);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      <div><strong>If this is a medical emergency, dial 911.</strong> For urgent but non-emergency concerns after hours, call our 24-hour nurse line at <a href="tel:18005550199">1-800-555-0199</a>.</div>
+    </div>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+          </span>
+          <span>Cardinal Medical</span>
+        </a>
+        <p>A regional academic medical centre advancing specialty care in cardiology, oncology, neurology, and orthopaedics — close to home, evidence-based at every step.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Care</h4>
+        <ul>
+          <li><a href="services.html">All specialties</a></li>
+          <li><a href="services.html#cardiac">Cardiac Institute</a></li>
+          <li><a href="services.html#oncology">Cancer Centre</a></li>
+          <li><a href="services.html#neurology">Neurosciences</a></li>
+          <li><a href="services.html#ortho">Orthopaedics</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Patients</h4>
+        <ul>
+          <li><a href="appointment.html">Request an appointment</a></li>
+          <li><a href="find-a-doctor.html">Find a doctor</a></li>
+          <li><a href="patient-portal.html">Patient portal</a></li>
+          <li><a href="locations.html">Locations &amp; hours</a></li>
+          <li><a href="#billing">Billing &amp; insurance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <ul>
+          <li><a href="about.html">Our mission</a></li>
+          <li><a href="about.html#research">Research &amp; trials</a></li>
+          <li><a href="about.html#education">Medical education</a></li>
+          <li><a href="about.html#careers">Careers</a></li>
+          <li><a href="about.html#newsroom">Newsroom</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:18005550140">1-800-555-0140</a></li>
+          <li><a href="mailto:hello@cardinalmedical.org">hello@cardinalmedical.org</a></li>
+          <li>2400 University Drive<br>Greenfield, OH 45123</li>
+          <li><a href="#language">Language assistance</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <small>© 2025 Cardinal Medical Centre. A 501(c)(3) non-profit teaching hospital.</small>
+      <div class="footer-legal">
+        <a href="#privacy">Privacy &amp; HIPAA</a>
+        <a href="#nondiscrimination">Non-discrimination</a>
+        <a href="#accessibility">Accessibility</a>
+        <a href="#terms">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

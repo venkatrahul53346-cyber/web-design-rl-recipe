@@ -31,6 +31,7 @@ import json
 import os
 import random
 import re
+import shutil
 import sys
 import tempfile
 import textwrap
@@ -44,7 +45,6 @@ from playwright.sync_api import sync_playwright
 from src.generate import build_task_dir
 from src.render import render_site
 from src.spec import WebsiteSpec
-from templates import REGISTRY
 
 
 COMPILER_MODEL = "claude-opus-4-7"
@@ -446,6 +446,15 @@ _MIN_PAGE_HEIGHT = 200               # below this is "blank or collapsed"
 _MIN_CONTENT_COVERAGE = 0.03         # ≥3% non-white pixels at desktop
 
 
+ALLOWED_IMAGE_SRCS = frozenset({
+    "photo-product-1.jpg",
+    "photo-product-2.jpg",
+    "photo-portrait-1.jpg",
+    "photo-landscape-1.jpg",
+    "illustration-abstract.jpg",
+})
+
+
 def _validate_page_format(page_html: str, page_name: str) -> List[str]:
     """Cheap text-only format checks — no rendering needed."""
     issues: List[str] = []
@@ -458,6 +467,18 @@ def _validate_page_format(page_html: str, page_name: str) -> List[str]:
         issues.append(
             f"`{page_name}` doesn't link to styles.css. Add "
             f'`<link rel="stylesheet" href="styles.css">` in <head>.'
+        )
+    # Validate <img> sources are in the allow-list
+    img_srcs = re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', page_html)
+    bad = [s for s in img_srcs if s not in ALLOWED_IMAGE_SRCS]
+    if bad:
+        unique_bad = sorted(set(bad))
+        issues.append(
+            f"`{page_name}` uses disallowed image src(s): {unique_bad}. "
+            f"Replace each `<img src=\"X\">` with one of the allowed "
+            f"placeholders ({sorted(ALLOWED_IMAGE_SRCS)}), or remove the "
+            f"<img> entirely and use CSS gradient / inline SVG / styled "
+            f"<div> for decorative content."
         )
     return issues
 
@@ -590,7 +611,7 @@ def _format_validation_feedback(issues: List[str], page_name: str) -> str:
 # Iterative per-page compile.
 # ---------------------------------------------------------------------------
 
-PAGE_MAX_ITERATIONS = 1  # initial attempt only, no corrections (kept fast)
+PAGE_MAX_ITERATIONS = 2  # initial attempt + up to 1 correction
 
 
 def _page_pass_iterative(
@@ -781,6 +802,30 @@ def call_compiler(spec: WebsiteSpec, *, model: str = COMPILER_MODEL) -> Dict[str
 # End-to-end synthesize (unchanged from before).
 # ---------------------------------------------------------------------------
 
+PLACEHOLDER_DIR = Path(__file__).resolve().parent.parent / "templates" / "_placeholders"
+
+
+def _placeholder_assets() -> Dict[str, Path]:
+    """Return {filename: source_path} for the 5 bundled placeholder JPGs.
+    Wired into every task's environment/assets/ via build_task_dir."""
+    if not PLACEHOLDER_DIR.is_dir():
+        raise RuntimeError(
+            f"placeholder dir missing: {PLACEHOLDER_DIR}. Run "
+            f"`python scripts/build_placeholders.py` to generate it."
+        )
+    files = {
+        "photo-product-1.jpg":      PLACEHOLDER_DIR / "photo-product-1.jpg",
+        "photo-product-2.jpg":      PLACEHOLDER_DIR / "photo-product-2.jpg",
+        "photo-portrait-1.jpg":     PLACEHOLDER_DIR / "photo-portrait-1.jpg",
+        "photo-landscape-1.jpg":    PLACEHOLDER_DIR / "photo-landscape-1.jpg",
+        "illustration-abstract.jpg": PLACEHOLDER_DIR / "illustration-abstract.jpg",
+    }
+    for name, path in files.items():
+        if not path.is_file():
+            raise RuntimeError(f"placeholder file missing: {path}")
+    return files
+
+
 def synthesize_task(spec: WebsiteSpec, out_dir: Path,
                     force: bool = False) -> Path:
     print(f"[{spec.slug}] compiling spec via {COMPILER_MODEL}…")
@@ -791,6 +836,12 @@ def synthesize_task(spec: WebsiteSpec, out_dir: Path,
         scratch = Path(tmpdir)
         for name, content in files.items():
             (scratch / name).write_text(content)
+        # Copy placeholder JPGs into scratch so render_site sees them — agent
+        # HTML references e.g. <img src="photo-product-1.jpg"> and we want
+        # the host-side render to match what the in-container render shows.
+        placeholders = _placeholder_assets()
+        for ph_name, ph_path in placeholders.items():
+            shutil.copy2(ph_path, scratch / ph_name)
         scratch_screens = scratch / "screenshots"
         render_site(scratch, scratch_screens)
         screenshots = {png.stem: png for png in scratch_screens.glob("*.png")}
@@ -817,65 +868,51 @@ def synthesize_task(spec: WebsiteSpec, out_dir: Path,
                 "compiler_model": COMPILER_MODEL,
             },
             keywords=("web", "html", "css", "visual", "synth", spec.archetype),
-            assets=None,
+            assets=placeholders,
             force=force,
         )
-
-
-SLOTS = {
-    "saas_minimal": "saas_minimal",
-    "saas-minimal": "saas_minimal",   # deprecated kebab-case alias
-    "devdocs_mono": "docs_mono",
-    "devdocs-mono": "docs_mono",      # deprecated kebab-case alias
-    "docs_mono":    "docs_mono",
-}
-
-
-def _resolve_template(name: str) -> str:
-    """Resolve a CLI template/slot name (with deprecated aliases) to a
-    REGISTRY key. Raises SystemExit with a helpful message on miss."""
-    if name in REGISTRY:
-        return name
-    if name in SLOTS and SLOTS[name] in REGISTRY:
-        return SLOTS[name]
-    raise SystemExit(
-        f"unknown template/slot {name!r}. "
-        f"Available templates: {sorted(REGISTRY)}"
-    )
 
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     src = p.add_mutually_exclusive_group(required=True)
-    src.add_argument("--template", choices=sorted(REGISTRY),
-                     help="Template registry key (see templates/__init__.py).")
-    src.add_argument("--random-template", action="store_true",
-                     help="Pick a template at random (uses --seed).")
-    src.add_argument("--slot", help=argparse.SUPPRESS)   # deprecated alias
-    src.add_argument("--spec", type=Path,
-                     help="Path to a JSON spec file (bypasses templates).")
+    src.add_argument(
+        "--vertical",
+        help="Vertical name (templates/verticals/). Pair with --style.",
+    )
+    src.add_argument(
+        "--random", action="store_true", dest="random_pair",
+        help="Pick a random compatible (vertical, style) pair.",
+    )
+    src.add_argument(
+        "--spec", type=Path,
+        help="Path to a JSON spec file (bypasses the registry).",
+    )
+    p.add_argument(
+        "--style",
+        help="Style name (templates/styles/). Required with --vertical.",
+    )
     p.add_argument("--seed", type=int, default=0,
-                   help="RNG seed for sampling within the template.")
+                   help="RNG seed for sampling within the (vertical, style).")
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--force", action="store_true")
     args = p.parse_args()
 
+    # Resolve spec
     if args.spec is not None:
         spec = WebsiteSpec.from_json(args.spec.read_text())
-    elif args.random_template:
-        rng = random.Random(args.seed)
-        # Two-step deterministic pick. Same outer seed for both is fine and
-        # documented; if we ever want independent draws, derive sub-seeds.
-        tmpl = rng.choice(sorted(REGISTRY))
-        spec = REGISTRY[tmpl].sample_spec(args.seed)
-        print(f"[random-template] picked {tmpl!r} (seed={args.seed})")
+    elif args.random_pair:
+        from templates import random_spec
+        v_name, s_name, spec = random_spec(args.seed)
+        print(f"[random] picked vertical={v_name!r} style={s_name!r} (seed={args.seed})")
     else:
-        name = args.template or args.slot
-        if args.slot:
-            print(f"[deprecation] --slot is deprecated; use --template {_resolve_template(args.slot)}",
-                  file=sys.stderr)
-        tmpl = _resolve_template(name)
-        spec = REGISTRY[tmpl].sample_spec(args.seed)
+        if not args.style:
+            p.error("--style is required when --vertical is given")
+        from templates import sample_spec
+        try:
+            spec = sample_spec(args.vertical, args.style, args.seed)
+        except ValueError as e:
+            p.error(str(e))
 
     try:
         out = synthesize_task(spec, args.out, force=args.force)

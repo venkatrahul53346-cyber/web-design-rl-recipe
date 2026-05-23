@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On the Farm — Experiences at Salt &amp; Field</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific compositions */
+  .farm-hero{padding:72px 0 0}
+  .farm-hero .hero-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:64px;align-items:end;padding:0 48px 64px;max-width:100%}
+  .farm-hero h1{margin-bottom:28px}
+  .farm-hero .kicker-row{display:flex;gap:32px;align-items:baseline;margin-bottom:32px;flex-wrap:wrap}
+  .farm-hero .kicker-row .meta{font-size:0.78rem;color:var(--ink-soft)}
+  .farm-hero .stage{aspect-ratio:5/4;position:relative;overflow:hidden;background:linear-gradient(160deg,#9a8e72 0%,#6e6447 45%,#3f4032 100%)}
+  .farm-hero .stage::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 25%, rgba(255,240,210,0.35), transparent 55%),radial-gradient(circle at 75% 80%, rgba(124,45,18,0.25), transparent 60%)}
+  .farm-hero .stage .tag{position:absolute;left:24px;bottom:24px;color:#FBF7F0;font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;z-index:2;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+
+  /* Index list of experiences */
+  .exp-index{display:grid;grid-template-columns:240px 1fr;gap:0;border-top:1px solid var(--rule)}
+  .exp-index .head{padding:32px 0;color:var(--ink-mute);font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase}
+  .exp-row{display:grid;grid-template-columns:64px 1.4fr 1fr 120px 40px;gap:24px;padding:28px 0;border-bottom:1px solid var(--rule);align-items:baseline;color:var(--ink)}
+  .exp-row:hover{background:rgba(251,247,240,0.5)}
+  .exp-row .num{font-family:var(--display);font-size:1.1rem;color:var(--ink-mute);font-style:italic}
+  .exp-row .name{font-family:var(--display);font-size:1.65rem;font-weight:300;letter-spacing:-0.01em}
+  .exp-row .blurb{color:var(--ink-soft);font-size:0.95rem;max-width:42ch}
+  .exp-row .meta{font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.04em}
+  .exp-row .arr{text-align:right;color:var(--accent);font-family:var(--display);font-size:1.4rem}
+
+  /* Feature spread */
+  .spread{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;align-items:center}
+  .spread.flip{grid-template-columns:1.3fr 1fr}
+  .spread .img{aspect-ratio:4/5;overflow:hidden;background:linear-gradient(170deg,#c9b896 0%,#8a7558 60%,#4a3f30 100%);position:relative}
+  .spread .img.wide{aspect-ratio:5/4;background:linear-gradient(150deg,#8a7558 0%,#6b5d44 50%,#2e2a22 100%)}
+  .spread .img::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 40% 30%, rgba(255,245,220,0.25), transparent 55%)}
+  .spread .copy h2{margin:18px 0 22px}
+  .spread .copy .eyebrow{margin-bottom:8px;display:block}
+  .spread .copy .signature{margin-top:28px;font-family:var(--display);font-style:italic;color:var(--ink-soft);font-size:1.05rem}
+  .spread .copy .pricing{margin-top:32px;padding-top:20px;border-top:1px solid var(--rule);display:flex;gap:40px;flex-wrap:wrap}
+  .spread .copy .pricing div{display:flex;flex-direction:column;gap:2px}
+  .spread .copy .pricing .label{font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute)}
+  .spread .copy .pricing .val{font-family:var(--display);font-size:1.25rem}
+
+  /* Seasonal calendar */
+  .calendar{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--rule);border-left:1px solid var(--rule)}
+  .calendar .cell{padding:32px 28px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);min-height:220px;display:flex;flex-direction:column;justify-content:space-between}
+  .calendar .season{font-family:var(--display);font-size:1.8rem;font-weight:300;letter-spacing:-0.01em}
+  .calendar .months{font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);margin-top:6px}
+  .calendar .doings{color:var(--ink-soft);font-size:0.92rem;margin-top:18px}
+
+  /* Photo strip — CSS art */
+  .photo-strip{display:grid;grid-template-columns:2fr 1fr 1.4fr;gap:6px;height:520px}
+  .photo-strip .ph{overflow:hidden;position:relative}
+  .photo-strip .ph.a{background:linear-gradient(145deg,#d4c4a3 0%,#9b8262 50%,#4a3f30 100%)}
+  .photo-strip .ph.b{background:linear-gradient(165deg,#7a8470 0%,#4a5544 60%,#252e22 100%)}
+  .photo-strip .ph.c{background:linear-gradient(155deg,#a8541f 0%,#7C2D12 50%,#3a1a08 100%)}
+  .photo-strip .ph::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 35% 30%, rgba(255,250,235,0.22), transparent 60%)}
+
+  /* Timeline */
+  .timeline-row{display:grid;grid-template-columns:160px 1fr;gap:48px;padding:32px 0;border-bottom:1px solid var(--rule)}
+  .timeline-row .t-time{font-family:var(--display);font-size:2rem;font-weight:300;font-style:italic;color:var(--ink)}
+  .timeline-row h4{font-family:var(--display);font-weight:400;font-size:1.4rem;margin-bottom:8px;letter-spacing:-0.01em}
+  .timeline-row p{color:var(--ink-soft);max-width:56ch}
+
+  /* Booking strip */
+  .strip-cta{background:var(--bg-warm);padding:64px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .strip-cta .row{display:grid;grid-template-columns:1.4fr 1fr;gap:64px;align-items:center}
+
+  .house-notes-grid{display:grid;grid-template-columns:1fr 2fr;gap:64px}
+  .house-notes-grid .inner{display:grid;grid-template-columns:1fr 1fr;gap:48px 64px}
+
+  @media (max-width:980px){
+    .farm-hero{padding:48px 0 0}
+    .farm-hero .hero-grid{grid-template-columns:1fr;padding:0 24px 48px;gap:36px}
+    .exp-index{grid-template-columns:1fr}
+    .exp-row{grid-template-columns:36px 1fr;gap:16px;padding:22px 0}
+    .exp-row .blurb,.exp-row .meta,.exp-row .arr{display:none}
+    .spread,.spread.flip{grid-template-columns:1fr;gap:36px}
+    .calendar{grid-template-columns:1fr}
+    .photo-strip{grid-template-columns:1fr;height:auto;gap:6px}
+    .photo-strip .ph{height:220px}
+    .timeline-row{grid-template-columns:1fr;gap:6px;padding:24px 0}
+    .timeline-row .t-time{font-size:1.6rem}
+    .strip-cta .row{grid-template-columns:1fr;gap:32px}
+    .house-notes-grid{grid-template-columns:1fr;gap:32px}
+    .house-notes-grid .inner{grid-template-columns:1fr;gap:28px}
+    h1.display{font-size:clamp(2.6rem,11vw,4rem)}
+    h2.display{font-size:clamp(2rem,8vw,3rem)}
+  }
+  @media (max-width:520px){
+    .farm-hero .kicker-row{gap:14px}
+    .spread .copy .pricing{gap:20px}
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="bar">
+    <nav class="nav-left" aria-label="Primary">
+      <a href="restaurant.html">Restaurant</a>
+      <a href="rooms.html">Rooms</a>
+      <a href="experiences.html" class="active">The Farm</a>
+      <a href="about.html">Our Story</a>
+    </nav>
+    <a class="brand-mark" href="index.html">Salt <em>&amp;</em> Field</a>
+    <div class="nav-right">
+      <a class="extra-link" href="press.html">Press</a>
+      <a class="extra-link" href="mailto:hello@saltandfield.com">Contact</a>
+      <a class="book-pill" href="reservations.html">Reserve</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="farm-hero">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow"><span class="dot"></span>On the Farm — Vol. III</span>
+        <h1 class="display" style="margin-top:22px">Hours spent <span class="display-italic">outside</span>, with reason.</h1>
+        <p class="lede" style="margin-top:28px">Eighty-six acres of pasture, orchard, river bottom and kitchen garden. Most guests arrive for dinner and a bed; the ones who stay an extra night come for these — quiet, useful days alongside the people who grow your meal.</p>
+        <div class="kicker-row" style="margin-top:36px">
+          <span class="meta">Eight standing offerings</span>
+          <span class="meta">Resident-led</span>
+          <span class="meta">House guests only</span>
+        </div>
+      </div>
+      <div class="stage" role="img" aria-label="Morning mist over the kitchen garden">
+        <span class="tag">The lower garden, 6:42 a.m.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="exp-index">
+        <div class="head">The Standing Programme</div>
+        <div class="list">
+          <a class="exp-row" href="#harvest">
+            <span class="num">01</span>
+            <span class="name">Harvest Walk</span>
+            <span class="blurb">A two-hour walk with the head gardener, basket in hand, ending at the pass with what you've cut.</span>
+            <span class="meta">Daily · 7:30 a.m.</span>
+            <span class="arr">→</span>
+          </a>
+          <a class="exp-row" href="#bread">
+            <span class="num">02</span>
+            <span class="name">The Bread Morning</span>
+            <span class="blurb">Shape, score and bake a country loaf in the wood oven beside our baker, Theo.</span>
+            <span class="meta">Fri &amp; Sat · 5:30 a.m.</span>
+            <span class="arr">→</span>
+          </a>
+          <a class="exp-row" href="#river">
+            <span class="num">03</span>
+            <span class="name">Lostine River Casting</span>
+            <span class="blurb">Catch-and-release fly fishing on a private mile of the Lostine, with a packed lunch from the kitchen.</span>
+            <span class="meta">Thu–Sun · half day</span>
+            <span class="arr">→</span>
+          </a>
+          <a class="exp-row" href="#cellar">
+            <span class="num">04</span>
+            <span class="name">In the Cellar</span>
+            <span class="blurb">A vertical pour of Wallowa Valley wines through five vintages, led by our sommelier.</span>
+            <span class="meta">Saturdays · 4:00 p.m.</span>
+            <span class="arr">→</span>
+          </a>
+          <a class="exp-row" href="#fermentation">
+            <span class="num">05</span>
+            <span class="name">Ferments &amp; Pantry</span>
+            <span class="blurb">An hour with our pastry chef in the cure room: koji, vinegars, lactos, the long shelf of last year.</span>
+            <span class="meta">Sundays · 11:00 a.m.</span>
+            <span class="arr">→</span>
+          </a>
+          <a class="exp-row" href="#horses">
+            <span class="num">06</span>
+            <span class="name">Pasture &amp; Animals</span>
+            <span class="blurb">Move the laying hens, meet the Jersey cows, and feed the two working draft horses, Beam and Linden.</span>
+            <span class="meta">Daily · 4:30 p.m.</span>
+            <span class="arr">→</span>
+          </a>
+          <a class="exp-row" href="#forage">
+            <span class="num">07</span>
+            <span class="name">A Forager's Hour</span>
+            <span class="blurb">Up into the timber edge for morels, chanterelles, nettle and currants — whatever the week is offering.</span>
+            <span class="meta">Seasonal · by request</span>
+            <span class="arr">→</span>
+          </a>
+          <a class="exp-row" href="#sauna">
+            <span class="num">08</span>
+            <span class="name">River Sauna</span>
+            <span class="blurb">Cedar sauna and a cold plunge in the Lostine. Towels, robes and tea provided; conversation optional.</span>
+            <span class="meta">By appointment</span>
+            <span class="arr">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-roomy" id="harvest">
+    <div class="wrap">
+      <div class="spread">
+        <div class="img" role="img" aria-label="Wicker basket with cut herbs and beets in early light"></div>
+        <div class="copy">
+          <span class="eyebrow"><span class="dot"></span>Experience 01 — Daily</span>
+          <h2 class="display">The <span class="display-italic">harvest</span> walk.</h2>
+          <div class="prose">
+            <p class="first">Two hours, basket in hand, with whoever happens to be working the kitchen garden that morning — usually our head gardener, Marisol Vance. You'll pull beets, snip lovage and sorrel, cut whatever flower is opening loudest, and walk it all up to the kitchen yourself.</p>
+            <p>Most of it ends up on the pass by dinner. Some of it ends up in a small jar at your door the next morning, labelled in pencil.</p>
+          </div>
+          <div class="signature">— led by Marisol Vance, head gardener</div>
+          <div class="pricing">
+            <div><span class="label">Duration</span><span class="val">Two hours</span></div>
+            <div><span class="label">Party size</span><span class="val">Up to six</span></div>
+            <div><span class="label">Included with stay</span><span class="val">No charge</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="photo-strip">
+      <div class="ph a" role="img" aria-label="Bread loaves on a board"></div>
+      <div class="ph b" role="img" aria-label="Fly rod against fence post"></div>
+      <div class="ph c" role="img" aria-label="Wine pour at dusk"></div>
+    </div>
+  </section>
+
+  <section class="section-roomy" id="bread">
+    <div class="wrap">
+      <div class="spread flip">
+        <div class="copy">
+          <span class="eyebrow"><span class="dot"></span>Experience 02 — Fri &amp; Sat</span>
+          <h2 class="display">A morning at the <span class="display-italic">wood oven</span>.</h2>
+          <div class="prose">
+            <p class="first">Theo lights the oak fire at four. You don't have to be there for that part. By the time you wander down at five-thirty, the firebox is roaring and the levain — fed the night before with our own milled Edison wheat — is ready to be shaped.</p>
+            <p>You'll shape, score and slide three loaves. Two go to the dining room. One leaves with you, still warm, wrapped in linen.</p>
+          </div>
+          <div class="signature">— led by Theo Halloran, head baker</div>
+          <div class="pricing">
+            <div><span class="label">Duration</span><span class="val">Three hours</span></div>
+            <div><span class="label">Party size</span><span class="val">Up to four</span></div>
+            <div><span class="label">Rate</span><span class="val">$95 / person</span></div>
+          </div>
+        </div>
+        <div class="img wide" role="img" aria-label="Hands scoring a sourdough loaf"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-hairline">
+    <div class="wrap">
+      <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:64px;margin-bottom:56px;align-items:end" class="calendar-head">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>The Year on the Farm</span>
+          <h2 class="display" style="margin-top:18px">What's <span class="display-italic">happening</span>, and when.</h2>
+        </div>
+        <p class="lede">We don't run all eight experiences every week. The valley dictates the calendar — when the river drops, when the morels come up, when the cows freshen. Here is the rough shape of the year.</p>
+      </div>
+      <div class="calendar">
+        <div class="cell">
+          <div>
+            <div class="season">Early Spring</div>
+            <div class="months">March — April</div>
+          </div>
+          <p class="doings">Lambing in the south barn. First nettles, the year's first morels along the timber edge. Bread mornings resume.</p>
+        </div>
+        <div class="cell">
+          <div>
+            <div class="season">High Summer</div>
+            <div class="months">June — August</div>
+          </div>
+          <p class="doings">Tomato glut. Stone fruit. Long evenings on the river. Sauna and plunge nights begin; harvest walks at six a.m. before the heat.</p>
+        </div>
+        <div class="cell">
+          <div>
+            <div class="season">Autumn</div>
+            <div class="months">September — November</div>
+          </div>
+          <p class="doings">Apple pressing in the cider house. Chanterelle hunts. The cellar tastings shift to library vintages and big reds.</p>
+        </div>
+        <div class="cell">
+          <div>
+            <div class="season">Quiet Winter</div>
+            <div class="months">December — February</div>
+          </div>
+          <p class="doings">House closed mid-December through late February. The pantry programme runs by appointment for returning guests only.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-roomy">
+    <div class="wrap-narrow">
+      <div style="margin-bottom:48px">
+        <span class="eyebrow"><span class="dot"></span>A Saturday in late June</span>
+        <h2 class="display" style="margin-top:18px">One <span class="display-italic">good</span> day, hour by hour.</h2>
+      </div>
+
+      <div class="timeline-row">
+        <div class="t-time">5:30</div>
+        <div>
+          <h4>The bread morning</h4>
+          <p>Down to the bakehouse in a sweater. Coffee from the press pot. Three loaves shaped before the first guests are awake.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="t-time">8:00</div>
+        <div>
+          <h4>Breakfast on the porch</h4>
+          <p>Soft eggs, your warm loaf, butter from the Jerseys, last summer's apricot jam. The whole thing takes as long as you let it.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="t-time">10:30</div>
+        <div>
+          <h4>Harvest walk with Marisol</h4>
+          <p>The basket fills with podded peas, marjoram, summer squash blossoms, and one very large head of garlic for the kitchen.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="t-time">1:00</div>
+        <div>
+          <h4>Hammock, river, nap — your call</h4>
+          <p>An unscheduled afternoon is the point. We can pack a lunch in a canvas tote if you want to wander further afield.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="t-time">4:00</div>
+        <div>
+          <h4>In the cellar</h4>
+          <p>Five vintages of Maison Bleu Gamay, poured by Nora. Bread, hard cheese, conversation. You'll feel it at dinner; that's fine.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="t-time">7:00</div>
+        <div>
+          <h4>The tasting menu</h4>
+          <p>Eleven courses. The marjoram from this morning appears in course four. Your basket photograph is in the menu binder.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="t-time">10:30</div>
+        <div>
+          <h4>The sauna, if you've still got it in you</h4>
+          <p>Cedar, then river, then the walk back to your room past the orchard. Lights off by eleven, generally.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-hairline">
+    <div class="wrap">
+      <div class="house-notes-grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>House Notes</span>
+          <h3 class="display" style="margin-top:18px">A few practical <span class="display-italic">things</span>.</h3>
+        </div>
+        <div class="inner">
+          <div>
+            <h5 style="font-family:var(--display);font-weight:400;font-size:1.15rem;margin-bottom:10px">For house guests, first</h5>
+            <p style="color:var(--ink-soft);font-size:0.95rem">Experiences are reserved for guests staying in one of the seven rooms. We open a small number of spaces to dining-only guests on Sundays — write to ask.</p>
+          </div>
+          <div>
+            <h5 style="font-family:var(--display);font-weight:400;font-size:1.15rem;margin-bottom:10px">Children</h5>
+            <p style="color:var(--ink-soft);font-size:0.95rem">Welcome on the harvest walk and at the animals from age six. Casting, sauna and cellar are for guests sixteen and older.</p>
+          </div>
+          <div>
+            <h5 style="font-family:var(--display);font-weight:400;font-size:1.15rem;margin-bottom:10px">Weather</h5>
+            <p style="color:var(--ink-soft);font-size:0.95rem">Almost everything goes ahead in light rain. We provide waxed jackets and tall boots in your size at the mudroom by the kitchen door.</p>
+          </div>
+          <div>
+            <h5 style="font-family:var(--display);font-weight:400;font-size:1.15rem;margin-bottom:10px">Booking</h5>
+            <p style="color:var(--ink-soft);font-size:0.95rem">Add experiences when you reserve, or mention them in the notes — your innkeeper, Will, will confirm by email a few days before arrival.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="strip-cta">
+    <div class="wrap">
+      <div class="row">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>To begin</span>
+          <h2 class="display" style="margin-top:14px">Stay two nights. <span class="display-italic">Choose one.</span></h2>
+          <p class="lede" style="margin-top:18px">The room rate includes the harvest walk and access to the pasture afternoons. The rest are added when you book — or once you're here and the morning suggests itself.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+          <a class="btn" href="reservations.html">Reserve a room</a>
+          <a class="arrow-link" href="rooms.html">See the seven rooms →</a>
+          <a class="inline-link" href="mailto:hello@saltandfield.com" style="margin-top:8px">Or write to Will directly</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="mark">Salt <em>&amp;</em> Field</div>
+        <p>A forty-seat restaurant and seven guest rooms on a regenerative farm in the Wallowa Valley. Tasting menus, Thursday through Sunday.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Visit</h5>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="restaurant.html">The Restaurant</a></li>
+          <li><a href="rooms.html">Stay With Us</a></li>
+          <li><a href="experiences.html">On the Farm</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>House</h5>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="press.html">Press &amp; Awards</a></li>
+          <li><a href="about.html#team">The Team</a></li>
+          <li><a href="about.html#cards">Gift Cards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Find Us</h5>
+        <address>
+          4180 Lostine River Road<br>
+          Lostine, Oregon 97857<br>
+          <a href="tel:+15415559082">541&nbsp;555&nbsp;9082</a><br>
+          <a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a>
+        </address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 Salt &amp; Field Farm Co. — Open Thursday through Sunday, by reservation.</div>
+      <div class="legal">
+        <a href="#">Instagram</a>
+        <a href="#">Newsletter</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

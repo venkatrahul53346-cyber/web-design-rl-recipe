@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Care &amp; Services — Cardinal Medical</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .svc-hero-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 3rem; align-items: end; }
+  .svc-hero-grid .lede { margin-top: 1.4rem; }
+  .svc-hero-meta { display: grid; gap: 0.75rem; padding: 1.5rem; }
+  .svc-hero-meta dt { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 500; }
+  .svc-hero-meta dd { margin: 0 0 0.6rem; font-weight: 500; color: var(--ink); font-size: 0.98rem; }
+  .svc-index { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-top: 2rem; }
+  .svc-index a { display: flex; flex-direction: column; gap: 0.4rem; padding: 1rem 1.1rem; border-radius: var(--radius); background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border-soft); backdrop-filter: blur(10px); color: var(--ink); transition: all 0.18s ease; min-width: 0; }
+  .svc-index a:hover { transform: translateY(-2px); background: rgba(255,255,255,0.78); color: var(--ink); }
+  .svc-index .num { font-size: 0.72rem; letter-spacing: 0.14em; color: var(--accent); font-weight: 500; }
+  .svc-index .ttl { font-weight: 500; letter-spacing: -0.01em; }
+  .svc-index .sub { font-size: 0.82rem; color: var(--ink-soft); }
+
+  .specialty { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 2.5rem; padding: 2.4rem; scroll-margin-top: 120px; }
+  .specialty + .specialty { margin-top: 2rem; }
+  .specialty .side { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+  .specialty .side .ico { width: 56px; height: 56px; border-radius: var(--radius); background: var(--accent-tint); display: inline-flex; align-items: center; justify-content: center; color: var(--accent-deep); }
+  .specialty .side .ico svg { width: 26px; height: 26px; stroke-width: 1.5; }
+  .specialty h2 { letter-spacing: -0.025em; }
+  .specialty .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+  .specialty .body { display: grid; gap: 1.4rem; min-width: 0; }
+  .specialty .conditions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem 1.5rem; padding: 0; margin: 0; list-style: none; }
+  .specialty .conditions li { font-size: 0.93rem; color: var(--ink-muted); padding: 0.35rem 0; border-bottom: 1px dashed var(--line); display: flex; align-items: center; gap: 0.5rem; }
+  .specialty .conditions li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent-soft); flex-shrink: 0; }
+  .specialty .programs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; }
+  .specialty .programs .pgm { padding: 0.95rem 1rem; background: rgba(255,255,255,0.55); border: 1px solid var(--glass-border-soft); border-radius: var(--radius); backdrop-filter: blur(10px); min-width: 0; }
+  .specialty .programs .pgm strong { display: block; font-weight: 500; font-size: 0.92rem; margin-bottom: 0.2rem; }
+  .specialty .programs .pgm span { font-size: 0.8rem; color: var(--ink-soft); }
+  .specialty .footer-row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; padding-top: 0.5rem; border-top: 1px solid var(--line); }
+  .specialty .footer-row .lead-line { font-size: 0.88rem; color: var(--ink-soft); margin-right: auto; flex: 1 1 220px; min-width: 0; }
+
+  .stats-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; padding: 0; }
+  .stats-strip .stat { padding: 1.6rem 1.8rem; border-right: 1px solid var(--line); min-width: 0; }
+  .stats-strip .stat:last-child { border-right: 0; }
+  .stats-strip .stat .n { font-size: 2.2rem; font-weight: 500; letter-spacing: -0.035em; color: var(--ink); line-height: 1; }
+  .stats-strip .stat .l { display: block; font-size: 0.84rem; color: var(--ink-muted); margin-top: 0.5rem; max-width: 22ch; }
+
+  .pathway { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+  .pathway .step { padding: 1.4rem; position: relative; min-width: 0; }
+  .pathway .step .step-n { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+  .pathway .step h3 { margin: 0.5rem 0 0.4rem; }
+  .pathway .step p { font-size: 0.9rem; margin: 0; }
+
+  .pathway-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 3rem; align-items: start; }
+
+  .refer { display: grid; grid-template-columns: 1.3fr 1fr; gap: 0; align-items: stretch; padding: 0; overflow: hidden; }
+  .refer-text { padding: 2.6rem; min-width: 0; }
+  .refer-side { padding: 2.6rem; background: rgba(37, 99, 235, 0.06); border-left: 1px solid var(--line); min-width: 0; }
+  .refer-side ul { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.55rem; }
+  .refer-side li { font-size: 0.92rem; color: var(--ink); display: flex; gap: 0.6rem; align-items: flex-start; }
+  .refer-side li svg { flex-shrink: 0; color: var(--accent); margin-top: 2px; }
+
+  .nav-cta-row { display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; align-items: center; padding: 2.4rem 2.6rem; }
+  .nav-cta-row .actions { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  @media (max-width: 960px) {
+    .svc-hero-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .specialty { grid-template-columns: 1fr; gap: 1.6rem; padding: 1.6rem; }
+    .refer { grid-template-columns: 1fr; }
+    .refer-text, .refer-side { padding: 1.8rem; }
+    .refer-side { border-left: 0; border-top: 1px solid var(--line); }
+    .svc-index { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats-strip .stat { border-right: 0; border-bottom: 1px solid var(--line); }
+    .stats-strip .stat:nth-child(2) { border-right: 0; }
+    .pathway { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pathway-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .specialty .programs { grid-template-columns: 1fr; }
+    .specialty .conditions { grid-template-columns: 1fr; }
+    .nav-cta-row { grid-template-columns: 1fr; padding: 1.6rem; }
+  }
+  @media (max-width: 560px) {
+    .svc-index { grid-template-columns: 1fr; }
+    .stats-strip { grid-template-columns: 1fr; }
+    .pathway { grid-template-columns: 1fr; }
+    .specialty { padding: 1.4rem; }
+    .refer-text, .refer-side { padding: 1.4rem; }
+    h1 { font-size: 2.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a href="index.html" class="brand" aria-label="Cardinal Medical home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+      </span>
+      <span>Cardinal Medical<small>Academic Medical Centre</small></span>
+    </a>
+    <nav class="nav-primary" aria-label="Primary">
+      <a href="services.html" class="active">Care &amp; Services</a>
+      <a href="find-a-doctor.html">Find a Doctor</a>
+      <a href="locations.html">Locations</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="patient-portal.html" class="nav-portal">Patient Portal</a>
+      <a href="appointment.html" class="btn btn-primary">Book appointment</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="section-hero">
+    <div class="wrap">
+      <div class="svc-hero-grid">
+        <div>
+          <span class="eyebrow">Care &amp; Services</span>
+          <h1 style="margin-top: 1.2rem;">Four specialty institutes,<br>one connected medical record.</h1>
+          <p class="lede">Cardinal Medical organises advanced care around four academic institutes — Cardiac, Cancer, Neurosciences, and Orthopaedics — supported by integrated imaging, rehabilitation, and a shared multidisciplinary review board that meets weekly on complex cases.</p>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1.6rem;">
+            <a href="appointment.html" class="btn btn-primary">Request an appointment</a>
+            <a href="find-a-doctor.html" class="btn btn-ghost">Find a specialist</a>
+          </div>
+        </div>
+        <dl class="glass svc-hero-meta" aria-label="At a glance">
+          <div>
+            <dt>Referral acceptance</dt>
+            <dd>Within 2 business days, by phone or fax</dd>
+          </div>
+          <div>
+            <dt>Insurance</dt>
+            <dd>In-network with all major Ohio carriers</dd>
+          </div>
+          <div>
+            <dt>Multidisciplinary boards</dt>
+            <dd>Tumour, cardiac, spine, movement disorders</dd>
+          </div>
+          <div>
+            <dt>Second opinions</dt>
+            <dd>Available remotely for out-of-region patients</dd>
+          </div>
+        </dl>
+      </div>
+
+      <nav class="svc-index" aria-label="Specialty index">
+        <a href="#cardiac">
+          <span class="num">01 / Cardiac</span>
+          <span class="ttl">Cardiac Institute</span>
+          <span class="sub">Heart, vascular, electrophysiology</span>
+        </a>
+        <a href="#oncology">
+          <span class="num">02 / Oncology</span>
+          <span class="ttl">Cancer Centre</span>
+          <span class="sub">Medical, surgical, radiation oncology</span>
+        </a>
+        <a href="#neurology">
+          <span class="num">03 / Neuro</span>
+          <span class="ttl">Neurosciences</span>
+          <span class="sub">Brain, spine, neuromuscular</span>
+        </a>
+        <a href="#ortho">
+          <span class="num">04 / Ortho</span>
+          <span class="ttl">Orthopaedics</span>
+          <span class="sub">Joint, sports, spine surgery</span>
+        </a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="glass-quiet stats-strip">
+        <div class="stat"><div class="n">38,400</div><span class="l">specialty visits in the past year</span></div>
+        <div class="stat"><div class="n">96%</div><span class="l">patients seen within published wait targets</span></div>
+        <div class="stat"><div class="n">142</div><span class="l">active clinical trials across institutes</span></div>
+        <div class="stat"><div class="n">4.8 / 5</div><span class="l">average post-visit experience rating</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+
+      <article id="cardiac" class="specialty glass">
+        <div class="side">
+          <span class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+          </span>
+          <span class="eyebrow">Institute 01</span>
+          <h2>Cardiac Institute</h2>
+          <p style="font-size: 0.94rem; margin: 0;">From preventive cardiology to structural heart procedures, our team delivers the full continuum of adult cardiovascular care under one roof.</p>
+          <div class="tags">
+            <span class="pill pill-good pill-dot">Accepting new patients</span>
+            <span class="pill">22 cardiologists</span>
+            <span class="pill">Greenfield · West Loop</span>
+          </div>
+        </div>
+        <div class="body">
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">Conditions we treat</h3>
+            <ul class="conditions">
+              <li>Coronary artery disease</li>
+              <li>Atrial fibrillation &amp; arrhythmias</li>
+              <li>Heart failure (HFrEF &amp; HFpEF)</li>
+              <li>Valvular heart disease</li>
+              <li>Hypertrophic cardiomyopathy</li>
+              <li>Peripheral artery disease</li>
+              <li>Adult congenital heart disease</li>
+              <li>Pulmonary hypertension</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">Programs &amp; procedures</h3>
+            <div class="programs">
+              <div class="pgm"><strong>Structural Heart</strong><span>TAVR, MitraClip, LAAC</span></div>
+              <div class="pgm"><strong>Electrophysiology</strong><span>Ablation, CRT, ICD implantation</span></div>
+              <div class="pgm"><strong>Advanced Heart Failure</strong><span>LVAD evaluation, transplant referral</span></div>
+            </div>
+          </div>
+          <div class="footer-row">
+            <span class="lead-line">New patient appointments typically within 5–7 days.</span>
+            <a href="find-a-doctor.html?specialty=cardiology" class="btn btn-ghost">Meet the team</a>
+            <a href="appointment.html?dept=cardiac" class="btn btn-primary">Book cardiology</a>
+          </div>
+        </div>
+      </article>
+
+      <article id="oncology" class="specialty glass">
+        <div class="side">
+          <span class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9"/><path d="M3 12a9 9 0 0 1 9-9"/><path d="M12 21a9 9 0 0 1-9-9"/><path d="M21 12a9 9 0 0 1-9 9"/></svg>
+          </span>
+          <span class="eyebrow">Institute 02</span>
+          <h2>Cancer Centre</h2>
+          <p style="font-size: 0.94rem; margin: 0;">An NCI-affiliated programme combining precision diagnostics, multidisciplinary tumour boards, and same-week treatment planning for newly diagnosed patients.</p>
+          <div class="tags">
+            <span class="pill pill-good pill-dot">Accepting new patients</span>
+            <span class="pill">31 oncologists</span>
+            <span class="pill">142 open trials</span>
+          </div>
+        </div>
+        <div class="body">
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">Conditions we treat</h3>
+            <ul class="conditions">
+              <li>Breast cancer</li>
+              <li>Lung &amp; thoracic cancers</li>
+              <li>Colorectal &amp; GI cancers</li>
+              <li>Prostate &amp; urologic cancers</li>
+              <li>Lymphoma &amp; leukaemia</li>
+              <li>Head &amp; neck cancers</li>
+              <li>Pancreatic &amp; hepatobiliary</li>
+              <li>Sarcoma &amp; rare tumours</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">Programs &amp; procedures</h3>
+            <div class="programs">
+              <div class="pgm"><strong>Precision Oncology</strong><span>Genomic testing, targeted therapy</span></div>
+              <div class="pgm"><strong>Radiation Oncology</strong><span>IMRT, SBRT, brachytherapy</span></div>
+              <div class="pgm"><strong>Survivorship Clinic</strong><span>Long-term follow-up &amp; wellness</span></div>
+            </div>
+          </div>
+          <div class="footer-row">
+            <span class="lead-line">Newly diagnosed? A nurse navigator will contact you within 24 hours.</span>
+            <a href="find-a-doctor.html?specialty=oncology" class="btn btn-ghost">Meet the team</a>
+            <a href="appointment.html?dept=oncology" class="btn btn-primary">Book oncology</a>
+          </div>
+        </div>
+      </article>
+
+      <article id="neurology" class="specialty glass">
+        <div class="side">
+          <span class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v0a3 3 0 0 0-3 3v2a3 3 0 0 0 3 3v0a3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v0a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3v0a3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg>
+          </span>
+          <span class="eyebrow">Institute 03</span>
+          <h2>Neurosciences</h2>
+          <p style="font-size: 0.94rem; margin: 0;">A joint neurology and neurosurgery programme with a Joint Commission–certified Comprehensive Stroke Centre and the region's only 7T research MRI.</p>
+          <div class="tags">
+            <span class="pill pill-good pill-dot">Accepting new patients</span>
+            <span class="pill">18 specialists</span>
+            <span class="pill">Comprehensive Stroke Centre</span>
+          </div>
+        </div>
+        <div class="body">
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">Conditions we treat</h3>
+            <ul class="conditions">
+              <li>Stroke &amp; cerebrovascular disease</li>
+              <li>Epilepsy &amp; seizure disorders</li>
+              <li>Parkinson's &amp; movement disorders</li>
+              <li>Multiple sclerosis</li>
+              <li>Alzheimer's &amp; memory disorders</li>
+              <li>Headache &amp; migraine</li>
+              <li>Brain tumours</li>
+              <li>Spinal cord disorders</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">Programs &amp; procedures</h3>
+            <div class="programs">
+              <div class="pgm"><strong>Stroke Program</strong><span>24/7 thrombectomy, tPA</span></div>
+              <div class="pgm"><strong>Epilepsy Monitoring</strong><span>Level 4 EMU, surgical evaluation</span></div>
+              <div class="pgm"><strong>DBS Program</strong><span>Deep brain stimulation for PD &amp; ET</span></div>
+            </div>
+          </div>
+          <div class="footer-row">
+            <span class="lead-line">Stroke symptoms? Call 911 — do not drive yourself.</span>
+            <a href="find-a-doctor.html?specialty=neurology" class="btn btn-ghost">Meet the team</a>
+            <a href="appointment.html?dept=neurology" class="btn btn-primary">Book neurology</a>
+          </div>
+        </div>
+      </article>
+
+      <article id="ortho" class="specialty glass">
+        <div class="side">
+          <span class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4a2 2 0 1 1 0 4 2 2 0 0 0 0 4 2 2 0 0 1 0 4 2 2 0 0 0 0 4"/><path d="M18 4a2 2 0 1 0 0 4 2 2 0 0 1 0 4 2 2 0 1 0 0 4 2 2 0 0 1 0 4"/><path d="M8 6h8"/><path d="M8 18h8"/></svg>
+          </span>
+          <span class="eyebrow">Institute 04</span>
+          <h2>Orthopaedics</h2>
+          <p style="font-size: 0.94rem; margin: 0;">Conservative-first orthopaedic care with one of Ohio's highest-volume joint replacement programs and dedicated clinics for sports, spine, and hand surgery.</p>
+          <div class="tags">
+            <span class="pill pill-good pill-dot">Accepting new patients</span>
+            <span class="pill">26 surgeons</span>
+            <span class="pill">Walk-in injury clinic</span>
+          </div>
+        </div>
+        <div class="body">
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">Conditions we treat</h3>
+            <ul class="conditions">
+              <li>Hip &amp; knee arthritis</li>
+              <li>Rotator cuff &amp; shoulder injuries</li>
+              <li>ACL &amp; ligament tears</li>
+              <li>Degenerative spine disease</li>
+              <li>Fractures &amp; trauma</li>
+              <li>Hand &amp; wrist conditions</li>
+              <li>Foot &amp; ankle disorders</li>
+              <li>Sports overuse injuries</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">Programs &amp; procedures</h3>
+            <div class="programs">
+              <div class="pgm"><strong>Joint Replacement</strong><span>Robotic-assisted hip &amp; knee</span></div>
+              <div class="pgm"><strong>Sports Medicine</strong><span>Same-week MRI &amp; surgical consult</span></div>
+              <div class="pgm"><strong>Spine Centre</strong><span>Minimally invasive decompression</span></div>
+            </div>
+          </div>
+          <div class="footer-row">
+            <span class="lead-line">Walk-in injury clinic open weekdays 8a–7p, no appointment needed.</span>
+            <a href="find-a-doctor.html?specialty=orthopaedics" class="btn btn-ghost">Meet the team</a>
+            <a href="appointment.html?dept=ortho" class="btn btn-primary">Book orthopaedics</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="section-band">
+    <div class="wrap">
+      <div class="pathway-grid">
+        <div>
+          <span class="eyebrow">What to expect</span>
+          <h2 style="margin-top: 1rem;">Your pathway through specialty care.</h2>
+          <p style="margin-top: 1rem; font-size: 0.96rem;">Every specialty visit follows the same predictable arc — so you know what's next, who you'll meet, and when you'll hear back.</p>
+        </div>
+        <div class="pathway">
+          <div class="glass-quiet step">
+            <span class="step-n">Step 01</span>
+            <h3>Request or referral</h3>
+            <p>Self-refer online, or have your primary care clinician send records securely. We confirm within 2 business days.</p>
+          </div>
+          <div class="glass-quiet step">
+            <span class="step-n">Step 02</span>
+            <h3>Triage &amp; matching</h3>
+            <p>A nurse navigator reviews your case and matches you with the right subspecialist and care setting.</p>
+          </div>
+          <div class="glass-quiet step">
+            <span class="step-n">Step 03</span>
+            <h3>Consultation</h3>
+            <p>Your first visit reviews history, imaging, and prior workup. Most visits include same-day labs or imaging.</p>
+          </div>
+          <div class="glass-quiet step">
+            <span class="step-n">Step 04</span>
+            <h3>Plan &amp; follow-through</h3>
+            <p>You leave with a written plan in the portal, scheduled follow-up, and a direct line to your care team.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="glass refer">
+        <div class="refer-text">
+          <span class="eyebrow">For referring clinicians</span>
+          <h2 style="margin-top: 1rem;">A direct line into every institute.</h2>
+          <p style="margin-top: 1rem;" class="lede">The Cardinal Physician Liaison Service connects community providers with our specialists for curbside consults, expedited transfers, and shared-decision review on complex cases — without losing the patient relationship you've built.</p>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1.6rem;">
+            <a href="tel:18005550155" class="btn btn-primary">Call physician line · 1-800-555-0155</a>
+            <a href="#refer-form" class="btn btn-ghost">Secure referral form</a>
+          </div>
+        </div>
+        <aside class="refer-side">
+          <h3>What we send back</h3>
+          <ul>
+            <li><svg class="i" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Consultation note within 24 hours of the visit</li>
+            <li><svg class="i" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Direct EHR integration with Epic Care Everywhere</li>
+            <li><svg class="i" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Shared imaging access through the regional PACS</li>
+            <li><svg class="i" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Co-management plan with clear handback criteria</li>
+            <li><svg class="i" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> CME conferences open to community physicians</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="glass-strong nav-cta-row">
+        <div>
+          <span class="eyebrow">Not sure where to start?</span>
+          <h2 style="margin-top: 0.8rem; font-size: 1.6rem;">Speak with a nurse navigator before you book.</h2>
+          <p style="margin: 0.6rem 0 0; max-width: 60ch;">If your symptoms cross specialties — or you'd like help understanding a recent diagnosis — our navigators help you decide what kind of visit is right, in plain language and at no cost.</p>
+        </div>
+        <div class="actions">
+          <a href="tel:18005550140" class="btn btn-primary">Call 1-800-555-0140</a>
+          <a href="appointment.html" class="btn btn-ghost">Or request online</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-emergency">
+      <svg class="i i-lg" style="color: var(--warn);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      <div><strong>If this is a medical emergency, dial 911.</strong> For urgent but non-emergency concerns after hours, call our 24-hour nurse line at <a href="tel:18005550199">1-800-555-0199</a>.</div>
+    </div>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+          </span>
+          <span>Cardinal Medical</span>
+        </a>
+        <p>A regional academic medical centre advancing specialty care in cardiology, oncology, neurology, and orthopaedics — close to home, evidence-based at every step.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Care</h4>
+        <ul>
+          <li><a href="services.html">All specialties</a></li>
+          <li><a href="services.html#cardiac">Cardiac Institute</a></li>
+          <li><a href="services.html#oncology">Cancer Centre</a></li>
+          <li><a href="services.html#neurology">Neurosciences</a></li>
+          <li><a href="services.html#ortho">Orthopaedics</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Patients</h4>
+        <ul>
+          <li><a href="appointment.html">Request an appointment</a></li>
+          <li><a href="find-a-doctor.html">Find a doctor</a></li>
+          <li><a href="patient-portal.html">Patient portal</a></li>
+          <li><a href="locations.html">Locations &amp; hours</a></li>
+          <li><a href="#billing">Billing &amp; insurance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <ul>
+          <li><a href="about.html">Our mission</a></li>
+          <li><a href="about.html#research">Research &amp; trials</a></li>
+          <li><a href="about.html#education">Medical education</a></li>
+          <li><a href="about.html#careers">Careers</a></li>
+          <li><a href="about.html#newsroom">Newsroom</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:18005550140">1-800-555-0140</a></li>
+          <li><a href="mailto:hello@cardinalmedical.org">hello@cardinalmedical.org</a></li>
+          <li>2400 University Drive<br>Greenfield, OH 45123</li>
+          <li><a href="#language">Language assistance</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <small>© 2025 Cardinal Medical Centre. A 501(c)(3) non-profit teaching hospital.</small>
+      <div class="footer-legal">
+        <a href="#privacy">Privacy &amp; HIPAA</a>
+        <a href="#nondiscrimination">Non-discrimination</a>
+        <a href="#accessibility">Accessibility</a>
+        <a href="#terms">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reservations — Salt &amp; Field</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  *{min-width:0}
+  html,body{overflow-x:hidden;max-width:100%}
+  input,select,textarea{max-width:100%}
+
+  .res-hero{padding:88px 0 56px;border-bottom:1px solid var(--rule)}
+  .res-hero .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:80px;align-items:end}
+  .res-hero h1{margin-top:18px}
+  .res-hero .meta-list{display:grid;grid-template-columns:1fr 1fr;gap:32px 40px;padding-top:14px;border-top:1px solid var(--rule)}
+  .res-hero .meta-list dt{font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:6px}
+  .res-hero .meta-list dd{font-family:var(--display);font-size:1.15rem;color:var(--ink);font-weight:400;line-height:1.3}
+  .res-hero .meta-list dd span{display:block;font-family:var(--sans);font-size:0.88rem;color:var(--ink-soft);margin-top:2px;letter-spacing:0}
+  @media(max-width:900px){
+    .res-hero{padding:56px 0 40px}
+    .res-hero .grid{grid-template-columns:1fr;gap:40px}
+  }
+  @media(max-width:520px){
+    .res-hero .meta-list{grid-template-columns:1fr;gap:24px}
+  }
+
+  .quick-find{padding:32px 0 24px}
+  .quick-find .booking-widget{margin-top:24px}
+
+  .form-layout{display:grid;grid-template-columns:0.85fr 1.4fr;gap:120px;padding:96px 0 56px;border-top:1px solid var(--rule)}
+  @media(max-width:980px){.form-layout{grid-template-columns:1fr;gap:56px;padding:64px 0 40px}}
+  .form-layout aside h2{margin:14px 0 22px}
+  .form-layout aside .note{font-size:0.95rem;color:var(--ink-soft);max-width:34ch;margin-bottom:28px}
+  .form-layout aside .courses{border-top:1px solid var(--rule);padding-top:20px}
+  .form-layout aside .courses .row{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--rule);font-size:0.92rem;color:var(--ink-soft)}
+  .form-layout aside .courses .row strong{font-family:var(--display);font-weight:400;color:var(--ink);font-size:1rem}
+  .form-layout aside .courses .row .course-tag{font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);flex-shrink:0}
+
+  .res-form{display:grid;gap:42px;min-width:0}
+  .res-form fieldset{border:none;min-width:0}
+  .res-form legend{font-family:var(--display);font-size:1.55rem;font-weight:400;letter-spacing:-0.01em;padding-bottom:14px;border-bottom:1px solid var(--rule);width:100%;margin-bottom:22px}
+  .res-form legend .num{color:var(--accent);font-style:italic;margin-right:14px;font-size:1.2rem}
+
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px 36px}
+  @media(max-width:640px){.field-grid{grid-template-columns:1fr;gap:24px}}
+  .field-grid.three{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:780px){.field-grid.three{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.field-grid.three{grid-template-columns:1fr}}
+
+  .ufield{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .ufield label{font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute)}
+  .ufield input, .ufield select, .ufield textarea{
+    border:none;border-bottom:1px solid var(--rule);background:transparent;
+    font-family:var(--sans);font-size:1rem;color:var(--ink);
+    padding:8px 0 10px;outline:none;width:100%;max-width:100%;border-radius:0;
+    transition:border-color .2s;
+  }
+  .ufield input:focus, .ufield select:focus, .ufield textarea:focus{border-bottom-color:var(--ink)}
+  .ufield textarea{resize:vertical;min-height:84px;line-height:1.55}
+  .ufield .hint{font-size:0.82rem;color:var(--ink-mute);margin-top:4px}
+
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;position:relative}
+  .pill-row input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+  .pill-row label{
+    display:inline-block;padding:10px 16px;border:1px solid var(--rule);
+    font-size:0.84rem;color:var(--ink-soft);cursor:pointer;
+    letter-spacing:0;text-transform:none;
+    transition:all .2s;
+  }
+  .pill-row label:hover{border-color:var(--ink-soft);color:var(--ink)}
+  .pill-row input:checked + label{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+  .check-row{display:flex;align-items:flex-start;gap:12px;margin-top:6px}
+  .check-row input{margin-top:5px;accent-color:var(--accent);flex-shrink:0}
+  .check-row label{font-size:0.9rem;color:var(--ink-soft);line-height:1.5}
+
+  .form-foot{display:flex;justify-content:space-between;align-items:center;gap:24px;padding-top:14px;border-top:1px solid var(--rule);flex-wrap:wrap}
+  .form-foot p{font-size:0.85rem;color:var(--ink-mute);max-width:42ch}
+
+  .alt-paths{padding:56px 0 96px;border-top:1px solid var(--rule);background:var(--bg-warm)}
+  .alt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
+  @media(max-width:900px){.alt-grid{grid-template-columns:1fr;gap:32px}}
+  .alt-card{padding:8px 0;min-width:0}
+  .alt-card h3{font-family:var(--display);font-size:1.5rem;font-weight:400;margin:14px 0 10px;letter-spacing:-0.01em}
+  .alt-card p{font-size:0.95rem;color:var(--ink-soft);margin-bottom:16px;max-width:34ch}
+
+  .policies{padding:96px 0;border-top:1px solid var(--rule)}
+  .pol-grid{display:grid;grid-template-columns:1fr 2fr;gap:80px;align-items:start}
+  @media(max-width:820px){.pol-grid{grid-template-columns:1fr;gap:32px}}
+  .pol-list{display:grid;grid-template-columns:1fr 1fr;gap:40px 56px}
+  @media(max-width:680px){.pol-list{grid-template-columns:1fr;gap:32px}}
+  .pol-item{min-width:0}
+  .pol-item h4{font-family:var(--sans);font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink);margin-bottom:8px}
+  .pol-item h4::before{content:'';display:inline-block;width:5px;height:5px;background:var(--accent);border-radius:50%;margin-right:10px;transform:translateY(-2px);vertical-align:middle}
+  .pol-item p{font-size:0.95rem;color:var(--ink-soft);max-width:38ch}
+
+  @media(max-width:520px){
+    .wrap, .wrap-narrow, .wrap-wide{padding:0 20px}
+    .policies, .alt-paths{padding:56px 0}
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="bar">
+    <nav class="nav-left" aria-label="Primary">
+      <a href="restaurant.html">Restaurant</a>
+      <a href="rooms.html">Rooms</a>
+      <a href="experiences.html">The Farm</a>
+      <a href="about.html">Our Story</a>
+    </nav>
+    <a class="brand-mark" href="index.html">Salt <em>&amp;</em> Field</a>
+    <div class="nav-right">
+      <a class="extra-link" href="press.html">Press</a>
+      <a class="extra-link" href="mailto:hello@saltandfield.com">Contact</a>
+      <a class="book-pill active" href="reservations.html">Reserve</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="res-hero">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Reservations · Thursday – Sunday</span>
+          <h1 class="display">Hold a seat<br>at the <em class="display-italic">long table.</em></h1>
+        </div>
+        <dl class="meta-list">
+          <div>
+            <dt>Service</dt>
+            <dd>One seating, 6:30 PM<span>Doors at 6:00 for a glass on the porch</span></dd>
+          </div>
+          <div>
+            <dt>Menu</dt>
+            <dd>Nine courses, $185<span>Beverage pairings from $95</span></dd>
+          </div>
+          <div>
+            <dt>Room</dt>
+            <dd>Forty seats<span>Communal long table &amp; six private two-tops</span></dd>
+          </div>
+          <div>
+            <dt>Drive Time</dt>
+            <dd>3 hrs from Portland<span>1 hr 20 min from Walla Walla</span></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="quick-find">
+    <div class="wrap">
+      <span class="eyebrow"><span class="dot"></span>Quick Availability</span>
+      <form class="booking-widget" aria-label="Quick availability search">
+        <div class="field">
+          <label for="qf-date">Date</label>
+          <input id="qf-date" type="date" value="2025-11-13">
+        </div>
+        <div class="field">
+          <label for="qf-time">Seating</label>
+          <select id="qf-time">
+            <option>6:30 PM — Long Table</option>
+            <option>6:30 PM — Two-top</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="qf-guests">Guests</label>
+          <select id="qf-guests">
+            <option>2 guests</option>
+            <option>3 guests</option>
+            <option>4 guests</option>
+            <option>5 guests</option>
+            <option>6 guests</option>
+          </select>
+        </div>
+        <button type="submit" class="submit">Check Nights</button>
+      </form>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="form-layout">
+        <aside>
+          <span class="eyebrow"><span class="dot"></span>What to Expect</span>
+          <h2 class="display">An evening, not a meal.</h2>
+          <p class="note">Service runs roughly two and a half hours. We cook one menu for the room each night, shaped by what came in from the gardens and from Robert's cellar that morning. Please arrive on time — the first course is plated for everyone together.</p>
+
+          <div class="courses">
+            <div class="row"><span class="course-tag">I.</span><strong>Garden &amp; Hearth</strong></div>
+            <div class="row"><span class="course-tag">II.</span><strong>From the Kettle</strong></div>
+            <div class="row"><span class="course-tag">III.</span><strong>Bread, Butter, Cure</strong></div>
+            <div class="row"><span class="course-tag">IV.</span><strong>The Cold Course</strong></div>
+            <div class="row"><span class="course-tag">V – VII.</span><strong>Fire &amp; Field</strong></div>
+            <div class="row"><span class="course-tag">VIII.</span><strong>Cheese, Pickle, Honey</strong></div>
+            <div class="row"><span class="course-tag">IX.</span><strong>Sweet, to Finish</strong></div>
+          </div>
+        </aside>
+
+        <form class="res-form" aria-label="Reservation request">
+
+          <fieldset>
+            <legend><span class="num">i.</span>The evening</legend>
+            <div class="field-grid three">
+              <div class="ufield">
+                <label for="r-date">Preferred date</label>
+                <input id="r-date" type="date" value="2025-11-13" required>
+                <span class="hint">Thursday – Sunday only</span>
+              </div>
+              <div class="ufield">
+                <label for="r-alt">Alternate date</label>
+                <input id="r-alt" type="date">
+                <span class="hint">In case the first is full</span>
+              </div>
+              <div class="ufield">
+                <label for="r-guests">Party size</label>
+                <select id="r-guests" required>
+                  <option>2 guests</option>
+                  <option>3 guests</option>
+                  <option>4 guests</option>
+                  <option>5 guests</option>
+                  <option>6 guests</option>
+                  <option>7 or more — inquire</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-grid" style="margin-top:28px">
+              <div class="ufield">
+                <label>Where would you like to sit?</label>
+                <div class="pill-row">
+                  <input type="radio" id="seat-long" name="seating" checked><label for="seat-long">Long table (communal)</label>
+                  <input type="radio" id="seat-two" name="seating"><label for="seat-two">Two-top by the window</label>
+                  <input type="radio" id="seat-any" name="seating"><label for="seat-any">No preference</label>
+                </div>
+              </div>
+              <div class="ufield">
+                <label>Beverage pairing</label>
+                <div class="pill-row">
+                  <input type="radio" id="pair-full" name="pair" checked><label for="pair-full">Full pairing · $95</label>
+                  <input type="radio" id="pair-zero" name="pair"><label for="pair-zero">Zero-proof · $55</label>
+                  <input type="radio" id="pair-none" name="pair"><label for="pair-none">À la carte</label>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend><span class="num">ii.</span>The table</legend>
+            <div class="field-grid">
+              <div class="ufield">
+                <label for="r-first">First name</label>
+                <input id="r-first" type="text" required>
+              </div>
+              <div class="ufield">
+                <label for="r-last">Last name</label>
+                <input id="r-last" type="text" required>
+              </div>
+              <div class="ufield">
+                <label for="r-email">Email</label>
+                <input id="r-email" type="email" placeholder="you@somewhere.com" required>
+              </div>
+              <div class="ufield">
+                <label for="r-phone">Phone</label>
+                <input id="r-phone" type="tel" placeholder="(541) 555 0140" required>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend><span class="num">iii.</span>The kitchen</legend>
+            <div class="ufield" style="margin-bottom:24px">
+              <label>Dietary considerations — select all that apply</label>
+              <div class="pill-row">
+                <input type="checkbox" id="d-veg"><label for="d-veg">Vegetarian</label>
+                <input type="checkbox" id="d-vgn"><label for="d-vgn">Vegan</label>
+                <input type="checkbox" id="d-pesc"><label for="d-pesc">Pescatarian</label>
+                <input type="checkbox" id="d-gf"><label for="d-gf">Gluten-free</label>
+                <input type="checkbox" id="d-dairy"><label for="d-dairy">No dairy</label>
+                <input type="checkbox" id="d-shell"><label for="d-shell">Shellfish allergy</label>
+                <input type="checkbox" id="d-nut"><label for="d-nut">Tree-nut allergy</label>
+                <input type="checkbox" id="d-preg"><label for="d-preg">Pregnancy adjustments</label>
+              </div>
+            </div>
+
+            <div class="ufield">
+              <label for="r-notes">Anything else Chef Mara should know</label>
+              <textarea id="r-notes" placeholder="Severe allergies, things you genuinely won't eat, an anniversary, a long-overdue first date, a friend who's afraid of beets — tell us in your own words."></textarea>
+              <span class="hint">We adapt the menu by hand. The more specific you are, the better we cook for you.</span>
+            </div>
+
+            <div class="ufield" style="margin-top:28px">
+              <label for="r-arrival">How are you arriving?</label>
+              <div class="pill-row">
+                <input type="radio" id="a-stay" name="arrival"><label for="a-stay">Staying in the rooms</label>
+                <input type="radio" id="a-drive" name="arrival" checked><label for="a-drive">Driving in for dinner</label>
+                <input type="radio" id="a-local" name="arrival"><label for="a-local">Local — walking or cycling</label>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend><span class="num">iv.</span>To confirm</legend>
+            <div class="check-row">
+              <input type="checkbox" id="c-deposit" required>
+              <label for="c-deposit">I understand a $75-per-guest deposit will be charged once the reservation is confirmed, and applied to the final bill on the night.</label>
+            </div>
+            <div class="check-row">
+              <input type="checkbox" id="c-cancel" required>
+              <label for="c-cancel">I have read the cancellation policy: full refund up to 7 days before; 50% within 7 days; no refund within 48 hours, though we will try to fill the seat from the waitlist.</label>
+            </div>
+            <div class="check-row">
+              <input type="checkbox" id="c-news">
+              <label for="c-news">Send me <em>The Lostine Letter</em> — our seasonal note, four times a year. No marketing in between.</label>
+            </div>
+          </fieldset>
+
+          <div class="form-foot">
+            <p>Submitting this form sends a request. We'll confirm by email or phone within one business day with available nights and a secure deposit link.</p>
+            <button type="submit" class="btn">Send request →</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt-paths">
+    <div class="wrap">
+      <span class="eyebrow"><span class="dot"></span>Other Ways to Visit</span>
+      <div class="alt-grid" style="margin-top:32px">
+        <div class="alt-card">
+          <h3>Stay the night</h3>
+          <p>Pair dinner with one of the seven rooms above the granary. Guests are seated first and breakfast is included the following morning.</p>
+          <a class="arrow-link" href="rooms.html">View the rooms</a>
+        </div>
+        <div class="alt-card">
+          <h3>Buy out the room</h3>
+          <p>Private dinners for parties of twenty to forty — weddings, birthdays, harvest gatherings. We work with you on the menu six weeks ahead.</p>
+          <a class="arrow-link" href="mailto:events@saltandfield.com">Inquire by email</a>
+        </div>
+        <div class="alt-card">
+          <h3>The waitlist</h3>
+          <p>Friday and Saturday nights book out roughly two months ahead. Join the cancellation waitlist for a specific date and we'll call if a seat opens.</p>
+          <a class="arrow-link" href="#">Join the waitlist</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="policies">
+    <div class="wrap">
+      <div class="pol-grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>House Notes</span>
+          <h2 class="display" style="margin-top:14px">A few <em class="display-italic">small things,</em> in advance.</h2>
+        </div>
+        <div class="pol-list">
+          <div class="pol-item">
+            <h4>Children</h4>
+            <p>Guests aged twelve and older are welcome at the long table; younger diners are happily hosted at private two-tops with advance notice.</p>
+          </div>
+          <div class="pol-item">
+            <h4>Dress</h4>
+            <p>There is no code. The walk from the parking field is gravel and the dining room runs cool — bring a layer between October and April.</p>
+          </div>
+          <div class="pol-item">
+            <h4>Phones &amp; photography</h4>
+            <p>Quiet phones, no flash. We're happy to photograph the table for you between the third and fourth courses.</p>
+          </div>
+          <div class="pol-item">
+            <h4>Accessibility</h4>
+            <p>The dining room, restrooms and two of the seven rooms are step-free. Tell us in the notes and we'll make sure the path from the parking field is lit and graded.</p>
+          </div>
+          <div class="pol-item">
+            <h4>Gift the dinner</h4>
+            <p>Gift cards in any denomination ship by post within the week, tied with twine and a hand-written note from the kitchen.</p>
+          </div>
+          <div class="pol-item">
+            <h4>Last-minute seats</h4>
+            <p>Same-day openings — usually a returned two-top — are posted to our Instagram around 2 PM. First message wins the seat.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="mark">Salt <em>&amp;</em> Field</div>
+        <p>A forty-seat restaurant and seven guest rooms on a regenerative farm in the Wallowa Valley. Tasting menus, Thursday through Sunday.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Visit</h5>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="restaurant.html">The Restaurant</a></li>
+          <li><a href="rooms.html">Stay With Us</a></li>
+          <li><a href="experiences.html">On the Farm</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>House</h5>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="press.html">Press &amp; Awards</a></li>
+          <li><a href="about.html#team">The Team</a></li>
+          <li><a href="about.html#cards">Gift Cards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Find Us</h5>
+        <address>
+          4180 Lostine River Road<br>
+          Lostine, Oregon 97857<br>
+          <a href="tel:+15415559082">541&nbsp;555&nbsp;9082</a><br>
+          <a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a>
+        </address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 Salt &amp; Field Farm Co. — Open Thursday through Sunday, by reservation.</div>
+      <div class="legal">
+        <a href="#">Instagram</a>
+        <a href="#">Newsletter</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

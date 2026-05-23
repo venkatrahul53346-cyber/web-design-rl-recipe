@@ -1,0 +1,68 @@
+{
+  "source": "synthesised",
+  "spec": {
+    "slug": "hotel_booking__photo_warm_display-0000",
+    "archetype": "A11",
+    "vertical": "hospitality",
+    "style": {
+      "density": "balanced",
+      "color_regime": "muted-editorial",
+      "typography": "display-mixed",
+      "border_language": "flat",
+      "motif": "photographic-product"
+    },
+    "palette_seed": "#3F4856",
+    "font_pair": [
+      "Migra",
+      "Inter",
+      null
+    ],
+    "difficulty": "hard",
+    "sitemap": [
+      "index",
+      "press",
+      "reservations",
+      "about",
+      "experiences",
+      "restaurant",
+      "rooms"
+    ],
+    "content_seed": 0,
+    "brand": {
+      "name": "Salt & Field",
+      "tagline": "A restaurant on a working farm",
+      "value_prop": "Salt & Field is a forty-seat restaurant on a regenerative farm. Tasting menus only, served Thursday through Sunday.",
+      "product_category": "restaurant",
+      "target_audience": "travelers and locals worth a drive"
+    },
+    "notes": "WHAT WE'RE BUILDING (hotel_booking):\nA boutique hotel's site (independent, not a chain). The site sells stays through atmosphere, not price. Photography is essential \u2014 the experience IS visual. Index is atmospheric hero + booking widget. Rooms page has cards for each room type with photo + amenities + nightly rate. Local guide / experiences page recommends what to do nearby. Restaurant page (if the hotel has one) doubles as marketing. Reservation page is a search form (dates / guests). Aesthetic is editorial-hospitality \u2014 different from restaurant in that booking is the conversion goal.\n\nBRAND: Salt & Field \u2014 \"A restaurant on a working farm\"\nSalt & Field is a forty-seat restaurant on a regenerative farm. Tasting menus only, served Thursday through Sunday.\n\nVISUAL LANGUAGE (photo_warm_display):\nWarm neutral background (#F4EFE7 / #FBF7F0). Photography is essential \u2014 full-bleed hero. Display headlines in a serif or display face (Migra / PP Editorial / Druk Wide), body in a clean sans for legibility. Soft, saturated accent (#7C2D12 rust or #854D0E ochre) used for links + primary CTA underline. Section breaks are flat \u2014 no borders, just whitespace. Avoid: SaaS-style feature cards, neon palettes, generic stock-photo placeholders.\n\nDESIGN REFERENCES (style + topic): acehotel.com, kimptonhotels.com, thehoxton.com, acehotel.com, lestrop.com, sister-cities.com\n\nPER-PAGE GUIDANCE:\n- index: Atmospheric full-bleed hero photo + hotel name in display + tagline. Below: booking-widget callout (arrive / depart / guests + 'check rates' CTA), intro prose paragraph, photography block (3-4 images of common areas / rooms).\n- press: Press mentions list + awards.\n- reservations: Form: arrive / depart / guests / room type (dropdown) / contact info / dietary or special notes / submit.\n- about: Hotel story / philosophy paragraph + ownership / history.\n- experiences: Curated local guide. 4-6 experience cards: image, title, short blurb, distance/time. Could be in-house (spa) or external (museum).\n- restaurant: If the hotel has a restaurant: photographic hero + chef intro + menu glimpse + reservations link.\n- rooms: Card per room type: photo, name (e.g. 'Garden Suite'), 1-line description, key amenities (3-5 bullets), starting rate, 'Book this room' CTA.\n\nIMAGE POLICY (HARD CONSTRAINT):\n- For purely decorative content (hero illustrations, abstract section   dividers, decorative blobs): use NO `<img>` tags. Use CSS gradients,   inline SVG, or styled `<div>` blocks with `background-color` /   `aspect-ratio` instead.\n- For content-essential photography (product photos, dish photos, hotel   rooms, portrait avatars, editorial leads), use `<img src=\"X\">` where   X is EXCLUSIVELY one of these five filenames:\n    photo-product-1.jpg     (generic product / object \u2014 warm tones)\n    photo-product-2.jpg     (cooler product variant \u2014 for grids)\n    photo-portrait-1.jpg    (generic person \u2014 for avatars / team / bylines)\n    photo-landscape-1.jpg   (generic scene \u2014 for hero / hospitality leads)\n    illustration-abstract.jpg (mesh-gradient \u2014 for splash / decorative hero)\n- Repeating a filename across multiple `<img>` tags is fine.\n- ANY OTHER `src=` value will be rejected at validation time. No external\n  URLs, no other filenames, no svg files."
+  },
+  "compiler_model": "claude-opus-4-7",
+  "pages": [
+    "about",
+    "experiences",
+    "index",
+    "press",
+    "reservations",
+    "restaurant",
+    "rooms"
+  ],
+  "files": [
+    "about.html",
+    "experiences.html",
+    "index.html",
+    "press.html",
+    "reservations.html",
+    "restaurant.html",
+    "rooms.html",
+    "styles.css"
+  ],
+  "has_external_css": true,
+  "assets": [
+    "illustration-abstract.jpg",
+    "photo-landscape-1.jpg",
+    "photo-portrait-1.jpg",
+    "photo-product-1.jpg",
+    "photo-product-2.jpg"
+  ]
+}

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Restaurant — Salt &amp; Field</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific composition for /restaurant */
+  .r-hero{padding:72px 0 56px;border-bottom:1px solid var(--rule)}
+  .r-hero .grid{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;align-items:end}
+  .r-hero h1{margin-top:18px}
+  .r-hero .meta-row{display:flex;flex-wrap:wrap;gap:24px 48px;margin-top:36px;border-top:1px solid var(--rule);padding-top:24px}
+  .r-hero .meta-row > div .k{font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:6px}
+  .r-hero .meta-row > div .v{font-family:var(--display);font-size:1.25rem;font-weight:400}
+  @media (max-width:900px){.r-hero .grid{grid-template-columns:1fr;gap:32px}}
+
+  .full-bleed{width:100%;aspect-ratio:21/9;background:#C8BFAE url('rick.jpg') center/cover no-repeat;position:relative}
+  .full-bleed::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,15,10,0) 60%,rgba(20,15,10,0.45));}
+  .full-bleed .cap{position:absolute;bottom:32px;left:40px;right:40px;color:#FBF7F0;font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;opacity:0.9}
+  @media (max-width:600px){.full-bleed .cap{left:20px;right:20px;bottom:20px;letter-spacing:0.18em}}
+
+  .two-col{display:grid;grid-template-columns:1fr 1.3fr;gap:96px;align-items:start}
+  @media (max-width:900px){.two-col{grid-template-columns:1fr;gap:40px}}
+  .two-col .col-side{position:sticky;top:120px}
+  @media (max-width:900px){.two-col .col-side{position:static}}
+
+  /* Menu */
+  .menu-shell{background:var(--bg-warm);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .menu-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:80px}
+  @media (max-width:900px){.menu-grid{grid-template-columns:1fr;gap:40px}}
+  .courses{list-style:none;display:flex;flex-direction:column}
+  .course{display:grid;grid-template-columns:44px 1fr auto;gap:18px;padding:28px 0;border-bottom:1px solid var(--rule);align-items:start}
+  .course:first-child{border-top:1px solid var(--rule)}
+  .course .num{font-family:var(--display);font-style:italic;font-weight:300;font-size:1.6rem;color:var(--accent);line-height:1}
+  .course .name{font-family:var(--display);font-size:1.35rem;font-weight:400;letter-spacing:-0.01em;margin-bottom:6px}
+  .course .desc{color:var(--ink-soft);font-size:0.95rem;max-width:50ch}
+  .course .src{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-mute);text-align:right;white-space:nowrap}
+  @media (max-width:600px){
+    .course{grid-template-columns:32px 1fr;gap:14px}
+    .course .num{font-size:1.3rem}
+    .course .name{font-size:1.15rem}
+    .course .src{grid-column:2;text-align:left;margin-top:8px;white-space:normal}
+  }
+
+  /* Photo strip */
+  .photo-strip{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;padding:96px 32px}
+  .photo-strip .ph{background:#D8CFBE url('rick.jpg') center/cover no-repeat}
+  .ph-a{grid-column:1/span 5;aspect-ratio:4/5}
+  .ph-b{grid-column:6/span 4;aspect-ratio:1/1;margin-top:96px}
+  .ph-c{grid-column:10/span 3;aspect-ratio:3/4}
+  .ph-d{grid-column:2/span 4;aspect-ratio:5/4;margin-top:-40px}
+  .ph-e{grid-column:7/span 6;aspect-ratio:16/10}
+  @media (max-width:900px){
+    .photo-strip{grid-template-columns:1fr 1fr;padding:48px 20px;gap:10px}
+    .photo-strip .ph{grid-column:auto !important;margin-top:0 !important;aspect-ratio:4/5}
+    .ph-e{grid-column:1/-1 !important;aspect-ratio:16/10}
+  }
+  @media (max-width:480px){
+    .photo-strip{grid-template-columns:1fr}
+    .photo-strip .ph{grid-column:1/-1 !important}
+  }
+
+  /* Service detail rows */
+  .detail-row{display:grid;grid-template-columns:160px 1fr 1fr 1fr;gap:48px;padding:36px 0;border-top:1px solid var(--rule);align-items:start}
+  .detail-row:last-child{border-bottom:1px solid var(--rule)}
+  .detail-row .label{font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent)}
+  .detail-row h4{font-family:var(--display);font-weight:400;font-size:1.3rem;margin-bottom:8px;letter-spacing:-0.01em}
+  .detail-row p{font-size:0.95rem;color:var(--ink-soft);max-width:36ch}
+  @media (max-width:900px){.detail-row{grid-template-columns:1fr;gap:18px;padding:28px 0}}
+
+  /* Pairing block */
+  .pairing{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule)}
+  .pairing > div{padding:48px}
+  .pairing > div:first-child{border-right:1px solid var(--rule);background:var(--bg-warm)}
+  .pairing h3{margin-bottom:14px}
+  .pairing .price{font-family:var(--display);font-size:2.2rem;font-weight:400;margin-top:24px}
+  .pairing .price small{font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);display:block;margin-top:6px;font-family:var(--sans)}
+  @media (max-width:900px){
+    .pairing{grid-template-columns:1fr}
+    .pairing > div{padding:32px 24px}
+    .pairing > div:first-child{border-right:none;border-bottom:1px solid var(--rule)}
+  }
+
+  /* Reserve strip */
+  .reserve-strip{background:var(--bg-deep);color:#FBF7F0;padding:96px 0}
+  .reserve-strip .grid{display:grid;grid-template-columns:1.2fr 1fr;gap:80px;align-items:end}
+  .reserve-strip h2{color:#FBF7F0}
+  .reserve-strip p{color:#C8BFAE;max-width:42ch}
+  .reserve-strip .btn{background:#FBF7F0;color:var(--bg-deep);border-color:#FBF7F0}
+  .reserve-strip .btn:hover{background:transparent;color:#FBF7F0}
+  .reserve-strip .cta-row{display:flex;flex-wrap:wrap;gap:18px;align-items:center}
+  @media (max-width:900px){
+    .reserve-strip{padding:72px 0}
+    .reserve-strip .grid{grid-template-columns:1fr;gap:32px}
+  }
+
+  .quote{padding:140px 0;text-align:left}
+  .quote blockquote{font-family:var(--display);font-weight:300;font-style:italic;font-size:clamp(1.6rem,3.6vw,3rem);line-height:1.1;letter-spacing:-0.015em;max-width:22ch}
+  .quote .attr{margin-top:32px;font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute)}
+  @media (max-width:600px){.quote{padding:96px 0}}
+
+  /* Global safety against overflow */
+  html,body{overflow-x:hidden;max-width:100%}
+  img,video,iframe{max-width:100%;height:auto}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="bar">
+    <nav class="nav-left" aria-label="Primary">
+      <a href="restaurant.html" class="active">Restaurant</a>
+      <a href="rooms.html">Rooms</a>
+      <a href="experiences.html">The Farm</a>
+      <a href="about.html">Our Story</a>
+    </nav>
+    <a class="brand-mark" href="index.html">Salt <em>&amp;</em> Field</a>
+    <div class="nav-right">
+      <a class="extra-link" href="press.html">Press</a>
+      <a class="extra-link" href="mailto:hello@saltandfield.com">Contact</a>
+      <a class="book-pill" href="reservations.html">Reserve</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Editorial intro -->
+  <section class="r-hero">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span>The Restaurant · No. 02</div>
+          <h1 class="display">A single seating,<br>seven nights<br>a <span class="display-italic">month.</span></h1>
+        </div>
+        <div>
+          <p class="lede">Forty seats. One menu, written each Wednesday after the harvest is in. We cook with what the field gave us that week, the river when it's running, and the orchard when it isn't. Dinner begins at seven and ends when it ends.</p>
+          <div class="meta-row">
+            <div><div class="k">Service</div><div class="v">Thu — Sun</div></div>
+            <div><div class="k">Seating</div><div class="v">7:00 PM</div></div>
+            <div><div class="k">Courses</div><div class="v">Nine</div></div>
+            <div><div class="k">Per guest</div><div class="v">$185</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Full-bleed photo -->
+  <div class="full-bleed" role="img" aria-label="The dining room at dusk">
+    <div class="cap">The dining room — photograph by Elin Marsden</div>
+  </div>
+
+  <!-- Editorial prose -->
+  <section class="section-roomy">
+    <div class="wrap">
+      <div class="two-col">
+        <div class="col-side">
+          <div class="eyebrow"><span class="dot"></span>A note from the kitchen</div>
+          <h2 class="display">From <span class="display-italic">field</span> to plate, in roughly four hundred feet.</h2>
+        </div>
+        <div class="prose">
+          <p class="first">The walk from the kitchen door to the lettuces is shorter than the walk from your table to the restroom. That proximity isn't a marketing line — it's the entire reason the menu exists in the form it does. Greens are pulled at four, dressed at six, on the plate by quarter past seven.</p>
+          <p>Chef Marin Aldaco trained under Magnus Nilsson at Fäviken and spent four years at Blue Hill at Stone Barns before moving the family to Wallowa County in 2021. The kitchen she's built here is small — six cooks including her — and quiet by design. We don't shout orders. The pass faces the dining room.</p>
+          <p>Most of what arrives at your table was alive on this farm within the last seventy-two hours. The pork is from our Berkshire-Tamworth cross, raised on whey from the cheese kitchen. The honey is from the hives behind the barn. The salt is from the Pacific, two hundred and ninety miles west, brought in once a season by a friend who drives a truck.</p>
+          <p>Everything else — the wine, the bread flour, the coffee — comes from people we know by name. <a href="about.html" class="inline-link">Read more about our growers and producers.</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- This week's menu -->
+  <section class="menu-shell section">
+    <div class="wrap">
+      <div class="menu-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span>This week · Thu 14 — Sun 17 Nov</div>
+          <h2 class="display">Menu No. <span class="display-italic">forty-one.</span></h2>
+          <p class="lede" style="margin-top:24px">Nine courses, served family-paced over roughly two and a half hours. The menu shifts each Wednesday; vegetarian and dietary versions are written in parallel — please tell us when you book.</p>
+          <div style="margin-top:36px">
+            <a href="reservations.html" class="arrow-link">Reserve a table →</a>
+          </div>
+        </div>
+        <ol class="courses">
+          <li class="course"><div class="num">i</div><div><div class="name">Buttermilk, smoked trout roe, dill oil</div><div class="desc">A cold spoonful to begin. Cultured cream from the dairy, roe from steelhead caught at Minam.</div></div><div class="src">Dairy · River</div></li>
+          <li class="course"><div class="num">ii</div><div><div class="name">Field lettuces, three-day vinegar, hazelnut</div><div class="desc">Twelve varieties of leaf and herb, pulled at four. Vinegar made from last year's pinot pomace.</div></div><div class="src">South field</div></li>
+          <li class="course"><div class="num">iii</div><div><div class="name">Roast carrot, fermented honey, rye crumb</div><div class="desc">Carrots dug Wednesday, roasted over alder. Honey from the hives behind the barn, fermented eight weeks.</div></div><div class="src">Root cellar</div></li>
+          <li class="course"><div class="num">iv</div><div><div class="name">Sourdough, cultured butter, harvest salt</div><div class="desc">Loaves baked at five each morning in the wood oven. Butter churned from the morning milking.</div></div><div class="src">House</div></li>
+          <li class="course"><div class="num">v</div><div><div class="name">Steelhead, cabbage, brown butter dashi</div><div class="desc">Cured lightly in salt, kissed by the embers. Served whole at the table, portioned to share.</div></div><div class="src">Wallowa River</div></li>
+          <li class="course"><div class="num">vi</div><div><div class="name">Berkshire pork, charred onion, juniper jus</div><div class="desc">Shoulder braised eighteen hours, loin grilled to order. Onions blackened in the hearth.</div></div><div class="src">East pasture</div></li>
+          <li class="course"><div class="num">vii</div><div><div class="name">A wedge of Pholia farmstead, quince paste</div><div class="desc">From our friends at Pholia Farm in Rogue River. Quince from the orchard, set this October.</div></div><div class="src">Neighbor</div></li>
+          <li class="course"><div class="num">viii</div><div><div class="name">Pear, brown sugar, brown butter ice cream</div><div class="desc">Bartletts from the row beside the creek. Caramel pulled dark to the edge of bitter.</div></div><div class="src">Orchard</div></li>
+          <li class="course"><div class="num">ix</div><div><div class="name">Mignardise &amp; coffee from Heart Roasters</div><div class="desc">A small plate to close — sometimes shortbread, sometimes a sip of warm cider.</div></div><div class="src">House</div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pairings -->
+  <section class="section">
+    <div class="wrap-narrow">
+      <div class="eyebrow" style="margin-bottom:18px"><span class="dot"></span>Pairings</div>
+      <h2 class="display" style="margin-bottom:48px">Two ways to drink<br>through the <span class="display-italic">evening.</span></h2>
+      <div class="pairing">
+        <div>
+          <div class="eyebrow">Wine</div>
+          <h3 class="display">The cellar pairing</h3>
+          <p style="color:var(--ink-soft);margin-top:14px;max-width:38ch">Five pours selected by sommelier Theo Park, leaning toward producers within a day's drive — the Willamette Valley, the Columbia Gorge, the Okanagan. Mostly low-intervention, occasionally older, always poured generously.</p>
+          <div class="price">$125 <small>five pours · per guest</small></div>
+        </div>
+        <div>
+          <div class="eyebrow">Non-alcoholic</div>
+          <h3 class="display">The garden pairing</h3>
+          <p style="color:var(--ink-soft);margin-top:14px;max-width:38ch">Five drinks built from the farm: a verjus highball, a chilled herbal infusion, a fermented honey spritz, a fire-cider tonic, and a roasted-grain digestif. Designed to track the meal as carefully as the wine.</p>
+          <div class="price">$65 <small>five pours · per guest</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Photo grid -->
+  <div class="photo-strip">
+    <div class="ph ph-a" aria-label="Hearth"></div>
+    <div class="ph ph-b" aria-label="Hands plating"></div>
+    <div class="ph ph-c" aria-label="Cellar"></div>
+    <div class="ph ph-d" aria-label="Bread"></div>
+    <div class="ph ph-e" aria-label="Dining room from the pass"></div>
+  </div>
+
+  <!-- Service details -->
+  <section class="section">
+    <div class="wrap">
+      <div class="eyebrow" style="margin-bottom:14px"><span class="dot"></span>The shape of an evening</div>
+      <h2 class="display" style="max-width:14ch;margin-bottom:56px">A few things to know <span class="display-italic">before you come.</span></h2>
+
+      <div class="detail-row">
+        <div class="label">Arrival</div>
+        <div>
+          <h4>Six-thirty in the orchard</h4>
+          <p>Guests arrive at 6:30 PM for a glass of something cold under the apple trees, weather permitting. The dining room opens at seven.</p>
+        </div>
+        <div>
+          <h4>Dress as you'd like</h4>
+          <p>No code. Most guests come in from a hike or a long drive. Layers are kind — evenings cool quickly here.</p>
+        </div>
+        <div>
+          <h4>Children</h4>
+          <p>We welcome children twelve and older. The kitchen happily prepares a thoughtful version of the menu for them.</p>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="label">Dietary</div>
+        <div>
+          <h4>Written in parallel</h4>
+          <p>A full vegetarian menu is written every week alongside the omnivore one — not as a substitution, but as its own thing.</p>
+        </div>
+        <div>
+          <h4>Allergies &amp; restrictions</h4>
+          <p>Tell us when you book. We accommodate gluten-free, dairy-free, and most allergies with at least 48 hours' notice.</p>
+        </div>
+        <div>
+          <h4>Pescatarian &amp; vegan</h4>
+          <p>Both possible with notice. Vegan menus draw heavily on the cellar of ferments and preserves we build through the summer.</p>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="label">The room</div>
+        <div>
+          <h4>Forty seats, one room</h4>
+          <p>The dining room was a hay barn until 2022. Cedar beams, a long open hearth, candles only after sundown.</p>
+        </div>
+        <div>
+          <h4>The pass</h4>
+          <p>The kitchen is open to the dining room. Marin and the cooks are happy to talk between courses — wave them down.</p>
+        </div>
+        <div>
+          <h4>Private dining</h4>
+          <p>The full room may be booked for parties of twenty-eight to forty. <a href="mailto:hello@saltandfield.com" class="inline-link">Write to us</a> for terms.</p>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="label">Booking</div>
+        <div>
+          <h4>Six weeks ahead</h4>
+          <p>We release reservations in calendar-month blocks, six weeks before service. The list is small — book early.</p>
+        </div>
+        <div>
+          <h4>The deposit</h4>
+          <p>A $90/guest deposit is taken at booking and applied to your final bill. Refundable up to seven days before.</p>
+        </div>
+        <div>
+          <h4>The waitlist</h4>
+          <p>If your night is full, join the list — we release seats most weeks as plans change. Sundays open up most often.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quote -->
+  <section class="quote section-hairline">
+    <div class="wrap-narrow">
+      <div class="eyebrow" style="margin-bottom:32px"><span class="dot"></span>From the dining room</div>
+      <blockquote>“You eat where the food was grown, by the people who grew it. There is almost nowhere in America where this is still true.”</blockquote>
+      <div class="attr">Bill Addison · Los Angeles Times · October 2024</div>
+    </div>
+  </section>
+
+  <!-- Reserve strip -->
+  <section class="reserve-strip">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <div class="eyebrow" style="color:#C8BFAE;margin-bottom:18px"><span class="dot"></span>Reservations</div>
+          <h2 class="display">A table for <span class="display-italic">two,</span><br>on a Thursday in <span class="display-italic">December.</span></h2>
+        </div>
+        <div>
+          <p style="margin-bottom:32px">Most evenings book three to five weeks out. Pair your dinner with a night in one of seven guest rooms — guests staying with us are seated first.</p>
+          <div class="cta-row">
+            <a href="reservations.html" class="btn">Reserve a table</a>
+            <a href="rooms.html" class="arrow-link" style="color:#FBF7F0;border-color:#C8BFAE">Stay the night →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="mark">Salt <em>&amp;</em> Field</div>
+        <p>A forty-seat restaurant and seven guest rooms on a regenerative farm in the Wallowa Valley. Tasting menus, Thursday through Sunday.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Visit</h5>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="restaurant.html">The Restaurant</a></li>
+          <li><a href="rooms.html">Stay With Us</a></li>
+          <li><a href="experiences.html">On the Farm</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>House</h5>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="press.html">Press &amp; Awards</a></li>
+          <li><a href="about.html#team">The Team</a></li>
+          <li><a href="about.html#cards">Gift Cards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Find Us</h5>
+        <address>
+          4180 Lostine River Road<br>
+          Lostine, Oregon 97857<br>
+          <a href="tel:+15415559082">541&nbsp;555&nbsp;9082</a><br>
+          <a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a>
+        </address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 Salt &amp; Field Farm Co. — Open Thursday through Sunday, by reservation.</div>
+      <div class="legal">
+        <a href="#">Instagram</a>
+        <a href="#">Newsletter</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

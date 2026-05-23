@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Press &amp; Awards — Salt &amp; Field</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .press-head{padding:120px 0 72px}
+  .press-head .grid{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;align-items:end}
+  .press-head h1{font-size:clamp(3rem,7.5vw,6.2rem);margin-top:24px}
+  .press-head .lede{margin-top:28px}
+
+  .logo-strip{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:56px 0;background:var(--bg-warm)}
+  .logo-strip .row{display:grid;grid-template-columns:repeat(6,1fr);gap:40px;align-items:center}
+  .logo-strip .logo{font-family:var(--display);font-style:italic;font-weight:300;font-size:1.4rem;color:var(--ink-soft);text-align:center;letter-spacing:-0.01em}
+  .logo-strip .logo.bold{font-style:normal;font-weight:400;letter-spacing:0.04em;text-transform:uppercase;font-family:var(--sans);font-size:0.95rem}
+
+  .mentions{padding:120px 0}
+  .section-head{display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:56px;border-bottom:1px solid var(--rule);padding-bottom:24px}
+  .mention{display:grid;grid-template-columns:140px 1fr 1.4fr 100px;gap:28px;align-items:start;padding:32px 0;border-bottom:1px solid var(--rule)}
+  .mention .date{font-size:0.85rem;color:var(--ink-mute);letter-spacing:0.04em;padding-top:6px}
+  .mention .outlet{font-family:var(--display);font-size:1.35rem;font-weight:400;letter-spacing:-0.01em}
+  .mention .outlet .byline{display:block;font-family:var(--sans);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--ink-mute);margin-top:8px;font-weight:500}
+  .mention .headline{color:var(--ink-soft);font-size:1.02rem}
+  .mention .headline em{font-family:var(--display);font-style:italic;color:var(--ink);font-weight:400}
+  .mention .cta{text-align:right;padding-top:6px}
+  .mention .cta a{font-size:0.74rem;letter-spacing:0.2em;text-transform:uppercase;border-bottom:1px solid var(--ink);padding-bottom:4px;white-space:nowrap}
+  .mention .cta a:hover{color:var(--accent);border-color:var(--accent)}
+
+  .awards{padding:96px 0;background:var(--bg-warm);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .awards .grid{display:grid;grid-template-columns:1fr 2fr;gap:80px}
+  .award-list{display:grid;grid-template-columns:1fr 1fr;gap:48px 56px}
+  .award{border-top:1px solid var(--rule);padding-top:18px}
+  .award .year{font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);font-weight:500;margin-bottom:8px}
+  .award h4{font-family:var(--display);font-size:1.25rem;font-weight:400;letter-spacing:-0.01em;margin-bottom:6px}
+  .award p{font-size:0.92rem;color:var(--ink-soft)}
+
+  .kit{padding:140px 0}
+  .kit-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:88px;align-items:start}
+  .photo-stack{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .photo-tile{width:100%;aspect-ratio:4/5;background:#E8DFCE;position:relative;overflow:hidden}
+  .photo-tile.tall{grid-row:span 2;aspect-ratio:4/6}
+  .photo-tile.offset{margin-top:-40px}
+  .photo-tile.t1{background:linear-gradient(160deg,#9a8569 0%,#6b5a44 60%,#3a3024 100%)}
+  .photo-tile.t2{background:linear-gradient(180deg,#b9a98a 0%,#7a6a4f 100%)}
+  .photo-tile.t3{background:linear-gradient(140deg,#7c2d12 0%,#4a2010 70%,#241008 100%)}
+  .photo-tile::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 60%,rgba(0,0,0,0.25) 100%)}
+  .kit-body h2{margin-bottom:24px}
+  .kit-body .lede{margin-bottom:40px}
+  .download-list{list-style:none;border-top:1px solid var(--rule)}
+  .download-list li{border-bottom:1px solid var(--rule);padding:22px 0;display:flex;justify-content:space-between;align-items:baseline;gap:24px;flex-wrap:wrap}
+  .download-list .label{font-family:var(--display);font-size:1.2rem;font-weight:400;letter-spacing:-0.01em}
+  .download-list .meta{display:block;font-family:var(--sans);font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--ink-mute);margin-top:6px;font-weight:500}
+  .download-list a.dl{font-size:0.74rem;letter-spacing:0.2em;text-transform:uppercase;border-bottom:1px solid var(--ink);padding-bottom:4px;white-space:nowrap}
+  .download-list a.dl:hover{color:var(--accent);border-color:var(--accent)}
+
+  .contact-band{padding:96px 0;background:var(--bg-warm);border-top:1px solid var(--rule)}
+  .contact-band .grid{display:grid;grid-template-columns:1fr 1.4fr;gap:80px;align-items:start}
+  .contact-band .eyebrow{margin-bottom:20px}
+  .contact-card{border:1px solid var(--rule);padding:48px;background:var(--bg)}
+  .contact-card .name{font-family:var(--display);font-size:1.8rem;font-weight:400;letter-spacing:-0.01em;margin-bottom:6px}
+  .contact-card .role{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--ink-mute);font-weight:500;margin-bottom:32px}
+  .contact-card dl{display:grid;grid-template-columns:120px 1fr;gap:18px 24px;border-top:1px solid var(--rule);padding-top:28px}
+  .contact-card dt{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--ink-mute);padding-top:3px}
+  .contact-card dd{font-size:1rem;color:var(--ink);word-wrap:break-word;overflow-wrap:break-word;min-width:0}
+  .contact-card dd a{border-bottom:1px solid var(--accent);padding-bottom:1px;word-break:break-word}
+
+  @media (max-width:860px){
+    .press-head{padding:64px 0 40px}
+    .press-head .grid{grid-template-columns:1fr;gap:32px}
+    .logo-strip{padding:40px 0}
+    .logo-strip .row{grid-template-columns:repeat(2,1fr);gap:28px}
+    .mentions{padding:64px 0}
+    .section-head{flex-direction:column;align-items:flex-start;gap:16px}
+    .mention{grid-template-columns:1fr;gap:10px;padding:24px 0}
+    .mention .cta{text-align:left}
+    .awards{padding:64px 0}
+    .awards .grid{grid-template-columns:1fr;gap:32px}
+    .award-list{grid-template-columns:1fr;gap:24px}
+    .kit{padding:64px 0}
+    .kit-grid{grid-template-columns:1fr;gap:48px}
+    .photo-tile.offset{margin-top:0}
+    .download-list li{flex-direction:column;align-items:flex-start;gap:12px}
+    .contact-band{padding:64px 0}
+    .contact-band .grid{grid-template-columns:1fr;gap:32px}
+    .contact-card{padding:28px}
+    .contact-card dl{grid-template-columns:1fr;gap:4px 0}
+    .contact-card dt{margin-top:14px}
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="bar">
+    <nav class="nav-left" aria-label="Primary">
+      <a href="restaurant.html">Restaurant</a>
+      <a href="rooms.html">Rooms</a>
+      <a href="experiences.html">The Farm</a>
+      <a href="about.html">Our Story</a>
+    </nav>
+    <a class="brand-mark" href="index.html">Salt <em>&amp;</em> Field</a>
+    <div class="nav-right">
+      <a class="extra-link active" href="press.html">Press</a>
+      <a class="extra-link" href="mailto:hello@saltandfield.com">Contact</a>
+      <a class="book-pill" href="reservations.html">Reserve</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="press-head wrap">
+    <div class="grid">
+      <div>
+        <div class="eyebrow"><span class="dot"></span>Press &amp; Awards</div>
+        <h1 class="display">In the <span class="display-italic">papers,</span><br>at the table.</h1>
+      </div>
+      <div>
+        <p class="lede">Salt &amp; Field opened in the spring of 2022 as a quiet experiment — a forty-seat dining room set inside a working hay barn in the Wallowa Valley. In the seasons since, writers, photographers and guidebook editors have made the drive. What follows is a record of their visits, along with the materials available to journalists planning their own.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="logo-strip">
+    <div class="wrap">
+      <div class="row">
+        <div class="logo">The New York Times</div>
+        <div class="logo bold">Bon Appétit</div>
+        <div class="logo">Condé Nast Traveler</div>
+        <div class="logo bold">Eater PDX</div>
+        <div class="logo">Sunset</div>
+        <div class="logo bold">Cherry Bombe</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mentions">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow"><span class="dot"></span>Recent Mentions</div>
+          <h2 class="display" style="margin-top:14px">Selected writing,<br><span class="display-italic">2023 — 2025.</span></h2>
+        </div>
+        <div class="lede" style="max-width:36ch">We're grateful to the journalists who travel the four hours from Portland — and the ones who travel considerably further.</div>
+      </div>
+
+      <article class="mention">
+        <div class="date">October 14, 2025</div>
+        <div class="outlet">The New York Times<span class="byline">By Tejal Rao</span></div>
+        <div class="headline">&ldquo;At Salt &amp; Field, a chef returns to the valley where she learned to fish, cook and listen. The result is one of the most <em>quietly radical</em> tasting menus in the American West.&rdquo;</div>
+        <div class="cta"><a href="#">Read</a></div>
+      </article>
+
+      <article class="mention">
+        <div class="date">August 2, 2025</div>
+        <div class="outlet">Condé Nast Traveler<span class="byline">Hot List 2025</span></div>
+        <div class="headline">Named one of the year's <em>twelve essential new hotels in North America</em> — &ldquo;a seven-room inn where the breakfast eggs were laid forty feet from your bed.&rdquo;</div>
+        <div class="cta"><a href="#">Read</a></div>
+      </article>
+
+      <article class="mention">
+        <div class="date">June 18, 2025</div>
+        <div class="outlet">Bon Appétit<span class="byline">By Hannah Goldfield</span></div>
+        <div class="headline">&ldquo;The lamb course alone — served with charred allium and a spoonful of cultured cream from the dairy across the road — is worth the drive from anywhere.&rdquo;</div>
+        <div class="cta"><a href="#">Read</a></div>
+      </article>
+
+      <article class="mention">
+        <div class="date">April 30, 2025</div>
+        <div class="outlet">Eater Portland<span class="byline">By Brooke Jackson-Glidden</span></div>
+        <div class="headline">Awarded four stars in the magazine's annual review: &ldquo;a restaurant that <em>refuses to be in a hurry</em>, and is better for it.&rdquo;</div>
+        <div class="cta"><a href="#">Read</a></div>
+      </article>
+
+      <article class="mention">
+        <div class="date">February 11, 2025</div>
+        <div class="outlet">Sunset Magazine<span class="byline">The West's Best Issue</span></div>
+        <div class="headline">Featured in a long-form photo essay on regenerative farming in the Pacific Northwest, with portraits of head shepherd Caleb Mendoza and the kitchen's winter root cellar.</div>
+        <div class="cta"><a href="#">Read</a></div>
+      </article>
+
+      <article class="mention">
+        <div class="date">November 6, 2024</div>
+        <div class="outlet">Cherry Bombe<span class="byline">Issue No. 23</span></div>
+        <div class="headline">Cover interview with chef-owner Inez Garrow on closing her Brooklyn restaurant, moving home to Oregon, and the &ldquo;<em>profound boredom</em>&rdquo; of cooking only what is in season.</div>
+        <div class="cta"><a href="#">Read</a></div>
+      </article>
+
+      <article class="mention">
+        <div class="date">September 19, 2024</div>
+        <div class="outlet">Travel + Leisure<span class="byline">By Hannah Walhout</span></div>
+        <div class="headline">&ldquo;A weekend at Salt &amp; Field rearranges what you think a meal is for. By Sunday morning you are reluctant to leave, and slightly suspicious of your own life back home.&rdquo;</div>
+        <div class="cta"><a href="#">Read</a></div>
+      </article>
+
+      <article class="mention">
+        <div class="date">May 4, 2023</div>
+        <div class="outlet">Food &amp; Wine<span class="byline">Best New Chefs</span></div>
+        <div class="headline">Chef Inez Garrow named to the magazine's annual list — &ldquo;cooking food that tastes like a specific patch of ground, in a specific week of the year.&rdquo;</div>
+        <div class="cta"><a href="#">Read</a></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="awards">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span>Recognition</div>
+          <h2 class="display" style="margin-top:18px">Awards<br><span class="display-italic">&amp; honors.</span></h2>
+        </div>
+        <div class="award-list">
+          <div class="award">
+            <div class="year">2025</div>
+            <h4>James Beard Semifinalist</h4>
+            <p>Best Chef: Northwest &amp; Pacific — Inez Garrow.</p>
+          </div>
+          <div class="award">
+            <div class="year">2025</div>
+            <h4>Michelin Green Star</h4>
+            <p>Recognized for exceptional commitment to sustainable gastronomy.</p>
+          </div>
+          <div class="award">
+            <div class="year">2024</div>
+            <h4>World's 50 Best — Discovery</h4>
+            <p>Listed among the year's notable openings outside major cities.</p>
+          </div>
+          <div class="award">
+            <div class="year">2024</div>
+            <h4>Oregon Restaurant of the Year</h4>
+            <p>Awarded by the Oregon Restaurant &amp; Lodging Association.</p>
+          </div>
+          <div class="award">
+            <div class="year">2023</div>
+            <h4>Food &amp; Wine Best New Chef</h4>
+            <p>One of ten chefs honored nationally for first-year work.</p>
+          </div>
+          <div class="award">
+            <div class="year">2023</div>
+            <h4>Eater Award — Stone Barns Prize</h4>
+            <p>For sourcing more than 80% of menu ingredients within twelve miles.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="kit">
+    <div class="wrap">
+      <div class="kit-grid">
+        <div class="photo-stack" aria-hidden="true">
+          <div class="photo-tile tall t1"></div>
+          <div class="photo-tile t2"></div>
+          <div class="photo-tile offset t3"></div>
+        </div>
+        <div class="kit-body">
+          <div class="eyebrow"><span class="dot"></span>Press Kit</div>
+          <h2 class="display" style="margin-top:18px">Materials for <span class="display-italic">writers,</span> photographers and editors.</h2>
+          <p class="lede">All assets below are cleared for editorial use with credit. For commercial licensing, custom shoot requests, or on-property photography, please write to Margaux at the address on this page — we are usually able to accommodate within two weeks' notice.</p>
+          <ul class="download-list">
+            <li>
+              <div>
+                <span class="label">Fact Sheet &amp; Backgrounder</span>
+                <span class="meta">PDF · 4 pages · 1.2 MB</span>
+              </div>
+              <a class="dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="label">High-resolution Photography</span>
+                <span class="meta">ZIP · 48 images · 412 MB</span>
+              </div>
+              <a class="dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="label">Chef &amp; Team Biographies</span>
+                <span class="meta">PDF · 6 pages · 980 KB</span>
+              </div>
+              <a class="dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="label">Logo &amp; Wordmark</span>
+                <span class="meta">ZIP · SVG, PNG, EPS · 14 MB</span>
+              </div>
+              <a class="dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="label">Sample Tasting Menu (Autumn 2025)</span>
+                <span class="meta">PDF · 2 pages · 480 KB</span>
+              </div>
+              <a class="dl" href="#">Download</a>
+            </li>
+            <li>
+              <div>
+                <span class="label">The Farm — Field Notes &amp; Maps</span>
+                <span class="meta">PDF · 12 pages · 6.4 MB</span>
+              </div>
+              <a class="dl" href="#">Download</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-band">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span>Press Contact</div>
+          <h2 class="display" style="margin-top:18px">Write us<br>directly.</h2>
+          <p class="lede" style="margin-top:24px">We answer press inquiries within two business days. For same-week deadlines, please mark your subject line accordingly and we will do our best to respond by end of day.</p>
+        </div>
+        <div class="contact-card">
+          <div class="name">Margaux Whelan</div>
+          <div class="role">Director of Communications</div>
+          <p style="color:var(--ink-soft);font-size:0.98rem;margin-bottom:8px">Margaux handles all editorial visits, photo shoots, broadcast and podcast requests, and licensing of imagery. She has been with Salt &amp; Field since opening and previously worked at Castagna in Portland.</p>
+          <dl>
+            <dt>Email</dt><dd><a href="mailto:press@saltandfield.com">press@saltandfield.com</a></dd>
+            <dt>Direct</dt><dd>541 555 9084</dd>
+            <dt>Mail</dt><dd>4180 Lostine River Road<br>Lostine, Oregon 97857</dd>
+            <dt>Hours</dt><dd>Tuesday — Friday, 9a to 4p Pacific</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="mark">Salt <em>&amp;</em> Field</div>
+        <p>A forty-seat restaurant and seven guest rooms on a regenerative farm in the Wallowa Valley. Tasting menus, Thursday through Sunday.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Visit</h5>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="restaurant.html">The Restaurant</a></li>
+          <li><a href="rooms.html">Stay With Us</a></li>
+          <li><a href="experiences.html">On the Farm</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>House</h5>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="press.html">Press &amp; Awards</a></li>
+          <li><a href="about.html#team">The Team</a></li>
+          <li><a href="about.html#cards">Gift Cards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Find Us</h5>
+        <address>
+          4180 Lostine River Road<br>
+          Lostine, Oregon 97857<br>
+          <a href="tel:+15415559082">541&nbsp;555&nbsp;9082</a><br>
+          <a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a>
+        </address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 Salt &amp; Field Farm Co. — Open Thursday through Sunday, by reservation.</div>
+      <div class="legal">
+        <a href="#">Instagram</a>
+        <a href="#">Newsletter</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

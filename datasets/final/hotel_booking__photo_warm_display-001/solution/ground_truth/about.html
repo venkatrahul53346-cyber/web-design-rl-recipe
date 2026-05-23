@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Story — Salt &amp; Field</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* page-specific compositions */
+  .about-hero{padding:96px 0 56px;border-bottom:1px solid var(--rule)}
+  .about-hero .grid{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;align-items:end}
+  .about-hero h1{margin-top:18px}
+  .about-hero .kicker-col p{color:var(--ink-soft);max-width:38ch;margin-top:18px}
+  @media (max-width:880px){.about-hero .grid{grid-template-columns:1fr;gap:32px}}
+
+  .mission{padding:140px 0}
+  .mission .grid{display:grid;grid-template-columns:1fr 1.3fr;gap:96px;align-items:start}
+  .mission .eyebrow{margin-bottom:24px}
+  .mission h2{margin-bottom:0}
+  @media (max-width:880px){.mission .grid{grid-template-columns:1fr;gap:40px}}
+
+  .founding{padding:96px 0;background:var(--bg-warm);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .founding .grid{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;align-items:start}
+  .founding figure{aspect-ratio:4/5;background:#E8DFCE;overflow:hidden}
+  .founding figure img{width:100%;height:100%;object-fit:cover}
+  .founding figcaption{font-size:0.78rem;color:var(--ink-mute);letter-spacing:0.06em;margin-top:12px}
+  @media (max-width:880px){.founding .grid{grid-template-columns:1fr;gap:40px}}
+
+  .values{padding:140px 0}
+  .values .head{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;align-items:end;margin-bottom:72px}
+  .values .head p{color:var(--ink-soft);max-width:46ch}
+  .values-list{border-top:1px solid var(--rule)}
+  .value-row{display:grid;grid-template-columns:80px 1fr 2fr;gap:48px;padding:36px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+  .value-row .num{font-family:var(--display);font-size:1.1rem;color:var(--accent);letter-spacing:0.04em}
+  .value-row h3{font-family:var(--display);font-weight:400;font-size:1.7rem;letter-spacing:-0.01em}
+  .value-row p{color:var(--ink-soft);max-width:54ch}
+  @media (max-width:880px){
+    .values .head{grid-template-columns:1fr;gap:24px;margin-bottom:48px}
+    .value-row{grid-template-columns:1fr;gap:10px}
+  }
+
+  .team{padding:96px 0;background:var(--bg-warm);border-top:1px solid var(--rule)}
+  .team .head{display:flex;justify-content:space-between;align-items:end;gap:32px;margin-bottom:56px;flex-wrap:wrap}
+  .team .head h2{max-width:18ch}
+  .team .head p{color:var(--ink-soft);max-width:36ch}
+  .team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:48px 32px}
+  .person .portrait{aspect-ratio:4/5;overflow:hidden;margin-bottom:16px;position:relative;background:#E8DFCE}
+  .person .portrait .mono{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-start;padding:18px;font-family:var(--display);font-style:italic;font-weight:300;font-size:2.2rem;color:rgba(31,27,22,0.35);letter-spacing:-0.02em}
+  .person:nth-child(1) .portrait{background:linear-gradient(160deg,#C9B89A 0%,#A89579 60%,#6B5D4A 100%)}
+  .person:nth-child(2) .portrait{background:linear-gradient(150deg,#A8B59A 0%,#7E8B6E 55%,#4A5440 100%)}
+  .person:nth-child(3) .portrait{background:linear-gradient(170deg,#E2C9A8 0%,#B89978 60%,#7C5A3E 100%)}
+  .person:nth-child(4) .portrait{background:linear-gradient(155deg,#B8A488 0%,#8A7457 55%,#503F2A 100%)}
+  .person:nth-child(5) .portrait{background:linear-gradient(165deg,#D4BFA0 0%,#9C8567 55%,#5C4A35 100%)}
+  .person:nth-child(6) .portrait{background:linear-gradient(145deg,#BFA98C 0%,#8B7558 50%,#4F3E2A 100%)}
+  .person:nth-child(7) .portrait{background:linear-gradient(175deg,#C7B596 0%,#94805F 60%,#574630 100%)}
+  .person:nth-child(8) .portrait{background:linear-gradient(150deg,#A89C82 0%,#766A52 55%,#3F3624 100%)}
+  .person .name{font-family:var(--display);font-size:1.3rem;font-weight:400;letter-spacing:-0.01em;margin-bottom:2px}
+  .person .role{font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .person .bio{font-size:0.92rem;color:var(--ink-soft);line-height:1.5}
+  @media (max-width:1000px){.team-grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:540px){.team-grid{grid-template-columns:1fr}}
+
+  .gift{padding:140px 0;background:var(--bg-deep);color:#E8DFCE}
+  .gift .grid{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;align-items:center}
+  .gift h2{color:#FBF7F0}
+  .gift p{color:#C9BFAE;max-width:46ch;margin-top:18px}
+  .gift .btn{background:transparent;color:#FBF7F0;border-color:#FBF7F0}
+  .gift .btn:hover{background:#FBF7F0;color:var(--bg-deep)}
+  .gift .eyebrow{color:#C9BFAE}
+  @media (max-width:880px){.gift .grid{grid-template-columns:1fr;gap:32px}}
+
+  .pull{padding:96px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .pull blockquote{font-family:var(--display);font-weight:300;font-style:italic;font-size:clamp(1.8rem,3.6vw,2.8rem);line-height:1.15;letter-spacing:-0.01em;max-width:24ch;margin:0 auto;text-align:center;color:var(--ink)}
+  .pull cite{display:block;font-style:normal;font-family:var(--sans);font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);margin-top:32px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="bar">
+    <nav class="nav-left" aria-label="Primary">
+      <a href="restaurant.html">Restaurant</a>
+      <a href="rooms.html">Rooms</a>
+      <a href="experiences.html">The Farm</a>
+      <a href="about.html" class="active">Our Story</a>
+    </nav>
+    <a class="brand-mark" href="index.html">Salt <em>&amp;</em> Field</a>
+    <div class="nav-right">
+      <a class="extra-link" href="press.html">Press</a>
+      <a class="extra-link" href="mailto:hello@saltandfield.com">Contact</a>
+      <a class="book-pill" href="reservations.html">Reserve</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="about-hero">
+    <div class="wrap">
+      <div class="grid">
+        <div class="kicker-col">
+          <span class="eyebrow"><span class="dot"></span>Our Story — Est. 2019</span>
+          <p>A forty-seat dining room and seven guest rooms, set among 184 acres of dryland wheat, pasture, and orchard at the mouth of the Lostine Canyon.</p>
+        </div>
+        <div>
+          <h1 class="display">A restaurant that <span class="display-italic">grows<br>most of what it serves.</span></h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mission">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Mission</span>
+          <h2 class="display" style="margin-top:24px">To cook the valley, honestly.</h2>
+        </div>
+        <div class="prose">
+          <p class="first">Salt &amp; Field exists to put a single, careful meal in front of forty people, four nights a week — a meal that could only have been made here, in this place, this month. We do not import a worldview from elsewhere and impose it on the Wallowas. We listen to what the field gives us. In May that means morel and asparagus and the first lamb of the year; in October it means kuri squash, mutton, dry-farmed beans, and the apples we did not press into cider.</p>
+          <p>Hospitality, to us, is the same problem as farming: pay attention, repeat the things that work, throw out the things that don't, and let the season be the season. Nothing more clever than that.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="founding">
+    <div class="wrap">
+      <div class="grid">
+        <figure>
+          <img src="photo-landscape-1.jpg" alt="The original barn before renovation, winter 2018">
+          <figcaption>The barn before renovation — January 2018</figcaption>
+        </figure>
+        <div>
+          <span class="eyebrow"><span class="dot"></span>How it began</span>
+          <h2 class="display" style="margin:24px 0 32px">A barn, a season of <span class="display-italic">borrowed plates,</span> and a stubborn idea.</h2>
+          <div class="prose">
+            <p class="first">In the spring of 2018, Marit Halvorsen and Theo Reyes drove a borrowed pickup from Portland to Lostine to look at a property neither of them could afford. There was a leaning barn, a dry creek, and a farmhouse that had been empty for two winters. They bought it anyway, with help from Marit's parents and a small group of friends from the restaurant world who agreed to be repaid in dinners.</p>
+            <p>The first season — summer 2019 — was twenty-two people on a long table under string lights, plates borrowed from the diner in Enterprise, and a menu written each morning on a chalkboard nailed to the barn door. Service ran past midnight. Someone played a fiddle. By August we had a waitlist of strangers driving from Boise and Seattle, which is the moment we understood this was no longer a project but a restaurant.</p>
+            <p>Six years on, the barn is the dining room. The chalkboard is still there, but the menu is printed now, and the plates are our own. The fiddle is, occasionally, still there too.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="values">
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>What we believe</span>
+          <h2 class="display" style="margin-top:24px">Five rules<br>of the house.</h2>
+        </div>
+        <p>We've written these down because we have to teach them to new cooks, new servers, and new farmhands every spring. They are not aspirational. They are how the place actually runs.</p>
+      </div>
+      <div class="values-list">
+        <div class="value-row">
+          <div class="num">01</div>
+          <h3>Cook the season, not the menu.</h3>
+          <p>If the chanterelles flushed yesterday, they are on the plate tonight. If the lamb isn't ready, we serve the goose instead. The menu changes weekly, sometimes nightly, and we do not apologize for it.</p>
+        </div>
+        <div class="value-row">
+          <div class="num">02</div>
+          <h3>Grow it, raise it, or know who did.</h3>
+          <p>Roughly seventy percent of what we serve comes from our own beds, orchard, and pasture. The rest comes from a list of fourteen producers within a two-hour drive — fishermen, foragers, dairies, and a single grain mill in La Grande.</p>
+        </div>
+        <div class="value-row">
+          <div class="num">03</div>
+          <h3>Forty seats, and not one more.</h3>
+          <p>We will not expand the dining room. The size of the room is the size of the meal we can make well. Adding tables would mean adding compromises, and that is the one thing we will not do.</p>
+        </div>
+        <div class="value-row">
+          <div class="num">04</div>
+          <h3>Pay everyone properly, including the dishwasher.</h3>
+          <p>Service is included. There is no tipping. Our lowest-paid hourly position earns $28 an hour and full health insurance. This is the entire reason the menu is priced the way it is.</p>
+        </div>
+        <div class="value-row">
+          <div class="num">05</div>
+          <h3>Leave the land better than the previous tenant.</h3>
+          <p>The pasture is in its fourth year of rotational grazing. The orchard is no-spray. We compost every scrap from the kitchen and the dining room. We are not certified organic and we are not seeking the certificate.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pull">
+    <div class="wrap-narrow">
+      <blockquote>“A place that feels like it has been here forever, and like it could only have happened now.”</blockquote>
+      <cite>— The New York Times, T Magazine, 2024</cite>
+    </div>
+  </section>
+
+  <section class="team" id="team">
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>The House</span>
+          <h2 class="display" style="margin-top:24px">Twenty-three people, four nights a week.</h2>
+        </div>
+        <p>The full crew runs to twenty-three across the kitchen, the floor, the rooms, and the farm. These eight lead the place.</p>
+      </div>
+      <div class="team-grid">
+        <article class="person">
+          <div class="portrait" aria-hidden="true"><span class="mono">M.H.</span></div>
+          <div class="name">Marit Halvorsen</div>
+          <div class="role">Chef &amp; Co-Owner</div>
+          <p class="bio">Trained at Husk and Blue Hill at Stone Barns. Grew up on a wheat farm outside Pendleton. Writes the menu.</p>
+        </article>
+        <article class="person">
+          <div class="portrait" aria-hidden="true"><span class="mono">T.R.</span></div>
+          <div class="name">Theo Reyes</div>
+          <div class="role">Farm Director &amp; Co-Owner</div>
+          <p class="bio">Former vegetable grower at Ayers Creek. Manages the 184 acres, the orchard, and the lamb program.</p>
+        </article>
+        <article class="person">
+          <div class="portrait" aria-hidden="true"><span class="mono">H.O.</span></div>
+          <div class="name">Hana Okazaki</div>
+          <div class="role">Pastry &amp; Fermentation</div>
+          <p class="bio">Six years at Sqirl, two at Tartine. Runs the bread program, the cellar, and every preserve on the property.</p>
+        </article>
+        <article class="person">
+          <div class="portrait" aria-hidden="true"><span class="mono">E.W.</span></div>
+          <div class="name">Eli Whitfield</div>
+          <div class="role">Sous Chef</div>
+          <p class="bio">Came up through Le Pigeon and Castagna. Runs the fire, the lamb, and most of the protein side of the kitchen.</p>
+        </article>
+        <article class="person">
+          <div class="portrait" aria-hidden="true"><span class="mono">S.P.</span></div>
+          <div class="name">Sienna Park</div>
+          <div class="role">General Manager</div>
+          <p class="bio">Ten years at the Ace and the Hoxton. Runs the floor, the rooms, and the reservation book. Knows your name by drink one.</p>
+        </article>
+        <article class="person">
+          <div class="portrait" aria-hidden="true"><span class="mono">C.B.</span></div>
+          <div class="name">Calder Boon</div>
+          <div class="role">Wine &amp; Cider</div>
+          <p class="bio">A list deliberately weighted to the Columbia Gorge, the Willamette, and a few stubborn growers in Slovenia.</p>
+        </article>
+        <article class="person">
+          <div class="portrait" aria-hidden="true"><span class="mono">J.T.</span></div>
+          <div class="name">June Tallgrass</div>
+          <div class="role">Head of Rooms</div>
+          <p class="bio">Looks after the seven guest rooms, the breakfast service, and the small library above the parlor.</p>
+        </article>
+        <article class="person">
+          <div class="portrait" aria-hidden="true"><span class="mono">R.C.</span></div>
+          <div class="name">Rafael Conte</div>
+          <div class="role">Livestock &amp; Pasture</div>
+          <p class="bio">Manages the flock of Katahdin sheep, the laying hens, and the four-year rotational grazing plan.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="gift" id="cards">
+    <div class="wrap">
+      <div class="grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Gift Cards</span>
+          <h2 class="display" style="margin-top:24px">A dinner, a night, or <span class="display-italic">both.</span></h2>
+        </div>
+        <div>
+          <p>Gift cards are issued by post on heavy cream stock, hand-numbered, and valid for two years. They can be applied toward the tasting menu, a room, or any of the farm experiences. Available from $185.</p>
+          <p style="margin-top:28px"><a class="btn" href="mailto:hello@saltandfield.com?subject=Gift%20card">Order a Gift Card</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="mark">Salt <em>&amp;</em> Field</div>
+        <p>A forty-seat restaurant and seven guest rooms on a regenerative farm in the Wallowa Valley. Tasting menus, Thursday through Sunday.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Visit</h5>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="restaurant.html">The Restaurant</a></li>
+          <li><a href="rooms.html">Stay With Us</a></li>
+          <li><a href="experiences.html">On the Farm</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>House</h5>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="press.html">Press &amp; Awards</a></li>
+          <li><a href="about.html#team">The Team</a></li>
+          <li><a href="about.html#cards">Gift Cards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Find Us</h5>
+        <address>
+          4180 Lostine River Road<br>
+          Lostine, Oregon 97857<br>
+          <a href="tel:+15415559082">541&nbsp;555&nbsp;9082</a><br>
+          <a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a>
+        </address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 Salt &amp; Field Farm Co. — Open Thursday through Sunday, by reservation.</div>
+      <div class="legal">
+        <a href="#">Instagram</a>
+        <a href="#">Newsletter</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

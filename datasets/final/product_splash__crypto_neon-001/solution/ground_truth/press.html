@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Press — Pliny</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .press-hero { position: relative; padding: 120px 0 64px; overflow: hidden; }
+  .press-hero .blob-violet { width: 520px; height: 520px; top: -180px; right: -120px; opacity: .45; }
+  .press-hero .blob-cyan { width: 360px; height: 360px; bottom: -200px; left: -80px; opacity: .25; }
+  .press-hero-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 64px; align-items: end; position: relative; z-index: 1; }
+  .press-hero h1 { font-size: clamp(64px, 10vw, 144px); }
+  .press-hero .lede { color: var(--ink-dim); font-size: 18px; max-width: 420px; }
+  .press-meta { display: flex; gap: 28px; margin-top: 28px; font-family: var(--mono); font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .12em; }
+  .press-meta span { display: inline-flex; align-items: center; gap: 8px; }
+  .press-meta b { color: var(--ink); font-weight: 500; }
+
+  /* Logo grid — hairline cells */
+  .logo-grid { display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .logo-cell { padding: 36px 18px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 13px; color: var(--ink-dim); letter-spacing: -.01em; font-weight: 500; min-height: 120px; text-align: center; transition: color .2s, background .2s; }
+  .logo-cell:hover { color: var(--ink); background: rgba(124,91,255,0.04); }
+  .logo-cell:nth-child(5n) { border-right: none; }
+  .logo-cell:nth-last-child(-n+5) { border-bottom: none; }
+  .logo-cell .ital { font-style: italic; font-family: var(--sans); font-weight: 300; font-size: 20px; color: var(--ink); letter-spacing: -.02em; }
+  .logo-cell .caps { font-weight: 700; font-family: var(--sans); font-size: 16px; letter-spacing: .04em; color: var(--ink); }
+  .logo-cell .sm { font-size: 11px; color: var(--ink-faint); display: block; margin-top: 4px; text-transform: uppercase; letter-spacing: .18em; }
+
+  @media (max-width: 880px) {
+    .logo-grid { grid-template-columns: repeat(2, 1fr); }
+    .logo-cell:nth-child(5n) { border-right: 1px solid var(--line); }
+    .logo-cell:nth-child(2n) { border-right: none; }
+    .press-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  }
+
+  /* Mentions list */
+  .mentions { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+  .mention { display: grid; grid-template-columns: 140px 1fr 180px 40px; gap: 32px; align-items: baseline; padding: 28px 8px; border-bottom: 1px solid var(--line); transition: background .15s; }
+  .mention:hover { background: rgba(124,91,255,0.03); }
+  .mention-date { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+  .mention-pub { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-dim); }
+  .mention-title { font-size: 20px; font-weight: 500; line-height: 1.3; letter-spacing: -.015em; }
+  .mention-title a:hover { color: var(--accent); }
+  .mention-arr { font-family: var(--mono); font-size: 16px; color: var(--ink-faint); text-align: right; }
+  .mention:hover .mention-arr { color: var(--accent); }
+  @media (max-width: 880px) {
+    .mention { grid-template-columns: 1fr; gap: 8px; padding: 22px 4px; }
+    .mention-arr { display: none; }
+  }
+
+  /* Pull quote */
+  .pull-quote { padding: 80px 0; position: relative; }
+  .pull-quote blockquote { margin: 0; font-size: clamp(32px, 4.2vw, 56px); line-height: 1.08; letter-spacing: -.03em; font-weight: 500; max-width: 1100px; }
+  .pull-quote blockquote em { font-weight: 300; color: var(--ink-dim); }
+  .pull-quote cite { display: block; margin-top: 32px; font-family: var(--mono); font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .16em; font-style: normal; }
+  .pull-quote cite b { color: var(--ink); font-weight: 500; }
+
+  /* Kit downloads */
+  .kit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .kit-card { padding: 28px; display: flex; flex-direction: column; gap: 20px; position: relative; transition: border-color .2s; }
+  .kit-card:hover { border-color: var(--line-bright); }
+  .kit-icon { width: 44px; height: 44px; border: 1px solid var(--line-bright); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: .04em; }
+  .kit-title { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+  .kit-desc { font-size: 14px; color: var(--ink-dim); line-height: 1.55; }
+  .kit-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 18px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .14em; }
+  .kit-meta a { color: var(--accent); }
+  .kit-meta a:hover { color: var(--ink); }
+  @media (max-width: 880px) { .kit-grid { grid-template-columns: 1fr; } }
+
+  /* Contact band */
+  .contact-band { display: grid; grid-template-columns: 1.2fr 1fr; gap: 80px; align-items: start; padding: 80px 48px; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(180deg, rgba(124,91,255,0.04), transparent 60%); position: relative; overflow: hidden; }
+  .contact-band .orb { position: absolute; right: -120px; bottom: -160px; width: 320px; height: 320px; opacity: .35; }
+  .contact-band h2 { font-size: clamp(36px, 4vw, 56px); }
+  .contact-list { display: flex; flex-direction: column; gap: 20px; }
+  .contact-item { padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .contact-item:last-child { border-bottom: none; }
+  .contact-item .label { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .18em; margin-bottom: 6px; }
+  .contact-item a { font-size: 18px; font-weight: 500; letter-spacing: -.01em; }
+  .contact-item a:hover { color: var(--accent); }
+  .contact-item .sub { font-family: var(--mono); font-size: 12px; color: var(--ink-dim); margin-top: 4px; }
+  @media (max-width: 880px) { .contact-band { grid-template-columns: 1fr; padding: 48px 28px; gap: 40px; } }
+
+  /* Stats strip */
+  .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stat { padding: 36px 28px; border-right: 1px solid var(--line); }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-size: 48px; font-weight: 700; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat-num .accent { color: var(--accent); }
+  .stat-lab { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .16em; margin-top: 14px; }
+  @media (max-width: 880px) { .stats-strip { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(2n) { border-right: none; } .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="brand" aria-label="Pliny home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Pliny</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html">Overview</a>
+      <a href="story.html">Story</a>
+      <a href="specs.html">Specs</a>
+      <a href="faq.html">FAQ</a>
+      <a href="press.html" class="is-active">Press</a>
+    </nav>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <span class="nav-status"><span class="live"></span>v0.9 · public beta</span>
+      <a href="preorder.html" class="nav-cta">Get early access <span class="arr">→</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="press-hero">
+    <div class="blob blob-violet"></div>
+    <div class="blob blob-cyan"></div>
+    <div class="wrap">
+      <p class="eyebrow"><span class="dot"></span>Press &amp; media · updated Nov 2025</p>
+      <div class="press-hero-grid" style="margin-top:32px;">
+        <div>
+          <h1>Read the <span class="display-italic accent">room.</span></h1>
+          <div class="press-meta">
+            <span><b>34</b> mentions</span>
+            <span><b>11</b> outlets</span>
+            <span>Since <b>Mar 2024</b></span>
+          </div>
+        </div>
+        <div>
+          <p class="lede">Coverage of Pliny since the closed alpha, plus everything you need to write about us — logos, screenshots, founder bios, and a direct line to our comms desk.</p>
+          <div style="display:flex; gap:12px; margin-top:28px;">
+            <a href="#kit" class="btn btn-primary">Download press kit</a>
+            <a href="#contact" class="btn btn-ghost">Email press desk</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="stats-strip">
+        <div class="stat"><div class="stat-num"><span class="accent">34</span></div><div class="stat-lab">Editorial mentions</div></div>
+        <div class="stat"><div class="stat-num">1.2<span style="font-size:28px;">M</span></div><div class="stat-lab">Cumulative reach</div></div>
+        <div class="stat"><div class="stat-num">19</div><div class="stat-lab">Podcast appearances</div></div>
+        <div class="stat"><div class="stat-num">4</div><div class="stat-lab">Industry awards</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:32px;">
+        <h2>As covered in</h2>
+        <p class="mono" style="font-size:12px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.16em;">15 outlets · global</p>
+      </div>
+      <div class="logo-grid" role="list" aria-label="Press coverage outlets">
+        <div class="logo-cell" role="listitem"><span class="caps">TECHCRUNCH</span></div>
+        <div class="logo-cell" role="listitem"><span class="ital">The Verge</span></div>
+        <div class="logo-cell" role="listitem"><span class="caps">WIRED</span></div>
+        <div class="logo-cell" role="listitem"><span class="ital">The Pragmatic Engineer</span></div>
+        <div class="logo-cell" role="listitem"><span class="caps">IEEE SPECTRUM</span></div>
+        <div class="logo-cell" role="listitem"><span class="ital">Stratechery</span></div>
+        <div class="logo-cell" role="listitem"><span class="caps">HACKER NEWS<span class="sm">front page · 4×</span></span></div>
+        <div class="logo-cell" role="listitem"><span class="ital">Lenny's Newsletter</span></div>
+        <div class="logo-cell" role="listitem"><span class="caps">FT</span></div>
+        <div class="logo-cell" role="listitem"><span class="ital">a16z future</span></div>
+        <div class="logo-cell" role="listitem"><span class="caps">SEMAFOR</span></div>
+        <div class="logo-cell" role="listitem"><span class="ital">Garbage Day</span></div>
+        <div class="logo-cell" role="listitem"><span class="caps">INFOQ</span></div>
+        <div class="logo-cell" role="listitem"><span class="ital">The Information</span></div>
+        <div class="logo-cell" role="listitem"><span class="caps">DEV.TO<span class="sm">featured</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pull-quote">
+    <div class="wrap">
+      <blockquote>
+        <em>“</em>Pliny doesn't try to write the PR for you. It reads it like a tired staff engineer who's seen this bug before — and then it tells you, kindly, exactly where it's hiding.<em>”</em>
+        <cite><b>Gergely Orosz</b> &nbsp;·&nbsp; The Pragmatic Engineer &nbsp;·&nbsp; Sep 2025</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:48px;">
+        <div>
+          <p class="eyebrow"><span class="dot"></span>Recent coverage</p>
+          <h2 style="margin-top:18px;">Selected mentions</h2>
+        </div>
+        <a href="#" class="mono" style="font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:.16em;">Full archive →</a>
+      </div>
+
+      <div class="mentions">
+        <article class="mention">
+          <span class="mention-date">2025 · 11 · 04</span>
+          <h3 class="mention-title"><a href="#">The AI code reviewers are finally good — and they're coming for the staff engineer's inbox</a></h3>
+          <span class="mention-pub">The Verge</span>
+          <span class="mention-arr">↗</span>
+        </article>
+        <article class="mention">
+          <span class="mention-date">2025 · 10 · 22</span>
+          <h3 class="mention-title"><a href="#">Pliny raises $14M Series A to ship a code reviewer that reads your whole repo</a></h3>
+          <span class="mention-pub">TechCrunch</span>
+          <span class="mention-arr">↗</span>
+        </article>
+        <article class="mention">
+          <span class="mention-date">2025 · 09 · 30</span>
+          <h3 class="mention-title"><a href="#">Inside the small Brooklyn lab teaching language models how to argue about types</a></h3>
+          <span class="mention-pub">Wired</span>
+          <span class="mention-arr">↗</span>
+        </article>
+        <article class="mention">
+          <span class="mention-date">2025 · 09 · 11</span>
+          <h3 class="mention-title"><a href="#">Issue #214 — Why Pliny's diff-aware review actually catches regressions</a></h3>
+          <span class="mention-pub">The Pragmatic Engineer</span>
+          <span class="mention-arr">↗</span>
+        </article>
+        <article class="mention">
+          <span class="mention-date">2025 · 08 · 19</span>
+          <h3 class="mention-title"><a href="#">Code review, again: how trained-on-your-codebase models are quietly changing CI</a></h3>
+          <span class="mention-pub">IEEE Spectrum</span>
+          <span class="mention-arr">↗</span>
+        </article>
+        <article class="mention">
+          <span class="mention-date">2025 · 07 · 07</span>
+          <h3 class="mention-title"><a href="#">Show HN: Pliny — a second pair of eyes for every pull request</a></h3>
+          <span class="mention-pub">Hacker News · #1</span>
+          <span class="mention-arr">↗</span>
+        </article>
+        <article class="mention">
+          <span class="mention-date">2025 · 06 · 24</span>
+          <h3 class="mention-title"><a href="#">The vertical-AI playbook, illustrated: Pliny's bet on staying small and opinionated</a></h3>
+          <span class="mention-pub">Stratechery</span>
+          <span class="mention-arr">↗</span>
+        </article>
+        <article class="mention">
+          <span class="mention-date">2025 · 05 · 02</span>
+          <h3 class="mention-title"><a href="#">Why three ex-Stripe engineers think GitHub Copilot was looking the wrong way</a></h3>
+          <span class="mention-pub">Semafor</span>
+          <span class="mention-arr">↗</span>
+        </article>
+        <article class="mention">
+          <span class="mention-date">2024 · 12 · 18</span>
+          <h3 class="mention-title"><a href="#">A field report from six months of letting an LLM gate our deploys</a></h3>
+          <span class="mention-pub">InfoQ</span>
+          <span class="mention-arr">↗</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="kit">
+    <div class="wrap">
+      <div style="display:grid; grid-template-columns: 1fr 2fr; gap:64px; align-items:start; margin-bottom:48px;">
+        <div>
+          <p class="eyebrow"><span class="dot"></span>Press kit</p>
+          <h2 style="margin-top:18px;">Everything <span class="display-italic">on file.</span></h2>
+        </div>
+        <p style="color:var(--ink-dim); font-size:17px; line-height:1.55; padding-top:24px;">All assets are free to use for editorial coverage. Please don't alter the wordmark or recolor the brand mark. If you need anything not listed here — a custom screenshot, a founder interview, an embargoed briefing — reach out below and we'll turn it around within one business day.</p>
+      </div>
+
+      <div class="kit-grid">
+        <a href="#" class="surface kit-card">
+          <div class="kit-icon">SVG</div>
+          <div>
+            <div class="kit-title">Logo &amp; wordmark pack</div>
+            <div class="kit-desc">Vector SVG and PNG in light/dark variants. Includes safe-area diagrams and the conic-gradient brand mark.</div>
+          </div>
+          <div class="kit-meta"><span>ZIP · 2.4 MB</span><a href="#">Download →</a></div>
+        </a>
+        <a href="#" class="surface kit-card">
+          <div class="kit-icon">PNG</div>
+          <div>
+            <div class="kit-title">Product screenshots</div>
+            <div class="kit-desc">High-res captures of the PR review surface, diff annotations, the dashboard, and the CLI — all in @2x.</div>
+          </div>
+          <div class="kit-meta"><span>ZIP · 38 MB</span><a href="#">Download →</a></div>
+        </a>
+        <a href="#" class="surface kit-card">
+          <div class="kit-icon">PDF</div>
+          <div>
+            <div class="kit-title">Fact sheet &amp; bios</div>
+            <div class="kit-desc">One-page company overview, funding history, founder bios (Maya Chen, Idris Yusuf, Tomás Reyes), and headshots.</div>
+          </div>
+          <div class="kit-meta"><span>PDF · 1.1 MB</span><a href="#">Download →</a></div>
+        </a>
+        <a href="#" class="surface kit-card">
+          <div class="kit-icon">MP4</div>
+          <div>
+            <div class="kit-title">B-roll &amp; demo footage</div>
+            <div class="kit-desc">90 seconds of cleared product capture in 4K ProRes — review-in-action, the dashboard, and the diff inspector.</div>
+          </div>
+          <div class="kit-meta"><span>MP4 · 412 MB</span><a href="#">Download →</a></div>
+        </a>
+        <a href="#" class="surface kit-card">
+          <div class="kit-icon">TXT</div>
+          <div>
+            <div class="kit-title">Boilerplate copy</div>
+            <div class="kit-desc">Approved 50, 100, and 250-word descriptions of Pliny, plus pronunciation (PLIH-nee, like the elder).</div>
+          </div>
+          <div class="kit-meta"><span>TXT · 6 KB</span><a href="#">Download →</a></div>
+        </a>
+        <a href="#" class="surface kit-card">
+          <div class="kit-icon">ALL</div>
+          <div>
+            <div class="kit-title">The full press kit</div>
+            <div class="kit-desc">Everything above, bundled. If you're filing a story today, grab this one — it covers every asset we can release publicly.</div>
+          </div>
+          <div class="kit-meta"><span>ZIP · 454 MB</span><a href="#">Download →</a></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-lg" id="contact">
+    <div class="wrap">
+      <div class="contact-band">
+        <div class="orb"></div>
+        <div style="position:relative; z-index:1;">
+          <p class="eyebrow"><span class="dot"></span>Press desk</p>
+          <h2 style="margin-top:18px;">A real human, within one business day.</h2>
+          <p style="color:var(--ink-dim); font-size:17px; line-height:1.55; margin-top:24px; max-width: 460px;">Briefings, embargoed access, founder interviews, deep technical walkthroughs — we'll route you to the right person and try not to waste your news cycle.</p>
+          <div style="margin-top:32px; display:flex; gap:12px;">
+            <a href="mailto:press@pliny.dev" class="btn btn-primary">press@pliny.dev</a>
+            <a href="#" class="btn btn-ghost">Sign embargo NDA</a>
+          </div>
+        </div>
+        <div class="contact-list" style="position:relative; z-index:1;">
+          <div class="contact-item">
+            <div class="label">Press inquiries</div>
+            <a href="mailto:press@pliny.dev">press@pliny.dev</a>
+            <div class="sub">Iris Saavedra · Head of Comms</div>
+          </div>
+          <div class="contact-item">
+            <div class="label">Analyst relations</div>
+            <a href="mailto:analysts@pliny.dev">analysts@pliny.dev</a>
+            <div class="sub">For Gartner, Forrester, RedMonk, etc.</div>
+          </div>
+          <div class="contact-item">
+            <div class="label">Partnerships &amp; events</div>
+            <a href="mailto:hello@pliny.dev">hello@pliny.dev</a>
+            <div class="sub">Conferences, podcasts, speaking</div>
+          </div>
+          <div class="contact-item">
+            <div class="label">Signal · for sensitive tips</div>
+            <a href="#">+1 (347) 555-0140</a>
+            <div class="sub">PGP key on request</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-wordmark" aria-hidden="true">Pliny</div>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="brand" style="font-size:18px;">
+          <span class="brand-mark"></span><span>Pliny</span>
+        </div>
+        <p class="footer-lede">A second pair of eyes for every pull request. Trained on your codebase, opinionated about the rest.</p>
+        <p class="footer-lede" style="margin-top:18px; font-family:var(--mono); font-size:12px; color:var(--ink-faint);">SOC 2 Type II · in audit<br/>Self-hostable · BYOM</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="specs.html">Specifications</a></li>
+          <li><a href="story.html">The story</a></li>
+          <li><a href="preorder.html">Request access</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Integration guide</a></li>
+          <li><a href="#">Security &amp; data</a></li>
+          <li><a href="press.html">Press kit</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">Engineering blog</a></li>
+          <li><a href="#">Careers — hiring</a></li>
+          <li><a href="mailto:hello@pliny.dev">hello@pliny.dev</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">X / Twitter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <div>© 2025 Pliny Labs, Inc. · Made in Brooklyn &amp; Lisbon</div>
+      <div class="legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Status — operational</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

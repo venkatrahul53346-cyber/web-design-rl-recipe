@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Departments &amp; Holdings — National Archive</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .dept-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 0; align-items: start; }
+  .dept-sidenav { position: sticky; top: 120px; border-right: 1px solid var(--border); padding: 8px 28px 32px 0; min-width: 0; }
+  .dept-sidenav h4 { margin-bottom: 14px; font-size: 11px; color: var(--text-muted); }
+  .dept-sidenav ul { list-style: none; padding: 0; margin: 0; }
+  .dept-sidenav li { border-bottom: 1px solid var(--border); }
+  .dept-sidenav li:last-child { border-bottom: 0; }
+  .dept-sidenav a { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 11px 0; text-decoration: none; color: var(--text-muted); font-size: 13.5px; }
+  .dept-sidenav a:hover { color: var(--text); }
+  .dept-sidenav a.active { color: var(--text); border-left: 2px solid var(--accent); padding-left: 12px; margin-left: -14px; }
+  .dept-sidenav .count { font-family: var(--mono); font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+  .dept-content { padding-left: 32px; padding-top: 8px; padding-bottom: 56px; min-width: 0; }
+  .dept-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 0 -1px; }
+  .dept-card { border: 1px solid var(--border); margin: -1px 0 0 -1px; padding: 28px; background: var(--surface); min-width: 0; }
+  .dept-card .dept-id { font-family: var(--mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; }
+  .dept-card h3 { margin: 8px 0 12px; font-size: 1.15rem; font-weight: 600; letter-spacing: -0.015em; }
+  .dept-card p { color: var(--text-muted); font-size: 14px; margin: 0 0 18px; }
+  .dept-meta { display: flex; flex-wrap: wrap; gap: 12px 18px; font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; padding-top: 16px; border-top: 1px solid var(--border); }
+  .dept-meta span strong { color: var(--text); font-weight: 500; }
+  .hero-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 56px; align-items: end; }
+  .dot-panel { background-image: radial-gradient(var(--border-strong) 1px, transparent 1px); background-size: 14px 14px; border: 1px solid var(--border); aspect-ratio: 4/3; position: relative; min-width: 0; }
+  .dot-panel-inner { position: absolute; inset: 24px; background: var(--bg-elevated); border: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+  .dot-panel-inner .mono { font-family: var(--mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; }
+  .dot-panel-inner .num { font-family: var(--sans); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text); word-break: break-all; }
+  .notice { border-left: 3px solid var(--accent); background: var(--surface); padding: 18px 22px; margin-top: 32px; }
+  .notice .label { font-family: var(--mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; }
+  .notice p { margin: 6px 0 0; color: var(--text-muted); font-size: 14px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border: 1px solid var(--border); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+  .chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+  .chip.ok::before { background: var(--ok); }
+  .chip.warn::before { background: var(--warn); }
+  .chip.closed::before { background: var(--text-dim); }
+  .head-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--border); margin-top: 40px; }
+  .head-stats > div { padding: 20px 24px 20px 0; border-right: 1px solid var(--border); min-width: 0; }
+  .head-stats > div:last-child { border-right: 0; padding-right: 0; }
+  .head-stats .n { font-family: var(--sans); font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; }
+  .head-stats .l { font-family: var(--mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px; }
+  .leadership-list { display: grid; grid-template-columns: 180px 1fr 1fr 140px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: baseline; font-size: 14px; gap: 8px; }
+  .leadership-list:first-of-type { border-top: 1px solid var(--border); }
+  .leadership-list .name { font-weight: 600; }
+  .leadership-list .role { color: var(--text-muted); }
+  .leadership-list .dept { color: var(--text-muted); font-family: var(--mono); font-size: 12px; }
+  .leadership-list .ext { font-family: var(--mono); color: var(--text-dim); font-size: 12px; }
+  .org-tree-wrap { overflow-x: auto; }
+  .org-tree { font-family: var(--mono); font-size: 13px; color: var(--text-muted); line-height: 2; white-space: pre; padding: 24px; background: var(--bg-elevated); border: 1px solid var(--border); }
+  .org-tree strong { color: var(--text); font-weight: 500; }
+  .work-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 0 -1px; }
+  .work-card { border: 1px solid var(--border); padding: 28px; margin: -1px 0 0 -1px; min-width: 0; }
+  @media (max-width: 900px) {
+    .dept-layout { grid-template-columns: minmax(0, 1fr); }
+    .dept-sidenav { position: static; border-right: 0; border-bottom: 1px solid var(--border); padding: 0 0 16px; }
+    .dept-content { padding: 24px 0; }
+    .dept-grid { grid-template-columns: minmax(0, 1fr); }
+    .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+    .head-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .head-stats > div:nth-child(2) { border-right: 0; padding-right: 0; }
+    .head-stats > div:nth-child(1), .head-stats > div:nth-child(2) { border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    .leadership-list { grid-template-columns: minmax(0, 1fr) minmax(0, auto); gap: 4px 16px; }
+    .leadership-list .dept, .leadership-list .ext { grid-column: 2; text-align: right; }
+    .work-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .dot-panel-inner .num { font-size: 1.7rem; }
+    .dept-card, .work-card { padding: 22px; }
+  }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+<div class="gov-ribbon">
+  <div class="container">
+    <span class="ribbon-flag">An official site of the National Government</span>
+    <span class="ribbon-sep">·</span>
+    <a href="#">How you know</a>
+    <span style="margin-left:auto;display:inline-flex;gap:14px;align-items:center;">
+      <a href="#" aria-label="Accessibility settings">Accessibility</a>
+      <span class="ribbon-sep">·</span>
+      <a href="#">EN</a> <span class="ribbon-sep">/</span> <a href="#">FR</a> <span class="ribbon-sep">/</span> <a href="#">ES</a>
+    </span>
+  </div>
+</div>
+<header class="site-header" role="banner">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">National Archive</span>
+        <span class="brand-sub">Records · Datasets · Heritage</span>
+      </span>
+    </a>
+    <form class="header-search" role="search" aria-label="Search the archive">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" placeholder="Search 14.2 million records, files, and datasets…" aria-label="Search records">
+      <kbd>⌘ K</kbd>
+    </form>
+    <div class="header-utils">
+      <a class="util-btn" href="forms.html">Request</a>
+      <a class="util-btn" href="#">Sign in</a>
+    </div>
+  </div>
+  <nav class="primary-nav" aria-label="Primary">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="departments.html" aria-current="page" class="active">Departments</a></li>
+      <li><a href="forms.html">Forms &amp; Requests</a></li>
+      <li><a href="news.html">News &amp; Notices</a></li>
+      <li><a href="about.html">About the Archive</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <span aria-current="page">Departments &amp; Holdings</span>
+  </div>
+</nav>
+
+<main id="main">
+
+  <section class="section-hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow">Directory · NA/ORG/2025</span>
+          <h1 style="margin-top:14px;">Departments &amp;<br>operational divisions</h1>
+          <p style="max-width:60ch;margin-top:18px;color:var(--text-muted);font-size:16px;">The National Archive is organised into nine departments responsible for accessioning, preservation, public access, and the administration of statutory records. Use this directory to identify the custodian of a series, request a finding aid, or contact a department lead directly.</p>
+          <div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;">
+            <a class="btn btn-primary" href="#directory">Browse departments</a>
+            <a class="btn" href="#leadership">Leadership &amp; contacts</a>
+            <a class="btn btn-ghost" href="#org-chart">Organisation chart</a>
+          </div>
+        </div>
+        <div class="dot-panel" aria-hidden="true">
+          <div class="dot-panel-inner">
+            <div>
+              <div class="mono">Total holdings under custody</div>
+              <div class="num" style="margin-top:6px;">14,238,910</div>
+              <div class="mono" style="color:var(--text-dim);margin-top:4px;">records · 312 km of shelving</div>
+            </div>
+            <div>
+              <div class="mono">Last accession entry</div>
+              <div style="font-family:var(--mono);color:var(--text);font-size:13px;margin-top:4px;">2025-03-14 · DEPT-04 · S/2025/0418</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="head-stats">
+        <div><div class="n">9</div><div class="l">Operational departments</div></div>
+        <div><div class="n">427</div><div class="l">Permanent staff</div></div>
+        <div><div class="n">38,402</div><div class="l">Series under management</div></div>
+        <div><div class="n">1934</div><div class="l">Established by statute</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="directory">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow" style="color:var(--text-muted);">Section 01</div>
+          <h2 style="margin-top:6px;">Department directory</h2>
+        </div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;">Updated quarterly · Q1 2025</div>
+      </div>
+
+      <div class="dept-layout">
+        <aside class="dept-sidenav" aria-label="Department index">
+          <h4>By function</h4>
+          <ul>
+            <li><a href="#dept-01" class="active">Accessioning &amp; Appraisal <span class="count">DEPT-01</span></a></li>
+            <li><a href="#dept-02">Preservation &amp; Conservation <span class="count">DEPT-02</span></a></li>
+            <li><a href="#dept-03">Digitisation Programme <span class="count">DEPT-03</span></a></li>
+            <li><a href="#dept-04">Public Access &amp; Reading Rooms <span class="count">DEPT-04</span></a></li>
+            <li><a href="#dept-05">Cataloguing &amp; Description <span class="count">DEPT-05</span></a></li>
+            <li><a href="#dept-06">Freedom of Information <span class="count">DEPT-06</span></a></li>
+            <li><a href="#dept-07">Government Records Liaison <span class="count">DEPT-07</span></a></li>
+            <li><a href="#dept-08">Heritage &amp; Outreach <span class="count">DEPT-08</span></a></li>
+            <li><a href="#dept-09">Digital Preservation Lab <span class="count">DEPT-09</span></a></li>
+          </ul>
+          <div class="notice" style="margin-top:24px;">
+            <div class="label">Notice</div>
+            <p>The Cartographic &amp; Architectural Records unit was merged into Cataloguing &amp; Description on 1 January 2025.</p>
+          </div>
+        </aside>
+
+        <div class="dept-content">
+          <div class="dept-grid">
+
+            <article class="dept-card" id="dept-01">
+              <div class="dept-id">DEPT-01</div>
+              <h3>Accessioning &amp; Appraisal</h3>
+              <p>Receives transfers from government bodies, appraises records of permanent value, and issues disposal schedules under the Public Records Act §14.</p>
+              <div style="margin-bottom:16px;"><span class="chip ok">Accepting transfers</span></div>
+              <div class="dept-meta">
+                <span>Head · <strong>M. Adelekan</strong></span>
+                <span>Staff · <strong>48</strong></span>
+                <span>Floor · <strong>B2 / East wing</strong></span>
+              </div>
+            </article>
+
+            <article class="dept-card" id="dept-02">
+              <div class="dept-id">DEPT-02</div>
+              <h3>Preservation &amp; Conservation</h3>
+              <p>Maintains the physical integrity of paper, parchment, photographic, and audiovisual holdings. Operates the conservation studio and environmental monitoring programme.</p>
+              <div style="margin-bottom:16px;"><span class="chip ok">Studio open</span> <span class="chip warn">3-month queue</span></div>
+              <div class="dept-meta">
+                <span>Head · <strong>R. Ostrowska</strong></span>
+                <span>Staff · <strong>34</strong></span>
+                <span>Floor · <strong>B1 / Studio 4</strong></span>
+              </div>
+            </article>
+
+            <article class="dept-card" id="dept-03">
+              <div class="dept-id">DEPT-03</div>
+              <h3>Digitisation Programme</h3>
+              <p>Captures, processes, and publishes digital surrogates of high-demand series. Operates eight production scanning lines and the public image-order workflow.</p>
+              <div style="margin-bottom:16px;"><span class="chip ok">All lines operational</span></div>
+              <div class="dept-meta">
+                <span>Head · <strong>K. Vasquez</strong></span>
+                <span>Staff · <strong>62</strong></span>
+                <span>Floor · <strong>L1 / Bay D</strong></span>
+              </div>
+            </article>
+
+            <article class="dept-card" id="dept-04">
+              <div class="dept-id">DEPT-04</div>
+              <h3>Public Access &amp; Reading Rooms</h3>
+              <p>Manages on-site access to original records, issues reader's tickets, supervises the four reading rooms, and coordinates supervised handling of restricted materials.</p>
+              <div style="margin-bottom:16px;"><span class="chip ok">Tue–Sat 09:00–17:00</span></div>
+              <div class="dept-meta">
+                <span>Head · <strong>S. Pereira</strong></span>
+                <span>Staff · <strong>71</strong></span>
+                <span>Floor · <strong>L2 / Reading Room 1</strong></span>
+              </div>
+            </article>
+
+            <article class="dept-card" id="dept-05">
+              <div class="dept-id">DEPT-05</div>
+              <h3>Cataloguing &amp; Description</h3>
+              <p>Produces and maintains finding aids to ISAD(G) standard. Responsible for the public catalogue, authority records, and the Cartographic &amp; Architectural Records collection.</p>
+              <div style="margin-bottom:16px;"><span class="chip ok">In progress</span> <span class="chip warn">Backlog 11.4%</span></div>
+              <div class="dept-meta">
+                <span>Head · <strong>D. Fischer</strong></span>
+                <span>Staff · <strong>53</strong></span>
+                <span>Floor · <strong>L3 / North</strong></span>
+              </div>
+            </article>
+
+            <article class="dept-card" id="dept-06">
+              <div class="dept-id">DEPT-06</div>
+              <h3>Freedom of Information</h3>
+              <p>Processes statutory access requests under the Freedom of Information Act 2000 and reviews records held under closure for early release.</p>
+              <div style="margin-bottom:16px;"><span class="chip warn">Avg. response 22 days</span></div>
+              <div class="dept-meta">
+                <span>Head · <strong>A. Nwosu</strong></span>
+                <span>Staff · <strong>29</strong></span>
+                <span>Floor · <strong>L4 / West</strong></span>
+              </div>
+            </article>
+
+            <article class="dept-card" id="dept-07">
+              <div class="dept-id">DEPT-07</div>
+              <h3>Government Records Liaison</h3>
+              <p>Advises ministries and agencies on records management, retention schedules, and the secure transfer of permanent records to the Archive.</p>
+              <div style="margin-bottom:16px;"><span class="chip ok">Advisory open</span></div>
+              <div class="dept-meta">
+                <span>Head · <strong>T. Bekele</strong></span>
+                <span>Staff · <strong>22</strong></span>
+                <span>Floor · <strong>L4 / East</strong></span>
+              </div>
+            </article>
+
+            <article class="dept-card" id="dept-08">
+              <div class="dept-id">DEPT-08</div>
+              <h3>Heritage &amp; Outreach</h3>
+              <p>Curates public exhibitions in the South Gallery, coordinates schools programmes, manages press enquiries, and delivers the annual Open Archives week.</p>
+              <div style="margin-bottom:16px;"><span class="chip ok">Exhibition: Lines on the Map</span></div>
+              <div class="dept-meta">
+                <span>Head · <strong>I. Marchetti</strong></span>
+                <span>Staff · <strong>18</strong></span>
+                <span>Floor · <strong>L1 / South Gallery</strong></span>
+              </div>
+            </article>
+
+            <article class="dept-card" id="dept-09">
+              <div class="dept-id">DEPT-09</div>
+              <h3>Digital Preservation Lab</h3>
+              <p>Ingests born-digital records, maintains format migration pathways, and operates the dark-archive replication infrastructure across three geographic sites.</p>
+              <div style="margin-bottom:16px;"><span class="chip ok">Ingest active</span> <span class="chip closed">Public tours suspended</span></div>
+              <div class="dept-meta">
+                <span>Head · <strong>J. Hara</strong></span>
+                <span>Staff · <strong>40</strong></span>
+                <span>Floor · <strong>B3 / Secure</strong></span>
+              </div>
+            </article>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm" id="leadership">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow" style="color:var(--text-muted);">Section 02</div>
+          <h2 style="margin-top:6px;">Leadership &amp; departmental contacts</h2>
+        </div>
+        <a href="contact.html" style="font-size:13px;">Full contact directory →</a>
+      </div>
+
+      <div role="list">
+        <div class="leadership-list" role="listitem">
+          <div class="name">Dr. Helena Carrow</div>
+          <div class="role">Director &amp; Keeper of Public Records</div>
+          <div class="dept">EXECUTIVE</div>
+          <div class="ext">EXT 1001</div>
+        </div>
+        <div class="leadership-list" role="listitem">
+          <div class="name">Mariam Adelekan</div>
+          <div class="role">Head, Accessioning &amp; Appraisal</div>
+          <div class="dept">DEPT-01</div>
+          <div class="ext">EXT 1140</div>
+        </div>
+        <div class="leadership-list" role="listitem">
+          <div class="name">Renata Ostrowska</div>
+          <div class="role">Head, Preservation &amp; Conservation</div>
+          <div class="dept">DEPT-02</div>
+          <div class="ext">EXT 1220</div>
+        </div>
+        <div class="leadership-list" role="listitem">
+          <div class="name">Karim Vasquez</div>
+          <div class="role">Head, Digitisation Programme</div>
+          <div class="dept">DEPT-03</div>
+          <div class="ext">EXT 1308</div>
+        </div>
+        <div class="leadership-list" role="listitem">
+          <div class="name">Sofia Pereira</div>
+          <div class="role">Head, Public Access &amp; Reading Rooms</div>
+          <div class="dept">DEPT-04</div>
+          <div class="ext">EXT 1402</div>
+        </div>
+        <div class="leadership-list" role="listitem">
+          <div class="name">Daniel Fischer</div>
+          <div class="role">Head, Cataloguing &amp; Description</div>
+          <div class="dept">DEPT-05</div>
+          <div class="ext">EXT 1517</div>
+        </div>
+        <div class="leadership-list" role="listitem">
+          <div class="name">Adaeze Nwosu</div>
+          <div class="role">Head, Freedom of Information</div>
+          <div class="dept">DEPT-06</div>
+          <div class="ext">EXT 1605</div>
+        </div>
+        <div class="leadership-list" role="listitem">
+          <div class="name">Tewodros Bekele</div>
+          <div class="role">Head, Government Records Liaison</div>
+          <div class="dept">DEPT-07</div>
+          <div class="ext">EXT 1711</div>
+        </div>
+        <div class="leadership-list" role="listitem">
+          <div class="name">Isabella Marchetti</div>
+          <div class="role">Head, Heritage &amp; Outreach</div>
+          <div class="dept">DEPT-08</div>
+          <div class="ext">EXT 1809</div>
+        </div>
+        <div class="leadership-list" role="listitem">
+          <div class="name">Junichi Hara</div>
+          <div class="role">Head, Digital Preservation Lab</div>
+          <div class="dept">DEPT-09</div>
+          <div class="ext">EXT 1900</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-lg" id="org-chart">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow" style="color:var(--text-muted);">Section 03</div>
+          <h2 style="margin-top:6px;">Organisation chart</h2>
+        </div>
+        <a href="#" style="font-size:13px;">Download PDF (148 KB) →</a>
+      </div>
+
+      <div class="org-tree-wrap">
+        <div class="org-tree" aria-label="Organisational hierarchy"><strong>Office of the Director</strong>
+├── Office of the General Counsel
+├── Office of the Inspector
+└── <strong>Records Operations Group</strong>
+    ├── DEPT-01  Accessioning &amp; Appraisal
+    ├── DEPT-02  Preservation &amp; Conservation
+    ├── DEPT-07  Government Records Liaison
+    └── DEPT-09  Digital Preservation Lab
+        ├── Ingest Pipeline
+        ├── Format Migration
+        └── Dark Archive (3 sites)
+<strong>Public Services Group</strong>
+├── DEPT-04  Public Access &amp; Reading Rooms
+├── DEPT-05  Cataloguing &amp; Description
+├── DEPT-06  Freedom of Information
+└── DEPT-08  Heritage &amp; Outreach
+<strong>Programmes Group</strong>
+└── DEPT-03  Digitisation Programme
+    ├── Production Lines (8)
+    └── Image Order Workflow</div>
+      </div>
+
+      <div class="notice">
+        <div class="label">Governance</div>
+        <p>The Archive is a non-ministerial department reporting to the Minister for the Cabinet Office. The Director is appointed by the Crown for a single seven-year term under the Public Records Act 1958 (as amended 2011).</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="eyebrow" style="color:var(--text-muted);">Section 04</div>
+          <h2 style="margin-top:6px;">Working with a department</h2>
+        </div>
+      </div>
+
+      <div class="work-grid">
+        <div class="work-card">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:0.12em;">For researchers</div>
+          <h3 style="margin:10px 0 12px;">Identify the custodian of a series</h3>
+          <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px;">Most series are held by a single department for their full lifecycle. Use the catalogue to find the series reference, then contact the relevant head via the directory above.</p>
+          <a href="services.html" class="btn btn-sm btn-ghost">Open catalogue</a>
+        </div>
+        <div class="work-card">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:0.12em;">For government bodies</div>
+          <h3 style="margin:10px 0 12px;">Transfer records to the Archive</h3>
+          <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px;">Government Records Liaison (DEPT-07) advises on retention schedules, the 20-year rule, and the technical specifications for paper and digital transfers.</p>
+          <a href="forms.html" class="btn btn-sm btn-ghost">Begin transfer process</a>
+        </div>
+        <div class="work-card">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:0.12em;">For journalists</div>
+          <h3 style="margin:10px 0 12px;">Submit a press enquiry</h3>
+          <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px;">All media enquiries are handled by Heritage &amp; Outreach (DEPT-08). Expedited responses are available for time-sensitive stories with documented deadlines.</p>
+          <a href="contact.html" class="btn btn-sm btn-ghost">Press contacts</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">National Archive</span>
+            <span class="brand-sub">Est. 1934</span>
+          </span>
+        </a>
+        <p>The custodian of the nation's permanent public record. Open to researchers, journalists, and the public — in person and online.</p>
+        <p class="mono" style="font-size:12px;color:var(--text-dim);margin-top:14px;">Reading rooms · Tue–Sat 09:00–17:00</p>
+      </div>
+      <div class="footer-col">
+        <h5>Research</h5>
+        <ul>
+          <li><a href="services.html">Catalogue search</a></li>
+          <li><a href="#">Digitised collections</a></li>
+          <li><a href="#">Open datasets</a></li>
+          <li><a href="#">Finding aids</a></li>
+          <li><a href="#">Citation guidance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Requests</h5>
+        <ul>
+          <li><a href="forms.html">Records request (FOI)</a></li>
+          <li><a href="forms.html">Reading room booking</a></li>
+          <li><a href="forms.html">Reproduction order</a></li>
+          <li><a href="forms.html">Restricted access</a></li>
+          <li><a href="forms.html">Transfer of records</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="about.html">Mission &amp; mandate</a></li>
+          <li><a href="departments.html">Departments</a></li>
+          <li><a href="#">Leadership</a></li>
+          <li><a href="news.html">News &amp; notices</a></li>
+          <li><a href="#">Annual reports</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Help</h5>
+        <ul>
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a href="#">Accessibility</a></li>
+          <li><a href="#">Languages</a></li>
+          <li><a href="#">Sitemap</a></li>
+          <li><a href="#">Status &amp; outages</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 1934–2025 National Archive. Open content licensed under the Open Government Licence v3.0 unless otherwise noted.</span>
+      <span class="legal">
+        <a href="#">Privacy notice</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Cookies</a>
+        <a href="#">FOI disclosures</a>
+      </span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

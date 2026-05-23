@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Specifications — Pliny</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* specs-page only */
+  .spec-hero { position: relative; padding: 80px 0 56px; overflow: hidden; }
+  .spec-hero .blob-violet { width: 620px; height: 620px; top: -260px; right: -180px; opacity: 0.5; max-width: 100%; }
+  .spec-hero .blob-cyan   { width: 380px; height: 380px; bottom: -180px; left: -120px; opacity: 0.35; max-width: 100%; }
+  .spec-hero .lockup {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 80px;
+    align-items: end;
+    position: relative; z-index: 2;
+  }
+  .spec-hero h1 .sub { display: block; font-style: italic; font-weight: 300; color: var(--ink-dim); font-size: clamp(20px, 2.2vw, 28px); letter-spacing: -0.02em; margin-top: 22px; }
+  .spec-id-card { font-family: var(--mono); font-size: 12px; color: var(--ink-dim); line-height: 1.9; min-width: 0; }
+  .spec-id-card .row { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding: 8px 0; }
+  .spec-id-card .row span:last-child { color: var(--ink); text-align: right; word-break: break-word; }
+  .spec-id-card .row:first-child { border-top: 1px solid var(--line); }
+
+  /* TOC strip */
+  .toc-strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(8,8,12,0.6); }
+  .toc-strip .wrap { display: flex; flex-wrap: wrap; gap: 0; }
+  .toc-strip a {
+    flex: 1 1 180px; min-width: 0;
+    padding: 22px 24px; border-right: 1px solid var(--line);
+    font-family: var(--mono); font-size: 11px; color: var(--ink-dim);
+    text-transform: uppercase; letter-spacing: 0.18em;
+    display: flex; align-items: baseline; gap: 14px;
+    transition: color .15s ease, background .15s ease;
+  }
+  .toc-strip a:last-child { border-right: 0; }
+  .toc-strip a:hover { color: var(--ink); background: rgba(124,91,255,0.04); }
+  .toc-strip a .num { color: var(--accent); font-size: 10px; }
+
+  /* hero image plate */
+  .hero-plate {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    aspect-ratio: 16/7;
+    background:
+      radial-gradient(60% 80% at 70% 30%, rgba(124,91,255,0.25), transparent 60%),
+      radial-gradient(50% 70% at 20% 80%, rgba(33,224,200,0.15), transparent 60%),
+      #0A0A12;
+  }
+  .hero-plate .orb {
+    position: absolute; width: 280px; height: 280px; max-width: 50%; aspect-ratio: 1;
+    right: 8%; top: 50%; transform: translateY(-50%);
+  }
+  .hero-plate .gridlines {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(26,26,34,0.6) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(26,26,34,0.6) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(70% 70% at 50% 50%, #000 30%, transparent 80%);
+  }
+  .hero-plate .corner-tags {
+    position: absolute; inset: 0; padding: 24px;
+    font-family: var(--mono); font-size: 11px; color: var(--ink-faint);
+    text-transform: uppercase; letter-spacing: 0.2em;
+    pointer-events: none;
+  }
+  .hero-plate .corner-tags .tl { position: absolute; top: 24px; left: 24px; }
+  .hero-plate .corner-tags .tr { position: absolute; top: 24px; right: 24px; text-align: right; }
+  .hero-plate .corner-tags .bl { position: absolute; bottom: 24px; left: 24px; }
+  .hero-plate .corner-tags .br { position: absolute; bottom: 24px; right: 24px; text-align: right; color: var(--accent); }
+
+  /* Section header */
+  .sec-head {
+    display: grid; grid-template-columns: 220px 1fr; gap: 60px;
+    align-items: baseline; margin-bottom: 48px;
+  }
+  .sec-head .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.22em; line-height: 1.8; }
+  .sec-head .meta .idx { display: block; color: var(--accent); font-size: 28px; letter-spacing: -0.02em; font-weight: 500; margin-bottom: 8px; }
+  .sec-head h2 { max-width: 720px; }
+  .sec-head .lede { color: var(--ink-dim); font-size: 17px; margin-top: 18px; max-width: 640px; }
+
+  /* spec table */
+  .spec-table-wrap { width: 100%; }
+  .spec-table {
+    width: 100%; border-collapse: collapse;
+    border-top: 1px solid var(--line);
+    table-layout: fixed;
+  }
+  .spec-table tr { border-bottom: 1px solid var(--line); }
+  .spec-table th, .spec-table td { padding: 22px 24px; text-align: left; vertical-align: top; word-wrap: break-word; overflow-wrap: anywhere; }
+  .spec-table th {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    width: 32%;
+  }
+  .spec-table td { color: var(--ink); font-size: 16px; line-height: 1.55; }
+  .spec-table td .note { display: block; color: var(--ink-dim); font-size: 13px; margin-top: 6px; }
+  .spec-table td .num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--accent); margin-right: 10px; }
+  .spec-table code.mono { word-break: break-all; }
+
+  /* dimensions block — asymmetric */
+  .dim-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 32px;
+  }
+  .dim-plate {
+    border: 1px solid var(--line); border-radius: 16px;
+    aspect-ratio: 4/5;
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(50% 60% at 50% 40%, rgba(124,91,255,0.22), transparent 70%),
+      #07070C;
+  }
+  .dim-plate .orb { position: absolute; width: 60%; aspect-ratio: 1; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .dim-plate .axis {
+    position: absolute; font-family: var(--mono); font-size: 11px; color: var(--ink-dim);
+    text-transform: uppercase; letter-spacing: 0.18em;
+  }
+  .dim-plate .axis.x { bottom: 24px; left: 24px; right: 24px; display: flex; justify-content: space-between; align-items: center; }
+  .dim-plate .axis.y { top: 24px; left: 24px; bottom: 24px; writing-mode: vertical-rl; transform: rotate(180deg); display: flex; justify-content: space-between; }
+  .dim-plate .axis .tick { color: var(--accent); }
+  .dim-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-content: start; }
+  .dim-numbers .cell { border: 1px solid var(--line); border-radius: 14px; padding: 28px 24px; min-width: 0; }
+  .dim-numbers .k { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.18em; }
+  .dim-numbers .v { font-size: clamp(28px, 6vw, 44px); font-weight: 700; letter-spacing: -0.035em; margin-top: 12px; font-variant-numeric: tabular-nums; word-break: break-word; }
+  .dim-numbers .v .unit { font-size: 16px; color: var(--ink-dim); font-weight: 400; margin-left: 4px; letter-spacing: 0; font-family: var(--mono); }
+  .dim-numbers .cell.span-2 { grid-column: 1 / -1; }
+
+  /* model matrix */
+  .matrix {
+    border: 1px solid var(--line); border-radius: 16px;
+    overflow: hidden;
+  }
+  .matrix-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; border-bottom: 1px solid var(--line); }
+  .matrix-row:last-child { border-bottom: 0; }
+  .matrix-row > div { padding: 22px 24px; border-right: 1px solid var(--line); min-width: 0; word-wrap: break-word; overflow-wrap: anywhere; }
+  .matrix-row > div:last-child { border-right: 0; }
+  .matrix-head { background: rgba(124,91,255,0.04); }
+  .matrix-head > div { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-dim); padding: 16px 24px; }
+  .matrix .name { font-weight: 600; font-size: 16px; }
+  .matrix .name .sub { display: block; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.18em; margin-top: 4px; }
+  .matrix .val { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); font-size: 14px; }
+  .matrix .val.dim { color: var(--ink-dim); }
+  .matrix .val .ok { color: var(--accent-2); }
+  .matrix .val .no { color: var(--ink-faint); }
+
+  /* integrations grid (hairline cells) */
+  .integ-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    border-top: 1px solid var(--line); border-left: 1px solid var(--line);
+  }
+  .integ-grid .cell {
+    border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    aspect-ratio: 5/3; padding: 22px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    font-family: var(--mono); color: var(--ink-dim);
+    min-width: 0;
+  }
+  .integ-grid .cell .name { color: var(--ink); font-size: 15px; letter-spacing: -0.01em; font-family: var(--sans); font-weight: 500; }
+  .integ-grid .cell .meta { font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); word-wrap: break-word; }
+  .integ-grid .cell .meta.live { color: var(--accent-2); }
+  .integ-grid .cell .meta.soon { color: var(--warn); }
+
+  /* security columns */
+  .sec-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .sec-cols .col { padding: 36px 32px; border-right: 1px solid var(--line); min-width: 0; }
+  .sec-cols .col:last-child { border-right: 0; }
+  .sec-cols .col h4 { font-size: 16px; margin-bottom: 16px; }
+  .sec-cols .col h4 .badge { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border: 1px solid var(--line-bright); border-radius: 999px; color: var(--ink-dim); margin-left: 8px; letter-spacing: 0.12em; vertical-align: middle; }
+  .sec-cols .col ul { list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--ink-dim); }
+  .sec-cols .col ul li { padding: 10px 0; border-top: 1px solid var(--line); display: flex; gap: 12px; }
+  .sec-cols .col ul li:first-child { border-top: 0; }
+  .sec-cols .col ul li::before { content: '+'; color: var(--accent); font-family: var(--mono); flex-shrink: 0; }
+
+  /* footnote */
+  .footnote {
+    border-top: 1px solid var(--line);
+    padding-top: 32px;
+    display: grid; grid-template-columns: 1fr 2fr; gap: 60px;
+    font-family: var(--mono); font-size: 12px; color: var(--ink-faint);
+    text-transform: uppercase; letter-spacing: 0.18em;
+  }
+  .footnote p { line-height: 1.9; }
+  .footnote .ref { color: var(--accent); }
+
+  /* final CTA */
+  .spec-cta {
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 64px 56px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(180deg, rgba(124,91,255,0.08), transparent 60%), #0A0A12;
+  }
+  .spec-cta .blob-pink { width: 380px; height: 380px; right: -120px; top: -120px; opacity: 0.35; max-width: 100%; }
+  .spec-cta .inner { position: relative; z-index: 2; display: grid; grid-template-columns: 1.6fr 1fr; gap: 60px; align-items: end; }
+  .spec-cta h2 { letter-spacing: -0.035em; }
+  .spec-cta .actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  @media (max-width: 880px) {
+    .spec-hero { padding: 56px 0 40px; }
+    .spec-hero .lockup { grid-template-columns: 1fr; gap: 32px; }
+    .hero-plate { aspect-ratio: 4/3; }
+    .hero-plate .corner-tags { padding: 16px; font-size: 9px; letter-spacing: 0.15em; }
+    .hero-plate .corner-tags .tl,
+    .hero-plate .corner-tags .tr,
+    .hero-plate .corner-tags .bl,
+    .hero-plate .corner-tags .br { top: 16px; left: 16px; right: auto; bottom: auto; }
+    .hero-plate .corner-tags .tr { top: 16px; right: 16px; left: auto; }
+    .hero-plate .corner-tags .bl { bottom: 16px; left: 16px; top: auto; }
+    .hero-plate .corner-tags .br { bottom: 16px; right: 16px; top: auto; left: auto; }
+    .sec-head { grid-template-columns: 1fr; gap: 16px; margin-bottom: 32px; }
+    .toc-strip a { padding: 16px 20px; flex: 1 1 50%; }
+    .dim-grid { grid-template-columns: 1fr; gap: 20px; }
+    .dim-plate { aspect-ratio: 1/1; }
+    .dim-numbers { gap: 16px; }
+    .dim-numbers .cell { padding: 20px 18px; }
+    .matrix-row { grid-template-columns: 1fr 1fr; }
+    .matrix-row > div { padding: 16px 18px; }
+    .matrix-row > div:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .matrix-head { display: none; }
+    .integ-grid { grid-template-columns: repeat(2, 1fr); }
+    .integ-grid .cell { aspect-ratio: auto; padding: 18px; gap: 10px; }
+    .sec-cols { grid-template-columns: 1fr; }
+    .sec-cols .col { border-right: 0; border-bottom: 1px solid var(--line); padding: 28px 20px; }
+    .sec-cols .col:last-child { border-bottom: 0; }
+    .footnote { grid-template-columns: 1fr; gap: 16px; }
+    .spec-cta { padding: 40px 24px; }
+    .spec-cta .inner { grid-template-columns: 1fr; gap: 32px; }
+    .spec-cta .actions .btn { flex: 1 1 auto; justify-content: center; }
+  }
+
+  @media (max-width: 640px) {
+    /* Stack the spec table on small screens */
+    .spec-table, .spec-table tbody, .spec-table tr, .spec-table th, .spec-table td { display: block; width: 100%; }
+    .spec-table tr { padding: 20px 0; }
+    .spec-table th, .spec-table td { padding: 6px 0; }
+    .spec-table th { padding-top: 12px; padding-bottom: 8px; }
+    .matrix-row { grid-template-columns: 1fr; }
+    .matrix-row > div { border-right: 0; border-top: 1px solid var(--line); }
+    .matrix-row > div:first-child { border-top: 0; }
+    .integ-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="brand" aria-label="Pliny home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Pliny</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html">Overview</a>
+      <a href="story.html">Story</a>
+      <a href="specs.html" class="is-active">Specs</a>
+      <a href="faq.html">FAQ</a>
+      <a href="press.html">Press</a>
+    </nav>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <span class="nav-status"><span class="live"></span>v0.9 · public beta</span>
+      <a href="preorder.html" class="nav-cta">Get early access <span class="arr">→</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="spec-hero">
+    <div class="blob blob-violet"></div>
+    <div class="blob blob-cyan"></div>
+    <div class="wrap">
+      <div class="eyebrow" style="margin-bottom:40px;"><span class="dot"></span>SPECIFICATION · REV 0.9.4 · 2025-Q1</div>
+      <div class="lockup">
+        <h1>The technical<br>sheet. <span class="sub">Every limit, every dimension, every byte we touch — written down before you ask.</span></h1>
+        <div class="spec-id-card">
+          <div class="row"><span>Product</span><span>Pliny Reviewer</span></div>
+          <div class="row"><span>Build</span><span>0.9.4-beta</span></div>
+          <div class="row"><span>Released</span><span>14 Feb 2025</span></div>
+          <div class="row"><span>Channel</span><span>Public beta</span></div>
+          <div class="row"><span>License</span><span>Commercial · BYOM</span></div>
+          <div class="row"><span>Doc ID</span><span>PLN-SPEC-094</span></div>
+        </div>
+      </div>
+
+      <div class="hero-plate" style="margin-top:64px;">
+        <div class="gridlines"></div>
+        <div class="orb"></div>
+        <div class="corner-tags">
+          <div class="tl">PLN-094 / SPEC-SHEET</div>
+          <div class="tr">VIEW · ISOMETRIC<br/>SCALE 1:1</div>
+          <div class="bl">RENDER · CSS · NO ASSETS</div>
+          <div class="br">↘ TRACE ID 7C5B-FF21</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <nav class="toc-strip" aria-label="Specifications contents">
+    <div class="wrap">
+      <a href="#models"><span class="num">01</span>Models</a>
+      <a href="#review"><span class="num">02</span>Review engine</a>
+      <a href="#dimensions"><span class="num">03</span>Dimensions</a>
+      <a href="#integrations"><span class="num">04</span>Integrations</a>
+      <a href="#security"><span class="num">05</span>Security</a>
+      <a href="#deploy"><span class="num">06</span>Deployment</a>
+    </div>
+  </nav>
+
+  <!-- 01 MODELS -->
+  <section class="section" id="models">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="meta"><span class="idx">01</span>Models<br/>BYOM · Hosted · Mixed</div>
+        <div>
+          <h2>Bring your own model, or run the one we tuned for review.</h2>
+          <p class="lede">Pliny is model-agnostic. The reviewer brain is a thin orchestration layer around whichever frontier model your security policy allows — including a local Llama checkpoint if you'd rather not phone home.</p>
+        </div>
+      </div>
+
+      <div class="matrix">
+        <div class="matrix-row matrix-head">
+          <div>Model</div>
+          <div>Context</div>
+          <div>Median latency / PR</div>
+          <div>Deployment</div>
+        </div>
+        <div class="matrix-row">
+          <div class="name">Pliny-R1 (default)<span class="sub">In-house · review-tuned</span></div>
+          <div class="val">200,000 tok</div>
+          <div class="val">11.4s</div>
+          <div class="val"><span class="ok">Hosted · US-east, EU-west</span></div>
+        </div>
+        <div class="matrix-row">
+          <div class="name">Anthropic Claude 3.7 Sonnet<span class="sub">BYOM · key required</span></div>
+          <div class="val">200,000 tok</div>
+          <div class="val">14.2s</div>
+          <div class="val"><span class="ok">BYOM</span></div>
+        </div>
+        <div class="matrix-row">
+          <div class="name">OpenAI GPT-4.1<span class="sub">BYOM · key required</span></div>
+          <div class="val">1,000,000 tok</div>
+          <div class="val">18.0s</div>
+          <div class="val"><span class="ok">BYOM</span></div>
+        </div>
+        <div class="matrix-row">
+          <div class="name">Llama 3.3 70B (self-hosted)<span class="sub">vLLM · A100 80GB ×2</span></div>
+          <div class="val">128,000 tok</div>
+          <div class="val">27.6s</div>
+          <div class="val"><span class="ok">Air-gapped</span></div>
+        </div>
+        <div class="matrix-row">
+          <div class="name">DeepSeek-V3<span class="sub">Experimental · opt-in</span></div>
+          <div class="val">64,000 tok</div>
+          <div class="val">21.1s</div>
+          <div class="val"><span class="no">Hosted only</span></div>
+        </div>
+      </div>
+
+      <p class="mono" style="font-size:12px; color:var(--ink-faint); margin-top:20px; text-transform:uppercase; letter-spacing:0.18em;">Latencies measured on a representative sample of 1,840 PRs averaging 312 changed lines across 11 customer repos, Jan 2025. ↑ Your mileage will vary.</p>
+    </div>
+  </section>
+
+  <hr class="hairline">
+
+  <!-- 02 REVIEW ENGINE -->
+  <section class="section" id="review">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="meta"><span class="idx">02</span>Review engine<br/>Static · Semantic · Runtime hooks</div>
+        <div>
+          <h2>What the second pair of eyes actually looks at.</h2>
+          <p class="lede">Three passes per PR: a structural read of the diff in graph form, a semantic read against the rest of your codebase, and an optional runtime trace replay if you give us OpenTelemetry.</p>
+        </div>
+      </div>
+
+      <div class="spec-table-wrap">
+      <table class="spec-table">
+        <tr>
+          <th>Trigger</th>
+          <td>Webhook on <code class="mono">pull_request.opened</code>, <code class="mono">.synchronize</code>, and <code class="mono">.ready_for_review</code>. Median time-to-first-comment is 38 seconds from webhook receipt.<span class="note">A re-run is queued automatically on force-push; cached embeddings make the second pass ~6× faster.</span></td>
+        </tr>
+        <tr>
+          <th>Languages — tier 1</th>
+          <td><span class="num">14</span>TypeScript, JavaScript, Python, Go, Rust, Java, Kotlin, Swift, Ruby, C, C++, C#, PHP, Elixir.<span class="note">Tier 1 means: AST-level diff parsing, type-aware suggestions, and language-specific lint rule promotion.</span></td>
+        </tr>
+        <tr>
+          <th>Languages — tier 2</th>
+          <td><span class="num">9</span>Scala, Clojure, Haskell, OCaml, Lua, Dart, Zig, Nim, Crystal — diff-level review only, no AST grounding.</td>
+        </tr>
+        <tr>
+          <th>Bug classes detected</th>
+          <td>Null-deref, off-by-one, race conditions on shared state, unhandled promise rejection, SQL injection, XSS via interpolation, missing auth checks on new routes, broken pagination, N+1 queries, secrets in code, leaked PII in logs, dependency CVE introductions.<span class="note">Maintained as a versioned rulebook at <span class="mono" style="color:var(--accent); word-break: break-all;">github.com/pliny-labs/rulebook</span> — public, MIT.</span></td>
+        </tr>
+        <tr>
+          <th>False-positive rate</th>
+          <td><span class="num">3.8%</span>across the 1,840-PR benchmark, measured as comments dismissed by reviewer with the &ldquo;not useful&rdquo; reason. We target ≤5% and ship a regression to staging at &gt;6%.</td>
+        </tr>
+        <tr>
+          <th>Codebase grounding</th>
+          <td>Incremental indexing on push. Symbols, call graph, and ownership extracted once per repo and updated per commit (median delta: 240ms for a 50-file change).<span class="note">Index lives on your side if self-hosted; otherwise encrypted at rest in the region you choose.</span></td>
+        </tr>
+        <tr>
+          <th>Output format</th>
+          <td>Inline review comments with file + line anchors, an optional summary comment, a structured JSON sidecar for downstream tooling, and webhooks on <code class="mono">review.completed</code>.</td>
+        </tr>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline">
+
+  <!-- 03 DIMENSIONS -->
+  <section class="section" id="dimensions">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="meta"><span class="idx">03</span>Dimensions<br/>Throughput · Limits</div>
+        <div>
+          <h2>Hard numbers, no asterisks.</h2>
+          <p class="lede">The reviewer is engineered around a single design constant: every PR gets a verdict within two minutes, regardless of size. These are the boxes we squeeze it into.</p>
+        </div>
+      </div>
+
+      <div class="dim-grid">
+        <div class="dim-plate">
+          <div class="orb"></div>
+          <div class="axis y">
+            <span>0</span><span class="tick">200K tok</span>
+          </div>
+          <div class="axis x">
+            <span>0 files</span><span class="tick">↔ 1,200 files</span>
+          </div>
+        </div>
+
+        <div class="dim-numbers">
+          <div class="cell">
+            <div class="k">Max PR size</div>
+            <div class="v tnum">1,200<span class="unit">files</span></div>
+          </div>
+          <div class="cell">
+            <div class="k">Max diff lines</div>
+            <div class="v tnum">48,000<span class="unit">loc</span></div>
+          </div>
+          <div class="cell">
+            <div class="k">Target latency</div>
+            <div class="v tnum">&lt; 120<span class="unit">s</span></div>
+          </div>
+          <div class="cell">
+            <div class="k">Concurrent PRs / org</div>
+            <div class="v tnum">64<span class="unit">parallel</span></div>
+          </div>
+          <div class="cell span-2">
+            <div class="k">SLA — hosted plan</div>
+            <div class="v tnum">99.9<span class="unit">% monthly · credit on miss</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline">
+
+  <!-- 04 INTEGRATIONS -->
+  <section class="section" id="integrations">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="meta"><span class="idx">04</span>Integrations<br/>SCM · CI · Notifications</div>
+        <div>
+          <h2>Plugs into the tools you already pay for.</h2>
+          <p class="lede">Pliny is intentionally narrow about what it owns: review comments and a status check. Everything else — code, secrets, CI — stays where it lives.</p>
+        </div>
+      </div>
+
+      <div class="integ-grid">
+        <div class="cell"><div class="name">GitHub</div><div class="meta live">● Live · App + OAuth</div></div>
+        <div class="cell"><div class="name">GitHub Enterprise Server</div><div class="meta live">● Live · 3.10+</div></div>
+        <div class="cell"><div class="name">GitLab</div><div class="meta live">● Live · SaaS + self-hosted 16+</div></div>
+        <div class="cell"><div class="name">Bitbucket Cloud</div><div class="meta live">● Live</div></div>
+        <div class="cell"><div class="name">Bitbucket DC</div><div class="meta soon">○ Q2 2025</div></div>
+        <div class="cell"><div class="name">Gitea</div><div class="meta soon">○ Q3 2025</div></div>
+        <div class="cell"><div class="name">Slack</div><div class="meta live">● Live · DM + channel digest</div></div>
+        <div class="cell"><div class="name">Linear</div><div class="meta live">● Live · auto-link issues</div></div>
+        <div class="cell"><div class="name">Jira</div><div class="meta live">● Live · Cloud + DC</div></div>
+        <div class="cell"><div class="name">PagerDuty</div><div class="meta live">● Live · critical regressions</div></div>
+        <div class="cell"><div class="name">Datadog</div><div class="meta live">● Live · trace replay</div></div>
+        <div class="cell"><div class="name">Honeycomb</div><div class="meta soon">○ Q2 2025</div></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline">
+
+  <!-- 05 SECURITY -->
+  <section class="section" id="security">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="meta"><span class="idx">05</span>Security<br/>Data · Access · Compliance</div>
+        <div>
+          <h2>Where your code lives, and what we promise to do with it.</h2>
+          <p class="lede">Default posture is zero-retention. Code is read, embeddings are computed, the review is posted, the buffer is wiped. Long-term storage is opt-in and per-repo.</p>
+        </div>
+      </div>
+
+      <div class="sec-cols">
+        <div class="col">
+          <h4>Data handling <span class="badge">DEFAULT</span></h4>
+          <ul>
+            <li>Zero-retention mode on by default — diffs purged within 60 seconds of review completion.</li>
+            <li>Embeddings stored encrypted at rest with AES-256, customer-scoped keys.</li>
+            <li>No code is used for training. Ever. Contractual.</li>
+            <li>Regions: us-east-1, eu-west-1, ap-south-1. Pinned per workspace.</li>
+            <li>PII redaction pass before any prompt leaves the perimeter.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Access &amp; auth <span class="badge">SSO</span></h4>
+          <ul>
+            <li>SAML 2.0 SSO with Okta, Azure AD, Google Workspace, JumpCloud.</li>
+            <li>SCIM 2.0 provisioning and de-provisioning.</li>
+            <li>Scoped tokens with repo-level granularity; no org-wide reads.</li>
+            <li>Audit log streamed to your SIEM via webhook or S3 sink.</li>
+            <li>IP allow-listing on every API surface.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Compliance <span class="badge">IN AUDIT</span></h4>
+          <ul>
+            <li>SOC 2 Type II — currently in audit window, report Q2 2025.</li>
+            <li>ISO 27001 — readiness assessment complete.</li>
+            <li>GDPR &amp; UK GDPR — DPA available, sub-processor list public.</li>
+            <li>HIPAA — supported on Enterprise plan with signed BAA.</li>
+            <li>Penetration test — annual, Latacora; latest report on request under NDA.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hairline">
+
+  <!-- 06 DEPLOYMENT -->
+  <section class="section" id="deploy">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="meta"><span class="idx">06</span>Deployment<br/>Hosted · VPC · Air-gapped</div>
+        <div>
+          <h2>Three ways to run it. Pick the one your security team won't argue with.</h2>
+        </div>
+      </div>
+
+      <div class="spec-table-wrap">
+      <table class="spec-table">
+        <tr>
+          <th>Hosted (default)</th>
+          <td>Multi-tenant on AWS, region-pinned. No infra on your side. Ships same day you sign up. Recommended unless you already operate your own ML infra.<span class="note">SLA 99.9% · transit in TLS 1.3 · keys managed in AWS KMS with HSM backing.</span></td>
+        </tr>
+        <tr>
+          <th>VPC-isolated</th>
+          <td>Single-tenant control plane in your AWS, GCP, or Azure account. We deploy via Terraform; you hold the keys. Models call out to a customer-owned NAT gateway or stay fully internal if you bring your own.<span class="note">Onboarding: ~3 business days. Requires a 2-vCPU control node and a model backend of your choice.</span></td>
+        </tr>
+        <tr>
+          <th>Air-gapped on-prem</th>
+          <td>For regulated industries and defense. Ships as a signed OCI bundle. Includes a local Llama 3.3 70B checkpoint or accepts any OpenAI-compatible endpoint behind your firewall.<span class="note">No phone-home telemetry. Updates delivered via signed artifact. Enterprise plan only.</span></td>
+        </tr>
+        <tr>
+          <th>Hardware recommendation</th>
+          <td>For self-hosted model serving: 2× NVIDIA A100 80GB or 2× H100 80GB. CPU control plane fits on a single c7i.2xlarge / n2-standard-8.<span class="note">Pliny itself is light — the bill is the model. Customers report ~$0.07 per PR amortized on Llama 3.3 70B at 50 PRs/day.</span></td>
+        </tr>
+      </table>
+      </div>
+
+      <div class="footnote" style="margin-top:64px;">
+        <p class="ref">↘ FOOTNOTES &amp; REFERENCES</p>
+        <p>All benchmark numbers were collected between 14 Dec 2024 and 28 Jan 2025 across eleven design-partner organisations spanning fintech, biotech, two large SaaS products, and a games studio. Raw notebooks available on request. Specification revisions follow semver; this document is PLN-SPEC-094 and supersedes PLN-SPEC-088. Production traffic continues to inform every number on this page; we update on the first of each month.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-lg">
+    <div class="wrap">
+      <div class="spec-cta">
+        <div class="blob blob-pink"></div>
+        <div class="inner">
+          <div>
+            <div class="eyebrow" style="margin-bottom:24px;"><span class="dot"></span>READY · ONBOARDING IN 24 HOURS</div>
+            <h2 class="glow">Spec sheet read. <span class="display-italic" style="color:var(--ink-dim);">Now let it read your repo.</span></h2>
+            <p style="color:var(--ink-dim); max-width:540px; margin-top:20px; font-size:17px;">Pliny installs as a GitHub app in about a minute. The first review lands while you're still on the page.</p>
+          </div>
+          <div class="actions">
+            <a href="preorder.html" class="btn btn-primary btn-xl">Request access <span class="mono">→</span></a>
+            <a href="faq.html" class="btn btn-ghost btn-xl">Read the FAQ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-wordmark" aria-hidden="true">Pliny</div>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="brand" style="font-size:18px;">
+          <span class="brand-mark"></span><span>Pliny</span>
+        </div>
+        <p class="footer-lede">A second pair of eyes for every pull request. Trained on your codebase, opinionated about the rest.</p>
+        <p class="footer-lede" style="margin-top:18px; font-family:var(--mono); font-size:12px; color:var(--ink-faint);">SOC 2 Type II · in audit<br/>Self-hostable · BYOM</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="specs.html">Specifications</a></li>
+          <li><a href="story.html">The story</a></li>
+          <li><a href="preorder.html">Request access</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Integration guide</a></li>
+          <li><a href="#">Security &amp; data</a></li>
+          <li><a href="press.html">Press kit</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">Engineering blog</a></li>
+          <li><a href="#">Careers — hiring</a></li>
+          <li><a href="mailto:hello@pliny.dev">hello@pliny.dev</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">X / Twitter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <div>© 2025 Pliny Labs, Inc. · Made in Brooklyn &amp; Lisbon</div>
+      <div class="legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Status — operational</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

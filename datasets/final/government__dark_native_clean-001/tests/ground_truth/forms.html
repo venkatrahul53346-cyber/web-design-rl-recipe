@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forms &amp; Requests — National Archive</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .forms-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 0; align-items: start; }
+  .forms-sidenav { position: sticky; top: 124px; border-right: 1px solid var(--border); padding: 8px 24px 24px 0; }
+  .forms-sidenav h4 { margin: 24px 0 10px; font-size: 11px; }
+  .forms-sidenav h4:first-child { margin-top: 0; }
+  .forms-sidenav ul { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--border); }
+  .forms-sidenav li { border-bottom: 1px solid var(--border); }
+  .forms-sidenav a { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px 10px 0; text-decoration: none; color: var(--text-muted); font-size: 13.5px; }
+  .forms-sidenav a:hover { color: var(--text); }
+  .forms-sidenav a[aria-current="true"] { color: var(--text); border-left: 2px solid var(--accent); padding-left: 10px; }
+  .forms-sidenav a span.mono { font-family: var(--mono); font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+  .forms-content { padding: 0 0 0 32px; min-width: 0; }
+  .hero-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0; align-items: stretch; }
+  .hero-grid > div:first-child { padding-right: 56px; min-width: 0; }
+  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .dot-panel { border-left: 1px solid var(--border); background-image: radial-gradient(var(--border-strong) 1px, transparent 1px); background-size: 14px 14px; background-position: 0 0; padding: 32px; display: flex; flex-direction: column; justify-content: space-between; min-height: 280px; min-width: 0; }
+  .dot-panel .stat-block { background: var(--bg); border: 1px solid var(--border); padding: 18px; min-width: 0; }
+  .stat-block .num { font-family: var(--mono); font-size: 28px; font-weight: 500; color: var(--text); letter-spacing: -0.02em; word-break: break-word; }
+  .stat-block .lbl { font-family: var(--mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .notice { border-left: 3px solid var(--accent); background: var(--surface); padding: 16px 18px; margin: 0 0 32px; }
+  .notice .eyebrow { color: var(--accent); }
+  .notice p { margin: 4px 0 0; color: var(--text-muted); font-size: 14px; }
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 1px solid var(--border); }
+  .form-card { padding: 24px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .form-card:nth-child(2n) { border-right: none; }
+  .form-card:nth-last-child(-n+2) { border-bottom: none; }
+  .form-card .form-meta { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 6px; }
+  .form-card h3 { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; }
+  .form-card p { color: var(--text-muted); font-size: 13.5px; margin: 0; flex: 1; }
+  .form-card .form-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--border); margin-top: 12px; }
+  .form-card .form-foot .mono { font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; padding: 3px 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-muted); }
+  .chip::before { content:''; width: 6px; height: 6px; background: var(--text-dim); border-radius: 50%; }
+  .chip.ok::before { background: var(--ok); }
+  .chip.warn::before { background: var(--warn); }
+  .chip.closed::before { background: var(--accent); }
+  .fieldset { border: 1px solid var(--border); background: var(--surface); padding: 28px; margin-bottom: 0; }
+  .fieldset legend { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); padding: 0 8px; }
+  .fieldset + .fieldset { border-top: none; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 18px; }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 13px; font-weight: 500; color: var(--text); }
+  .field .hint { font-size: 12px; color: var(--text-muted); }
+  .field input, .field select, .field textarea { width: 100%; max-width: 100%; background: var(--bg); border: 1px solid var(--border-strong); color: var(--text); padding: 10px 12px; font-family: var(--sans); font-size: 14px; font-weight: 450; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
+  .field textarea { min-height: 120px; resize: vertical; }
+  .form-actions { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 20px 28px; background: var(--bg-elevated); border: 1px solid var(--border); border-top: none; }
+  .form-actions .mono { font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); }
+  .data-table { width: 100%; min-width: 720px; border-collapse: collapse; }
+  .data-table th { text-align: left; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); font-weight: 500; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg-elevated); white-space: nowrap; }
+  .data-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); vertical-align: top; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table td.mono { font-family: var(--mono); font-size: 12.5px; color: var(--text-muted); white-space: nowrap; }
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--border); }
+  .step { padding: 22px; border-right: 1px solid var(--border); min-width: 0; }
+  .step:last-child { border-right: none; }
+  .step .num { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; }
+  .step h4 { color: var(--text); text-transform: none; letter-spacing: -0.01em; font-size: 15px; margin: 8px 0 6px; }
+  .step p { font-size: 13px; color: var(--text-muted); margin: 0; }
+  .hero-h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 16px; }
+  .lede { font-size: 1.05rem; color: var(--text-muted); max-width: 60ch; margin-bottom: 24px; }
+  .alt-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--border); }
+  .alt-cell { padding: 22px; border-right: 1px solid var(--border); min-width: 0; }
+  .alt-cell:last-child { border-right: none; }
+  .track-panel { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: end; }
+  .section-header { flex-wrap: wrap; }
+
+  @media (max-width: 900px) {
+    .forms-layout { grid-template-columns: 1fr; }
+    .forms-sidenav { position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 0 0 24px; }
+    .forms-content { padding: 32px 0 0; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-grid > div:first-child { padding-right: 0; padding-bottom: 32px; }
+    .dot-panel { border-left: none; border-top: 1px solid var(--border); padding: 24px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-card { border-right: none !important; border-bottom: 1px solid var(--border) !important; }
+    .form-card:last-child { border-bottom: none !important; }
+    .field-row { grid-template-columns: 1fr; gap: 16px; }
+    .fieldset { padding: 20px; }
+    .form-actions { padding: 16px 20px; }
+    .steps { grid-template-columns: 1fr; }
+    .step { border-right: none; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; }
+    .alt-grid { grid-template-columns: 1fr; }
+    .alt-cell { border-right: none; border-bottom: 1px solid var(--border); }
+    .alt-cell:last-child { border-bottom: none; }
+    .track-panel { grid-template-columns: 1fr; align-items: stretch; }
+  }
+
+  @media (max-width: 560px) {
+    .stat-grid { grid-template-columns: 1fr; }
+    .stat-block .num { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+<div class="gov-ribbon">
+  <div class="container">
+    <span class="ribbon-flag">An official site of the National Government</span>
+    <span class="ribbon-sep">·</span>
+    <a href="#">How you know</a>
+    <span style="margin-left:auto;display:inline-flex;gap:14px;align-items:center;">
+      <a href="#" aria-label="Accessibility settings">Accessibility</a>
+      <span class="ribbon-sep">·</span>
+      <a href="#">EN</a> <span class="ribbon-sep">/</span> <a href="#">FR</a> <span class="ribbon-sep">/</span> <a href="#">ES</a>
+    </span>
+  </div>
+</div>
+<header class="site-header" role="banner">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">National Archive</span>
+        <span class="brand-sub">Records · Datasets · Heritage</span>
+      </span>
+    </a>
+    <form class="header-search" role="search" aria-label="Search the archive">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" placeholder="Search 14.2 million records, files, and datasets…" aria-label="Search records">
+      <kbd>⌘ K</kbd>
+    </form>
+    <div class="header-utils">
+      <a class="util-btn active" href="forms.html">Request</a>
+      <a class="util-btn" href="#">Sign in</a>
+    </div>
+  </div>
+  <nav class="primary-nav" aria-label="Primary">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="departments.html">Departments</a></li>
+      <li><a href="forms.html" aria-current="page">Forms &amp; Requests</a></li>
+      <li><a href="news.html">News &amp; Notices</a></li>
+      <li><a href="about.html">About the Archive</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="services.html">Services</a>
+    <span class="sep">/</span>
+    <span aria-current="page">Forms &amp; Requests</span>
+  </div>
+</nav>
+
+<main id="main">
+
+  <section class="section-hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow">Public Services · Form Library</span>
+          <h1 class="hero-h1" style="margin-top:14px;">Submit a request to the National Archive.</h1>
+          <p class="lede">Use the forms below to request records, book a place in a reading room, order reproductions, or apply for access to materials held under restriction. All requests are logged, given a reference number, and answered in writing.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#foi">Start a records request</a>
+            <a class="btn" href="#reading-room">Book a reading room</a>
+            <a class="btn btn-ghost" href="#track">Track an existing request</a>
+          </div>
+        </div>
+        <aside class="dot-panel" aria-label="Current service indicators">
+          <div>
+            <span class="eyebrow" style="color:var(--text-muted);">Service status · updated hourly</span>
+            <div class="stat-grid">
+              <div class="stat-block">
+                <div class="num">21 days</div>
+                <div class="lbl">FOI median reply</div>
+              </div>
+              <div class="stat-block">
+                <div class="num">4,812</div>
+                <div class="lbl">Open requests Q3</div>
+              </div>
+              <div class="stat-block">
+                <div class="num">98.4%</div>
+                <div class="lbl">Within statutory limit</div>
+              </div>
+              <div class="stat-block">
+                <div class="num">€0.00</div>
+                <div class="lbl">Standard request fee</div>
+              </div>
+            </div>
+          </div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.12em;margin-top:18px;">Last updated 14 Mar 2025 · 08:00 UTC</div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <div class="container" style="padding-top:48px;padding-bottom:88px;">
+    <div class="forms-layout">
+
+      <aside class="forms-sidenav" aria-label="Forms index">
+        <h4>Common requests</h4>
+        <ul>
+          <li><a href="#foi" aria-current="true">Records request (FOI) <span class="mono">F-01</span></a></li>
+          <li><a href="#reading-room">Reading room booking <span class="mono">F-02</span></a></li>
+          <li><a href="#reproduction">Reproduction order <span class="mono">F-03</span></a></li>
+          <li><a href="#restricted">Restricted access <span class="mono">F-04</span></a></li>
+          <li><a href="#transfer">Transfer of records <span class="mono">F-05</span></a></li>
+          <li><a href="#correction">Correction of record <span class="mono">F-06</span></a></li>
+        </ul>
+        <h4>Specialist</h4>
+        <ul>
+          <li><a href="#">Researcher accreditation <span class="mono">F-11</span></a></li>
+          <li><a href="#">Cabinet papers review <span class="mono">F-12</span></a></li>
+          <li><a href="#">Citation in publication <span class="mono">F-13</span></a></li>
+          <li><a href="#">Loan for exhibition <span class="mono">F-14</span></a></li>
+        </ul>
+        <h4>Need help?</h4>
+        <ul>
+          <li><a href="contact.html">Speak with a registrar</a></li>
+          <li><a href="#">Glossary of terms</a></li>
+          <li><a href="#track">Track a reference</a></li>
+        </ul>
+      </aside>
+
+      <div class="forms-content">
+
+        <div class="notice" role="note">
+          <span class="eyebrow">Notice · Industrial action</span>
+          <p>Reading rooms at the Central Repository (Site A) will close on 28 March 2025. Reproduction orders received between 24 March and 1 April will be processed with an additional five working days of delay.</p>
+        </div>
+
+        <section class="section-sm" style="padding-top:0;border-bottom:none;">
+          <div class="section-header">
+            <div>
+              <div class="eyebrow">How a request is handled</div>
+              <h2 style="margin-top:8px;">Four steps, from submission to release</h2>
+            </div>
+          </div>
+          <div class="steps">
+            <div class="step">
+              <div class="num">Step 01</div>
+              <h4>Submit</h4>
+              <p>You complete the form online or in person. A reference number is issued within one working day.</p>
+            </div>
+            <div class="step">
+              <div class="num">Step 02</div>
+              <h4>Assess</h4>
+              <p>A registrar locates the file and reviews it against access, privacy, and exemption rules.</p>
+            </div>
+            <div class="step">
+              <div class="num">Step 03</div>
+              <h4>Decide</h4>
+              <p>You receive a written decision: full release, partial release with redactions, or refusal with reasons.</p>
+            </div>
+            <div class="step">
+              <div class="num">Step 04</div>
+              <h4>Deliver</h4>
+              <p>Records are made available digitally, in the reading room, or as a reproduction, per your preference.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" style="padding-top:32px;border-bottom:none;" id="forms-library">
+          <div class="section-header">
+            <div>
+              <div class="eyebrow">Form Library · 24 active forms</div>
+              <h2 style="margin-top:8px;">Choose the request that applies</h2>
+            </div>
+            <a href="#" class="mono" style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);">Download index (PDF, 84 KB) →</a>
+          </div>
+
+          <div class="form-grid">
+
+            <article class="form-card" id="foi">
+              <div class="form-meta"><span>F-01 / FOI Act §8</span><span>Free</span></div>
+              <h3>Records request (Freedom of Information)</h3>
+              <p>Request any record held by a public body that is not already published. For records older than 30 years, use this form rather than the restricted access route.</p>
+              <div class="form-foot">
+                <span class="chip ok">Open · 20 working days</span>
+                <a class="btn btn-sm btn-primary" href="#form-foi">Begin →</a>
+              </div>
+            </article>
+
+            <article class="form-card" id="reading-room">
+              <div class="form-meta"><span>F-02 / Reg. 14</span><span>Free</span></div>
+              <h3>Reading room booking</h3>
+              <p>Reserve a desk and pre-order up to twelve files per session at the Central Repository, Eastern Annex, or Maritime Branch reading rooms.</p>
+              <div class="form-foot">
+                <span class="chip ok">Slots Tue–Sat</span>
+                <a class="btn btn-sm" href="#">Begin →</a>
+              </div>
+            </article>
+
+            <article class="form-card" id="reproduction">
+              <div class="form-meta"><span>F-03 / Sched. 2</span><span>From €4.50</span></div>
+              <h3>Reproduction order</h3>
+              <p>Order high-resolution scans, photographic copies, or certified true copies of records. Bulk and commercial reproduction rates are listed in the fee schedule.</p>
+              <div class="form-foot">
+                <span class="chip warn">Backlog · 18 days</span>
+                <a class="btn btn-sm" href="#">Begin →</a>
+              </div>
+            </article>
+
+            <article class="form-card" id="restricted">
+              <div class="form-meta"><span>F-04 / Cl. Act §22</span><span>Free</span></div>
+              <h3>Restricted access application</h3>
+              <p>Apply for early access to records subject to a 30-, 50-, or 75-year embargo. Applicants must state the public-interest justification.</p>
+              <div class="form-foot">
+                <span class="chip warn">Panel review</span>
+                <a class="btn btn-sm" href="#">Begin →</a>
+              </div>
+            </article>
+
+            <article class="form-card" id="transfer">
+              <div class="form-meta"><span>F-05 / NA Act §17</span><span>Free</span></div>
+              <h3>Transfer of records to the Archive</h3>
+              <p>For use by public authorities transferring records of permanent value. Includes appraisal schedule and packing instructions.</p>
+              <div class="form-foot">
+                <span class="chip">Authorities only</span>
+                <a class="btn btn-sm" href="#">Begin →</a>
+              </div>
+            </article>
+
+            <article class="form-card" id="correction">
+              <div class="form-meta"><span>F-06 / Data Prot.</span><span>Free</span></div>
+              <h3>Correction of personal record</h3>
+              <p>Where you can demonstrate that information held about you is factually inaccurate, request a corrective note be appended to the file.</p>
+              <div class="form-foot">
+                <span class="chip ok">Open · 28 days</span>
+                <a class="btn btn-sm" href="#">Begin →</a>
+              </div>
+            </article>
+
+          </div>
+        </section>
+
+        <section class="section" id="form-foi" style="padding-top:24px;border-bottom:none;">
+          <div class="section-header">
+            <div>
+              <div class="eyebrow">Form F-01 · Records request</div>
+              <h2 style="margin-top:8px;">Submit a Freedom of Information request</h2>
+            </div>
+            <span class="mono" style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);">Est. time 6–10 min</span>
+          </div>
+
+          <form>
+            <fieldset class="fieldset">
+              <legend>Section A · Applicant</legend>
+              <div class="field-row">
+                <div class="field">
+                  <label for="f-name">Full name</label>
+                  <input id="f-name" type="text" autocomplete="name" required>
+                </div>
+                <div class="field">
+                  <label for="f-cap">Acting in the capacity of</label>
+                  <select id="f-cap">
+                    <option>Member of the public</option>
+                    <option>Journalist or media professional</option>
+                    <option>Academic researcher</option>
+                    <option>Legal representative</option>
+                    <option>Public authority</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="f-email">Email for correspondence</label>
+                  <input id="f-email" type="email" autocomplete="email" required>
+                  <span class="hint">We will use this address for the reference number and the written decision.</span>
+                </div>
+                <div class="field">
+                  <label for="f-phone">Telephone (optional)</label>
+                  <input id="f-phone" type="tel" autocomplete="tel">
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <legend>Section B · The records sought</legend>
+              <div class="field-row">
+                <div class="field full">
+                  <label for="f-desc">Describe the records you are seeking</label>
+                  <textarea id="f-desc" required placeholder="E.g. correspondence between the Ministry of Transport and the Harbour Authority concerning the 1978 Port Modernisation Plan."></textarea>
+                  <span class="hint">Be as specific as you can — dates, departments, file references, or named persons all help. There is no minimum; a paragraph is usually enough.</span>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="f-dept">Likely department or holding body</label>
+                  <select id="f-dept">
+                    <option>Not sure — please route my request</option>
+                    <option>Ministry of the Interior</option>
+                    <option>Ministry of Finance</option>
+                    <option>Ministry of Transport &amp; Public Works</option>
+                    <option>Ministry of Foreign Affairs</option>
+                    <option>Cabinet Office</option>
+                    <option>Office of the Auditor-General</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="f-date">Approximate date range</label>
+                  <input id="f-date" type="text" placeholder="e.g. 1975 — 1982">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field full">
+                  <label for="f-purpose">Purpose of the request (optional)</label>
+                  <textarea id="f-purpose" placeholder="You are not required to give a reason. A short note can help the registrar prioritise or suggest related material." style="min-height:80px;"></textarea>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <legend>Section C · Delivery preference</legend>
+              <div class="field-row">
+                <div class="field">
+                  <label for="f-deliv">Preferred delivery</label>
+                  <select id="f-deliv">
+                    <option>Digital copies by secure download</option>
+                    <option>Inspection in a reading room</option>
+                    <option>Certified paper copies by post</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="f-lang">Correspondence language</label>
+                  <select id="f-lang">
+                    <option>English</option>
+                    <option>Français</option>
+                    <option>Español</option>
+                  </select>
+                </div>
+              </div>
+            </fieldset>
+
+            <div class="form-actions">
+              <span class="mono">Auto-saved 14:02 · Reference issues on submission</span>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-ghost">Save draft</button>
+                <button type="submit" class="btn btn-primary">Submit request</button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <section class="section" id="track" style="padding-top:48px;border-bottom:none;">
+          <div class="section-header">
+            <div>
+              <div class="eyebrow">Tracking</div>
+              <h2 style="margin-top:8px;">Check the status of a request</h2>
+            </div>
+          </div>
+          <div class="panel track-panel">
+            <div class="field">
+              <label for="t-ref">Reference number</label>
+              <input id="t-ref" type="text" placeholder="FOI-2025-014823">
+              <span class="hint">References are 14 characters and were emailed to you on submission.</span>
+            </div>
+            <button class="btn btn-primary" type="button">Look up request</button>
+          </div>
+        </section>
+
+        <section class="section" style="padding-top:32px;border-bottom:none;">
+          <div class="section-header">
+            <div>
+              <div class="eyebrow">Reference · Statutory limits</div>
+              <h2 style="margin-top:8px;">Reply times under law</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Form</th>
+                  <th>Statutory limit</th>
+                  <th>Current median</th>
+                  <th>Fee</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>F-01 Records request</td>
+                  <td class="mono">20 working days</td>
+                  <td class="mono">21 days</td>
+                  <td class="mono">Free</td>
+                  <td>Extension to 40 days where the request is voluminous or involves third-party consultation.</td>
+                </tr>
+                <tr>
+                  <td>F-02 Reading room booking</td>
+                  <td class="mono">—</td>
+                  <td class="mono">2 days</td>
+                  <td class="mono">Free</td>
+                  <td>Confirmation by email; bring photographic identification on arrival.</td>
+                </tr>
+                <tr>
+                  <td>F-03 Reproduction order</td>
+                  <td class="mono">15 working days</td>
+                  <td class="mono">18 days</td>
+                  <td class="mono">From €4.50</td>
+                  <td>Commercial reproduction rates per Schedule 2 of the Fees Regulations.</td>
+                </tr>
+                <tr>
+                  <td>F-04 Restricted access</td>
+                  <td class="mono">60 working days</td>
+                  <td class="mono">47 days</td>
+                  <td class="mono">Free</td>
+                  <td>Decisions are made by the Access Review Panel which sits monthly.</td>
+                </tr>
+                <tr>
+                  <td>F-05 Transfer of records</td>
+                  <td class="mono">—</td>
+                  <td class="mono">Variable</td>
+                  <td class="mono">Free</td>
+                  <td>Appraisal scheduled by mutual agreement with the transferring authority.</td>
+                </tr>
+                <tr>
+                  <td>F-06 Correction of record</td>
+                  <td class="mono">28 calendar days</td>
+                  <td class="mono">19 days</td>
+                  <td class="mono">Free</td>
+                  <td>Right of appeal to the Information Commissioner if refused.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" style="padding-top:32px;border-bottom:none;">
+          <div class="section-header">
+            <div>
+              <div class="eyebrow">If you cannot use the online form</div>
+              <h2 style="margin-top:8px;">Alternative ways to submit</h2>
+            </div>
+          </div>
+          <div class="alt-grid">
+            <div class="alt-cell">
+              <div class="eyebrow" style="color:var(--text-muted);">By post</div>
+              <p style="margin-top:10px;font-family:var(--mono);font-size:13px;color:var(--text);line-height:1.6;">Records Office<br>National Archive<br>14 Chancery Quay<br>Capital City, 1010</p>
+              <p style="color:var(--text-muted);font-size:13px;">Mark the envelope &ldquo;FOI Request&rdquo;. A reference is issued on receipt.</p>
+            </div>
+            <div class="alt-cell">
+              <div class="eyebrow" style="color:var(--text-muted);">By telephone</div>
+              <p style="margin-top:10px;font-family:var(--mono);font-size:13px;color:var(--text);">+00 1 555 0140</p>
+              <p style="color:var(--text-muted);font-size:13px;">Monday to Friday, 09:00–16:30. Translation available in 24 languages on request.</p>
+            </div>
+            <div class="alt-cell">
+              <div class="eyebrow" style="color:var(--text-muted);">In person</div>
+              <p style="margin-top:10px;font-family:var(--mono);font-size:13px;color:var(--text);">Registrar's Desk, Ground Floor</p>
+              <p style="color:var(--text-muted);font-size:13px;">Tuesday to Saturday, 09:00–17:00. No appointment is required to file a request.</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 12 3l9 6v2H3V9Z"/><path d="M5 11v8M9 11v8M15 11v8M19 11v8M3 21h18"/></svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">National Archive</span>
+            <span class="brand-sub">Est. 1934</span>
+          </span>
+        </a>
+        <p>The custodian of the nation's permanent public record. Open to researchers, journalists, and the public — in person and online.</p>
+        <p class="mono" style="font-size:12px;color:var(--text-dim);margin-top:14px;">Reading rooms · Tue–Sat 09:00–17:00</p>
+      </div>
+      <div class="footer-col">
+        <h5>Research</h5>
+        <ul>
+          <li><a href="services.html">Catalogue search</a></li>
+          <li><a href="#">Digitised collections</a></li>
+          <li><a href="#">Open datasets</a></li>
+          <li><a href="#">Finding aids</a></li>
+          <li><a href="#">Citation guidance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Requests</h5>
+        <ul>
+          <li><a href="forms.html">Records request (FOI)</a></li>
+          <li><a href="forms.html">Reading room booking</a></li>
+          <li><a href="forms.html">Reproduction order</a></li>
+          <li><a href="forms.html">Restricted access</a></li>
+          <li><a href="forms.html">Transfer of records</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>About</h5>
+        <ul>
+          <li><a href="about.html">Mission &amp; mandate</a></li>
+          <li><a href="departments.html">Departments</a></li>
+          <li><a href="#">Leadership</a></li>
+          <li><a href="news.html">News &amp; notices</a></li>
+          <li><a href="#">Annual reports</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Help</h5>
+        <ul>
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a href="#">Accessibility</a></li>
+          <li><a href="#">Languages</a></li>
+          <li><a href="#">Sitemap</a></li>
+          <li><a href="#">Status &amp; outages</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 1934–2025 National Archive. Open content licensed under the Open Government Licence v3.0 unless otherwise noted.</span>
+      <span class="legal">
+        <a href="#">Privacy notice</a>
+        <a href="#">Terms of use</a>
+        <a href="#">Cookies</a>
+        <a href="#">FOI disclosures</a>
+      </span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

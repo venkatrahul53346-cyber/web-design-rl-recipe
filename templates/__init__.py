@@ -1,44 +1,116 @@
-"""Template registry — explicit, no autoglob.
+"""Template registry — vertical × style combination.
 
-Each generation run picks a template (either via ``--template <name>`` or
-``--random-template``) and calls ``REGISTRY[name].sample_spec(seed)``.
-Modules with a leading underscore (``_base``, ``_brands``,
-``_palettes``, ``_fonts``) are infrastructure and are deliberately
-NOT registered.
+Two independent registries, combined by a compatibility matrix:
+- ``VERTICALS`` (templates/verticals/) carries topic, page hints,
+  brand-vertical constraints, sitemap.
+- ``STYLES`` (templates/styles/) carries the locked style axes
+  (color_regime × typography × border_language × motif), palette
+  pool, font pool.
+- ``COMPATIBLE_STYLES`` (templates/compatibility.py) lists which
+  (vertical, style) pairs are visually plausible.
 
-To add a new template:
-1. Create ``templates/my_template.py`` with ``META``, ``DESIGN_NOTES``,
-   and ``sample_spec(seed)``.
-2. Import it here and add it to ``REGISTRY``.
-3. Add a roundtrip case in ``tests/test_templates.py``.
+Public API:
+    VERTICALS, STYLES, COMPATIBLE_STYLES
+    sample_spec(vertical_name, style_name, seed) -> WebsiteSpec
+    random_spec(seed) -> tuple[str, str, WebsiteSpec]
+    is_compatible / list_compatible_styles / all_valid_pairs / random_compatible_pair
 """
 from __future__ import annotations
 
-from typing import Dict
+import random
+from typing import Tuple
 
-from templates import (
-    auth_glassy,
-    dashboard_dense,
-    docs_mono,
-    ecom_pastel,
-    editorial_serif,
-    portfolio_neobrut,
-    pricing_dark,
-    restaurant_photo,
-    saas_minimal,
-    splash_3d,
+from src.spec import BrandSpec, StyleSpec, WebsiteSpec
+from templates._base import (
+    BrandPersona,
+    compose_notes,
+    format_notes,
+    make_rng,
+    sample_brand,
+    sample_sitemap,
 )
+from templates._brands import BRANDS_BY_VERTICAL
+from templates.compatibility import (
+    COMPATIBLE_STYLES,
+    all_valid_pairs,
+    is_compatible,
+    list_compatible_styles,
+    random_compatible_pair,
+)
+from templates.styles import STYLES
+from templates.verticals import VERTICALS
 
 
-REGISTRY: Dict[str, object] = {
-    "saas_minimal":      saas_minimal,
-    "docs_mono":         docs_mono,
-    "pricing_dark":      pricing_dark,
-    "auth_glassy":       auth_glassy,
-    "editorial_serif":   editorial_serif,
-    "dashboard_dense":   dashboard_dense,
-    "portfolio_neobrut": portfolio_neobrut,
-    "ecom_pastel":       ecom_pastel,
-    "splash_3d":         splash_3d,
-    "restaurant_photo":  restaurant_photo,
-}
+__all__ = [
+    "VERTICALS", "STYLES", "COMPATIBLE_STYLES",
+    "sample_spec", "random_spec",
+    "is_compatible", "list_compatible_styles",
+    "all_valid_pairs", "random_compatible_pair",
+    "BrandPersona", "compose_notes", "format_notes",
+    "make_rng", "sample_brand", "sample_sitemap",
+]
+
+
+def sample_spec(vertical_name: str, style_name: str, seed: int) -> WebsiteSpec:
+    """Sample a deterministic WebsiteSpec from a (vertical, style) pair.
+
+    Raises ``ValueError`` if the pair is not in ``COMPATIBLE_STYLES``.
+    """
+    if not is_compatible(vertical_name, style_name):
+        raise ValueError(
+            f"({vertical_name}, {style_name}) is not in COMPATIBLE_STYLES. "
+            f"Allowed styles for {vertical_name}: "
+            f"{list_compatible_styles(vertical_name)}"
+        )
+    if vertical_name not in VERTICALS:
+        raise ValueError(f"unknown vertical {vertical_name!r}")
+    if style_name not in STYLES:
+        raise ValueError(f"unknown style {style_name!r}")
+
+    v = VERTICALS[vertical_name].META
+    s = STYLES[style_name].META
+    rng = make_rng(seed)
+
+    brand = sample_brand(rng, BRANDS_BY_VERTICAL, v.brand_verticals)
+    palette = rng.choice(s.palette_pool)
+    font_pair = s.font_pair_locked or rng.choice(s.font_pool)
+    sitemap = sample_sitemap(
+        rng, pool=v.sitemap_pool,
+        min_pages=v.sitemap_min, max_pages=v.sitemap_max,
+        first=v.sitemap_first,
+    )
+
+    style_axes = StyleSpec(
+        density=v.density_override or s.density_default,
+        color_regime=s.color_regime,
+        typography=s.typography,
+        border_language=s.border_language,
+        motif=s.motif,
+    )
+    notes = compose_notes(v=v, s=s, brand=brand, sitemap=sitemap)
+
+    return WebsiteSpec(
+        slug=f"{vertical_name}__{style_name}-{seed:04d}",
+        archetype=v.archetype,
+        vertical=brand.vertical,
+        style=style_axes,
+        palette_seed=palette,
+        font_pair=font_pair,
+        difficulty=v.difficulty,
+        sitemap=sitemap,
+        content_seed=seed,
+        brand=BrandSpec(**brand.to_brandspec_kwargs()),
+        notes=notes,
+    )
+
+
+def random_spec(seed: int) -> Tuple[str, str, WebsiteSpec]:
+    """Pick a random compatible (vertical, style) pair, sample a spec.
+
+    Returns ``(vertical_name, style_name, spec)`` so the caller can log
+    the selection. Both pair-selection and spec-sampling use the same
+    seed; if independent draws are needed in future, derive sub-seeds.
+    """
+    rng = random.Random(seed)
+    v_name, s_name = random_compatible_pair(rng)
+    return v_name, s_name, sample_spec(v_name, s_name, seed)

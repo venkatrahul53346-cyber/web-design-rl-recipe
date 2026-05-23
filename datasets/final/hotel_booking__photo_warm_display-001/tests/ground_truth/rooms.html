@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Rooms — Salt &amp; Field</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific composition only */
+  .rooms-hero{padding:64px 0 24px}
+  .rooms-hero .lockup{display:grid;grid-template-columns:1.4fr 1fr;gap:64px;align-items:end;border-bottom:1px solid var(--rule);padding-bottom:48px}
+  .rooms-hero h1{margin-top:18px}
+  .rooms-hero .meta-list{display:flex;flex-direction:column;gap:18px;padding-bottom:8px}
+  .rooms-hero .meta-list .row{display:flex;justify-content:space-between;border-bottom:1px solid var(--rule);padding-bottom:14px;font-size:0.9rem;color:var(--ink-soft)}
+  .rooms-hero .meta-list .row strong{font-family:var(--display);font-weight:400;color:var(--ink);font-size:1.05rem}
+  @media (max-width:860px){.rooms-hero .lockup{grid-template-columns:1fr;gap:40px}}
+
+  .full-bleed{width:100%;height:min(74vh,720px);overflow:hidden;position:relative;background:#E8DFCE}
+  .full-bleed img{width:100%;height:100%;object-fit:cover}
+  .full-bleed .credit{position:absolute;left:32px;bottom:24px;color:#FBF7F0;font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;opacity:.85;z-index:2}
+  .full-bleed::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,15,10,0) 50%,rgba(20,15,10,0.55) 100%);pointer-events:none}
+
+  .intro-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:96px;align-items:start}
+  .intro-grid .col-aside{position:sticky;top:120px}
+  @media (max-width:860px){.intro-grid{grid-template-columns:1fr;gap:40px}.intro-grid .col-aside{position:static}}
+
+  .rooms-list{display:flex;flex-direction:column;gap:0}
+  .room-row{display:grid;grid-template-columns:1.1fr 1fr;gap:64px;padding:80px 0;border-top:1px solid var(--rule);align-items:center}
+  .room-row:nth-child(even){grid-template-columns:1fr 1.1fr}
+  .room-row:nth-child(even) .room-photo{order:2}
+  .room-row .room-photo{aspect-ratio:5/4;overflow:hidden;background:#E8DFCE}
+  .room-row .room-photo img{width:100%;height:100%;object-fit:cover}
+  .room-row .room-text .num{font-family:var(--display);font-style:italic;font-size:1.1rem;color:var(--accent);margin-bottom:18px;display:block}
+  .room-row .room-text h2{margin-bottom:18px}
+  .room-row .room-text .desc{color:var(--ink-soft);max-width:46ch;margin-bottom:28px}
+  .room-row .specs{display:grid;grid-template-columns:1fr 1fr;gap:20px 32px;padding:24px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-bottom:28px}
+  .room-row .specs .item label{display:block;font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:4px}
+  .room-row .specs .item span{font-family:var(--display);font-size:1.1rem;color:var(--ink)}
+  .room-row .row-actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+  .room-row .rate-line{font-size:0.95rem;color:var(--ink-soft)}
+  .room-row .rate-line strong{font-family:var(--display);font-size:1.4rem;font-weight:400;color:var(--ink);margin-right:6px}
+  @media (max-width:860px){.room-row,.room-row:nth-child(even){grid-template-columns:1fr;gap:32px;padding:56px 0}.room-row:nth-child(even) .room-photo{order:0}}
+
+  .house-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .house-grid .gimg{overflow:hidden;background:#E8DFCE}
+  .house-grid .gimg img{width:100%;height:100%;object-fit:cover}
+  .house-grid .g1{grid-column:1/span 7;aspect-ratio:16/10}
+  .house-grid .g2{grid-column:8/span 5;aspect-ratio:4/5;align-self:end}
+  .house-grid .g3{grid-column:2/span 4;aspect-ratio:1/1}
+  .house-grid .g4{grid-column:6/span 6;aspect-ratio:16/9}
+  @media (max-width:860px){.house-grid .g1,.house-grid .g2,.house-grid .g3,.house-grid .g4{grid-column:1/-1;aspect-ratio:4/3}}
+
+  .stay-includes{display:grid;grid-template-columns:1fr 2fr;gap:80px;align-items:start}
+  .includes-list{display:grid;grid-template-columns:1fr 1fr;gap:32px 48px}
+  .includes-list .item{border-top:1px solid var(--rule);padding-top:18px}
+  .includes-list .item h4{font-family:var(--display);font-weight:400;font-size:1.2rem;margin-bottom:8px}
+  .includes-list .item p{color:var(--ink-soft);font-size:0.95rem;line-height:1.5}
+  @media (max-width:860px){.stay-includes{grid-template-columns:1fr;gap:32px}.includes-list{grid-template-columns:1fr}}
+
+  .policies{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .policies .p{padding:28px;border-right:1px solid var(--rule)}
+  .policies .p:last-child{border-right:none}
+  .policies .p .eyebrow{margin-bottom:10px;display:block}
+  .policies .p p{font-family:var(--display);font-size:1.15rem;color:var(--ink);line-height:1.3}
+  @media (max-width:860px){.policies{grid-template-columns:1fr 1fr}.policies .p:nth-child(2){border-right:none}.policies .p:nth-child(1),.policies .p:nth-child(2){border-bottom:1px solid var(--rule)}}
+
+  .quote-block{max-width:920px;margin:0 auto;text-align:left}
+  .quote-block blockquote{font-family:var(--display);font-weight:300;font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.2;letter-spacing:-0.01em;color:var(--ink);margin-bottom:24px}
+  .quote-block blockquote em{font-style:italic;color:var(--ink-soft)}
+  .quote-block cite{font-style:normal;font-size:0.78rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute)}
+
+  .reserve-cta{background:var(--bg-warm);padding:96px 0}
+  .reserve-cta .inner{display:grid;grid-template-columns:1.2fr 1fr;gap:56px;align-items:end}
+  .reserve-cta h2{margin-bottom:18px}
+  .reserve-cta p{color:var(--ink-soft);max-width:42ch}
+  @media (max-width:860px){.reserve-cta .inner{grid-template-columns:1fr;gap:32px}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="bar">
+    <nav class="nav-left" aria-label="Primary">
+      <a href="restaurant.html">Restaurant</a>
+      <a href="rooms.html" class="active">Rooms</a>
+      <a href="experiences.html">The Farm</a>
+      <a href="about.html">Our Story</a>
+    </nav>
+    <a class="brand-mark" href="index.html">Salt <em>&amp;</em> Field</a>
+    <div class="nav-right">
+      <a class="extra-link" href="press.html">Press</a>
+      <a class="extra-link" href="mailto:hello@saltandfield.com">Contact</a>
+      <a class="book-pill" href="reservations.html">Reserve</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="rooms-hero">
+    <div class="wrap">
+      <div class="lockup">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Seven rooms above the orchard</span>
+          <h1 class="display">A bed, a window,<br>a <span class="display-italic">long quiet</span> morning.</h1>
+        </div>
+        <div class="meta-list">
+          <div class="row"><span>Rooms in the house</span><strong>Seven</strong></div>
+          <div class="row"><span>Nightly rate, from</span><strong>$340</strong></div>
+          <div class="row"><span>Check-in / Check-out</span><strong>4pm / 11am</strong></div>
+          <div class="row"><span>Minimum stay, weekends</span><strong>Two nights</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="full-bleed">
+    <img src="photo-landscape-1.jpg" alt="Morning light across the linen of an upstairs room at Salt and Field">
+    <span class="credit">The North Room, 6:42 a.m.</span>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="intro-grid">
+        <div class="col-aside">
+          <span class="eyebrow"><span class="dot"></span>The House</span>
+          <h2 class="display" style="margin-top:14px">Built in 1908, kept honest.</h2>
+        </div>
+        <div class="prose">
+          <p class="first">The farmhouse was built by Olaf and Margit Halverson in the spring of 1908 and stayed in their family for ninety-one years. When we took the keys in 2019 the roof leaked into the kitchen and a barn cat lived in the linen press. We have not tried to erase any of that — we have only tried to make it warm.</p>
+          <p>There are seven rooms upstairs and a small reading room down the hall with a wood stove and most of the books we love. Floors are original Douglas fir. Walls are lime-washed in a color we mixed ourselves from the river clay. Beds are by Hästens; sheets are by Matteo; the wool throws come off our own ewes, spun in Pendleton.</p>
+          <p>No televisions. No mini-bars. No phones at the bedside — though there is one, an honest rotary one, in the hall if you need it. Breakfast is brought to your door at the hour you ask for it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight section-hairline">
+    <div class="wrap">
+      <span class="eyebrow"><span class="dot"></span>The Seven</span>
+      <div class="rooms-list">
+
+        <article class="room-row">
+          <div class="room-photo"><img src="photo-portrait-1.jpg" alt="The Orchard Room"></div>
+          <div class="room-text">
+            <span class="num">№ 01</span>
+            <h2 class="display">The Orchard Room</h2>
+            <p class="desc">The largest of the seven, with a southeast corner exposure over the heirloom apple block. A clawfoot tub sits beneath the gable window; in October the whole room smells like Newtown Pippins.</p>
+            <div class="specs">
+              <div class="item"><label>Sleeps</label><span>Two</span></div>
+              <div class="item"><label>Bed</label><span>King, Hästens</span></div>
+              <div class="item"><label>Bath</label><span>Ensuite, clawfoot</span></div>
+              <div class="item"><label>Floor</label><span>Second, southeast</span></div>
+            </div>
+            <div class="row-actions">
+              <div class="rate-line"><strong>$540</strong>per night</div>
+              <a href="reservations.html?room=orchard" class="arrow-link">Reserve →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="room-row">
+          <div class="room-photo"><img src="photo-landscape-1.jpg" alt="The Lostine Room"></div>
+          <div class="room-text">
+            <span class="num">№ 02</span>
+            <h2 class="display">The Lostine</h2>
+            <p class="desc">West-facing, named for the river you can hear from the bed when the windows are open. A long writing desk under the dormer; a Federico armchair pulled close to the radiator.</p>
+            <div class="specs">
+              <div class="item"><label>Sleeps</label><span>Two</span></div>
+              <div class="item"><label>Bed</label><span>Queen, Hästens</span></div>
+              <div class="item"><label>Bath</label><span>Ensuite, shower</span></div>
+              <div class="item"><label>Floor</label><span>Second, west</span></div>
+            </div>
+            <div class="row-actions">
+              <div class="rate-line"><strong>$420</strong>per night</div>
+              <a href="reservations.html?room=lostine" class="arrow-link">Reserve →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="room-row">
+          <div class="room-photo"><img src="photo-product-1.jpg" alt="The Hayloft"></div>
+          <div class="room-text">
+            <span class="num">№ 03</span>
+            <h2 class="display">The Hayloft</h2>
+            <p class="desc">A standalone suite above the renovated equipment barn, twenty yards from the main house. Twelve-foot ceilings, exposed Douglas fir rafters, a wood stove and a deep soaking tub by the window.</p>
+            <div class="specs">
+              <div class="item"><label>Sleeps</label><span>Two</span></div>
+              <div class="item"><label>Bed</label><span>King, Hästens</span></div>
+              <div class="item"><label>Bath</label><span>Ensuite, soaking tub</span></div>
+              <div class="item"><label>Setting</label><span>Detached barn</span></div>
+            </div>
+            <div class="row-actions">
+              <div class="rate-line"><strong>$620</strong>per night</div>
+              <a href="reservations.html?room=hayloft" class="arrow-link">Reserve →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="room-row">
+          <div class="room-photo"><img src="photo-portrait-1.jpg" alt="The Pantry Room"></div>
+          <div class="room-text">
+            <span class="num">№ 04</span>
+            <h2 class="display">The Pantry</h2>
+            <p class="desc">The smallest and most beloved. Tucked at the back of the second floor with one east window over the kitchen garden — the right room for a single traveler who reads in bed.</p>
+            <div class="specs">
+              <div class="item"><label>Sleeps</label><span>One</span></div>
+              <div class="item"><label>Bed</label><span>Full, Hästens</span></div>
+              <div class="item"><label>Bath</label><span>Hall, private</span></div>
+              <div class="item"><label>Floor</label><span>Second, east</span></div>
+            </div>
+            <div class="row-actions">
+              <div class="rate-line"><strong>$340</strong>per night</div>
+              <a href="reservations.html?room=pantry" class="arrow-link">Reserve →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="room-row">
+          <div class="room-photo"><img src="photo-landscape-1.jpg" alt="The North Room"></div>
+          <div class="room-text">
+            <span class="num">№ 05</span>
+            <h2 class="display">The North Room</h2>
+            <p class="desc">Even, cool light through two tall north windows. The favorite of painters and people who sleep late. A daybed runs along the wall opposite the bed for an afternoon spent doing very little.</p>
+            <div class="specs">
+              <div class="item"><label>Sleeps</label><span>Two</span></div>
+              <div class="item"><label>Bed</label><span>Queen, Hästens</span></div>
+              <div class="item"><label>Bath</label><span>Ensuite, shower</span></div>
+              <div class="item"><label>Floor</label><span>Second, north</span></div>
+            </div>
+            <div class="row-actions">
+              <div class="rate-line"><strong>$420</strong>per night</div>
+              <a href="reservations.html?room=north" class="arrow-link">Reserve →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="room-row">
+          <div class="room-photo"><img src="photo-product-2.jpg" alt="The Wallowa Suite"></div>
+          <div class="room-text">
+            <span class="num">№ 06</span>
+            <h2 class="display">The Wallowa Suite</h2>
+            <p class="desc">Two rooms connected by a short hall — a sleeping room and a sitting room with a small library and a Vermont Castings stove. Built for a longer stay, or for two friends traveling together.</p>
+            <div class="specs">
+              <div class="item"><label>Sleeps</label><span>Two to four</span></div>
+              <div class="item"><label>Bed</label><span>King + sofa bed</span></div>
+              <div class="item"><label>Bath</label><span>Ensuite, soaking tub</span></div>
+              <div class="item"><label>Floor</label><span>Second, full corner</span></div>
+            </div>
+            <div class="row-actions">
+              <div class="rate-line"><strong>$680</strong>per night</div>
+              <a href="reservations.html?room=wallowa" class="arrow-link">Reserve →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="room-row">
+          <div class="room-photo"><img src="illustration-abstract.jpg" alt="The Shepherd's Hut"></div>
+          <div class="room-text">
+            <span class="num">№ 07</span>
+            <h2 class="display">The Shepherd's Hut</h2>
+            <p class="desc">An iron-wheeled hut on the north pasture, two hundred yards from the house and a thousand miles from anywhere. A wood stove, a single bed, a window over the lambing field. Available May through October.</p>
+            <div class="specs">
+              <div class="item"><label>Sleeps</label><span>One or two</span></div>
+              <div class="item"><label>Bed</label><span>Built-in double</span></div>
+              <div class="item"><label>Bath</label><span>Outdoor shower, WC</span></div>
+              <div class="item"><label>Season</label><span>May — October</span></div>
+            </div>
+            <div class="row-actions">
+              <div class="rate-line"><strong>$390</strong>per night</div>
+              <a href="reservations.html?room=hut" class="arrow-link">Reserve →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="house-grid">
+        <div class="gimg g1"><img src="photo-landscape-1.jpg" alt="The reading room at dusk"></div>
+        <div class="gimg g2"><img src="photo-portrait-1.jpg" alt="A made bed with wool throws"></div>
+        <div class="gimg g3"><img src="photo-product-1.jpg" alt="A clawfoot tub under a gable window"></div>
+        <div class="gimg g4"><img src="photo-product-2.jpg" alt="The porch at first light"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-roomy section-hairline" style="background:var(--bg-warm)">
+    <div class="wrap">
+      <div class="stay-includes">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Every Stay Includes</span>
+          <h2 class="display" style="margin-top:14px">Quiet things,<br>done <span class="display-italic">carefully</span>.</h2>
+        </div>
+        <div class="includes-list">
+          <div class="item">
+            <h4>Breakfast at your door</h4>
+            <p>Yeasted bread from our oven, butter we churn ourselves, eggs from the Wyandottes, jam from whichever fruit is having its week. Brought up to you at the hour you ask, in a wooden tray with a linen cloth.</p>
+          </div>
+          <div class="item">
+            <h4>The hour before dinner</h4>
+            <p>Sherry, olives, and warm almonds in the sitting room from five until six on dinner nights — for resident guests only, before the dining room opens.</p>
+          </div>
+          <div class="item">
+            <h4>A walk in the morning</h4>
+            <p>A guided walk of the farm with one of the growers at eight on Friday and Saturday mornings. Wellingtons in your size live by the back door.</p>
+          </div>
+          <div class="item">
+            <h4>Library &amp; provisions</h4>
+            <p>Twenty-four-hour access to the pantry — tea, a wheel of cheese, last night's bread, a decanter of pear brandy. Take what you like; the honor jar is on the shelf.</p>
+          </div>
+          <div class="item">
+            <h4>The bath</h4>
+            <p>Hand-poured soap and bath salts from Maak in Portland, hung-to-dry linen robes, and a stack of striped towels heavy as a young dog.</p>
+          </div>
+          <div class="item">
+            <h4>The drive in</h4>
+            <p>If you'd rather not navigate the gravel after dark, we'll meet you at the Joseph airstrip or the Enterprise bus station. Just let us know your arrival.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="quote-block">
+        <span class="eyebrow" style="display:block;margin-bottom:24px"><span class="dot"></span>A Note From a Guest</span>
+        <blockquote>"We slept with the windows open and woke up to a cow being moved across the lower field. There was a thermos of coffee outside the door at seven, exactly as we'd asked. <em>I think it may be the best room I have ever stayed in, and I have stayed in a great many rooms.</em>"</blockquote>
+        <cite>— Jancis Holloway, Condé Nast Traveller, November 2024</cite>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <span class="eyebrow" style="display:block;margin-bottom:24px"><span class="dot"></span>The Particulars</span>
+      <div class="policies">
+        <div class="p">
+          <span class="eyebrow">Arrival</span>
+          <p>Check-in from 4pm. The drive is gravel — slow at the cattle guard.</p>
+        </div>
+        <div class="p">
+          <span class="eyebrow">Children</span>
+          <p>Welcome in the rooms; the tasting menu is best for ten and over.</p>
+        </div>
+        <div class="p">
+          <span class="eyebrow">Dogs</span>
+          <p>One well-mannered dog per room. The Hayloft has its own yard.</p>
+        </div>
+        <div class="p">
+          <span class="eyebrow">Cancellation</span>
+          <p>Full refund up to fourteen days prior. Half thereafter.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reserve-cta">
+    <div class="wrap">
+      <div class="inner">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Stay With Us</span>
+          <h2 class="display" style="margin-top:14px">A room, a table,<br>and the <span class="display-italic">whole long</span> evening.</h2>
+          <p style="margin-top:20px">Resident guests are first in line for the dining room — book a room with a tasting reservation and we'll hold a table for the night of your stay. Two-night minimums Thursday through Sunday.</p>
+        </div>
+        <form class="booking-widget" onsubmit="event.preventDefault()">
+          <div class="field">
+            <label for="in">Arrive</label>
+            <input id="in" type="date" value="2025-10-23">
+          </div>
+          <div class="field">
+            <label for="out">Depart</label>
+            <input id="out" type="date" value="2025-10-25">
+          </div>
+          <div class="field">
+            <label for="guests">Guests</label>
+            <select id="guests">
+              <option>Two</option>
+              <option>One</option>
+              <option>Three</option>
+              <option>Four</option>
+            </select>
+          </div>
+          <button class="submit" type="submit">Check Availability</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="mark">Salt <em>&amp;</em> Field</div>
+        <p>A forty-seat restaurant and seven guest rooms on a regenerative farm in the Wallowa Valley. Tasting menus, Thursday through Sunday.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Visit</h5>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="restaurant.html">The Restaurant</a></li>
+          <li><a href="rooms.html">Stay With Us</a></li>
+          <li><a href="experiences.html">On the Farm</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>House</h5>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="press.html">Press &amp; Awards</a></li>
+          <li><a href="about.html#team">The Team</a></li>
+          <li><a href="about.html#cards">Gift Cards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Find Us</h5>
+        <address>
+          4180 Lostine River Road<br>
+          Lostine, Oregon 97857<br>
+          <a href="tel:+15415559082">541&nbsp;555&nbsp;9082</a><br>
+          <a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a>
+        </address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 Salt &amp; Field Farm Co. — Open Thursday through Sunday, by reservation.</div>
+      <div class="legal">
+        <a href="#">Instagram</a>
+        <a href="#">Newsletter</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salt &amp; Field — A restaurant on a working farm in the Wallowa Valley</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* index-specific layout */
+.intro-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:96px;align-items:start}
+.intro-grid .col-eyebrow{font-family:var(--sans);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--ink-soft)}
+.intro-grid h2.display{margin:18px 0 28px}
+@media(max-width:900px){.intro-grid{grid-template-columns:1fr;gap:40px}}
+
+.menu-strip{background:var(--bg-warm);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.menu-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:48px;align-items:start}
+.menu-grid .header-col{grid-column:1/span 4;position:sticky;top:120px}
+.menu-grid .courses{grid-column:6/span 7;display:flex;flex-direction:column;gap:0}
+.course{display:grid;grid-template-columns:auto 1fr auto;gap:32px;padding:28px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.course:last-child{border-bottom:none}
+.course .label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--accent);font-weight:500;min-width:80px}
+.course .dish{font-family:var(--display);font-size:1.55rem;font-weight:300;letter-spacing:-0.01em;line-height:1.15}
+.course .dish em{font-style:italic}
+.course .source{font-size:0.86rem;color:var(--ink-mute);text-align:right;max-width:18ch}
+@media(max-width:900px){.menu-grid{gap:24px}.menu-grid .header-col,.menu-grid .courses{grid-column:1/-1;position:static}.course{grid-template-columns:auto 1fr;gap:16px}.course .source{grid-column:1/-1;text-align:left;padding-left:112px}}
+
+.photo-mosaic{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:120px;gap:14px}
+.photo-mosaic .tile{overflow:hidden;background:#E8DFCE;position:relative}
+.photo-mosaic .tile img{width:100%;height:100%;object-fit:cover}
+.tile.t1{grid-column:1/span 5;grid-row:1/span 3}
+.tile.t2{grid-column:6/span 4;grid-row:1/span 2}
+.tile.t3{grid-column:10/span 3;grid-row:1/span 3}
+.tile.t4{grid-column:6/span 4;grid-row:3/span 2}
+.tile.t5{grid-column:1/span 5;grid-row:4/span 2}
+.tile.t6{grid-column:10/span 3;grid-row:4/span 2}
+@media(max-width:820px){.photo-mosaic{grid-auto-rows:90px}}
+
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch}
+.dual .panel{padding:96px 56px;display:flex;flex-direction:column;justify-content:space-between;min-height:540px}
+.dual .panel.left{border-right:1px solid var(--rule)}
+.dual .panel .photo-frame{aspect-ratio:5/4;margin-bottom:36px;overflow:hidden;background:#E8DFCE}
+.dual .panel .photo-frame img{width:100%;height:100%;object-fit:cover}
+.dual h3.display{margin:10px 0 14px}
+.dual p{color:var(--ink-soft);max-width:42ch;margin-bottom:24px}
+@media(max-width:900px){.dual{grid-template-columns:1fr}.dual .panel{padding:64px 32px;min-height:auto}.dual .panel.left{border-right:none;border-bottom:1px solid var(--rule)}}
+
+.notes{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.notes .note{padding:40px 32px;border-right:1px solid var(--rule)}
+.notes .note:last-child{border-right:none}
+.notes .note .k{font-family:var(--display);font-size:2.2rem;font-weight:300;letter-spacing:-0.01em;line-height:1;margin-bottom:10px}
+.notes .note .k em{font-style:italic;color:var(--accent)}
+.notes .note .l{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--ink-soft);margin-bottom:8px}
+.notes .note p{font-size:0.92rem;color:var(--ink-soft)}
+@media(max-width:900px){.notes{grid-template-columns:1fr 1fr}.notes .note:nth-child(2){border-right:none}.notes .note:nth-child(-n+2){border-bottom:1px solid var(--rule)}}
+@media(max-width:560px){.notes{grid-template-columns:1fr}.notes .note{border-right:none;border-bottom:1px solid var(--rule)}.notes .note:last-child{border-bottom:none}}
+
+.press-row{display:flex;flex-direction:column}
+.press-item{display:grid;grid-template-columns:160px 1fr auto;gap:48px;padding:32px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.press-item .pub{font-family:var(--display);font-size:1.15rem;font-style:italic;font-weight:400}
+.press-item .quote{font-family:var(--display);font-size:1.35rem;font-weight:300;line-height:1.25;letter-spacing:-0.01em;max-width:60ch}
+.press-item .date{font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-mute);white-space:nowrap}
+@media(max-width:780px){.press-item{grid-template-columns:1fr;gap:8px}.press-item .date{order:-1}}
+
+.calendar-section{background:var(--bg-deep);color:var(--bg-warm)}
+.calendar-section .eyebrow{color:#B8AC97}
+.calendar-section h2.display{color:var(--bg-warm);margin:18px 0 24px;max-width:18ch}
+.calendar-section p{color:#C9BEA8;max-width:46ch;margin-bottom:36px}
+.calendar-section .btn{border-color:var(--bg-warm);background:transparent;color:var(--bg-warm)}
+.calendar-section .btn:hover{background:var(--bg-warm);color:var(--bg-deep)}
+.calendar-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:96px;align-items:center}
+.seatings{border-top:1px solid #4A4339}
+.seating{display:grid;grid-template-columns:auto 1fr auto;gap:24px;padding:18px 0;border-bottom:1px solid #4A4339;align-items:baseline}
+.seating .d{font-family:var(--display);font-size:1.2rem;font-weight:400}
+.seating .t{font-size:0.92rem;color:#C9BEA8}
+.seating .s{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:#B8AC97}
+.seating .s.full{color:#7C2D12}
+@media(max-width:900px){.calendar-grid{grid-template-columns:1fr;gap:48px}}
+
+.hero-overline{position:absolute;top:48px;left:48px;right:48px;display:flex;justify-content:space-between;color:#FBF7F0;font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;opacity:0.85;z-index:2}
+.hero-headline{position:absolute;left:48px;right:48px;top:38%;transform:translateY(-50%);color:#FBF7F0;z-index:2;max-width:980px}
+.hero-headline h1{font-size:clamp(3rem,8.5vw,7.6rem)}
+.hero-headline h1 em{font-style:italic}
+@media(max-width:700px){.hero-overline,.hero-caption,.hero-headline{left:24px;right:24px}.hero-caption{bottom:32px;flex-direction:column;align-items:flex-start;gap:16px}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="bar">
+    <nav class="nav-left" aria-label="Primary">
+      <a href="restaurant.html">Restaurant</a>
+      <a href="rooms.html">Rooms</a>
+      <a href="experiences.html">The Farm</a>
+      <a href="about.html">Our Story</a>
+    </nav>
+    <a class="brand-mark active" href="index.html">Salt <em>&amp;</em> Field</a>
+    <div class="nav-right">
+      <a class="extra-link" href="press.html">Press</a>
+      <a class="extra-link" href="mailto:hello@saltandfield.com">Contact</a>
+      <a class="book-pill" href="reservations.html">Reserve</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-media">
+      <img src="photo-landscape-1.jpg" alt="The dining room at Salt &amp; Field at dusk, with hanging pendants and a long communal table">
+      <div class="hero-overline">
+        <span>Lostine, Oregon · Est. 2019</span>
+        <span>Open Thu — Sun</span>
+      </div>
+      <div class="hero-headline">
+        <h1 class="display">A restaurant<br>on a working <em>farm.</em></h1>
+      </div>
+      <div class="hero-caption">
+        <div class="meta">Forty seats · One tasting menu · Two seatings nightly</div>
+        <a class="btn btn-accent" href="reservations.html">Reserve a table</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="section">
+    <div class="wrap">
+      <div class="intro-grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>The House</span>
+          <h2 class="display">Dinner is what grew this week, cooked over fire and cared for very closely.</h2>
+        </div>
+        <div class="prose">
+          <p class="first">Salt &amp; Field sits at the end of a gravel road in the Wallowa Valley, where eighty acres of pasture, orchard and market garden feed a forty-seat dining room three nights a week. The menu is decided each Thursday morning, after a walk through the rows with the kitchen team, and printed in the afternoon. There are no choices on the card and no dishes that travel far to reach it.</p>
+          <p>Seven guest rooms above the granary make it possible to stay through breakfast — a slow, quiet meal of eggs from the coop, sourdough from the wood oven, and whatever fruit the trees are giving up. Most guests drive in from Portland, Boise or Walla Walla. A few hike down from the Eagle Cap Wilderness with mud on their boots. We welcome both.</p>
+          <a class="arrow-link" href="about.html">Read our story →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THIS WEEK'S MENU -->
+  <section class="section menu-strip">
+    <div class="wrap">
+      <div class="menu-grid">
+        <div class="header-col">
+          <span class="eyebrow"><span class="dot"></span>Week of October 23</span>
+          <h2 class="display" style="margin-top:18px">This week's <em class="display-italic">menu.</em></h2>
+          <p class="lede" style="margin-top:20px">Seven courses, $165 per guest. Beverage pairing $95, including a non-alcoholic option of cider, shrubs and herbal infusions from the garden.</p>
+          <div style="margin-top:32px"><a class="arrow-link" href="restaurant.html">See the full menu →</a></div>
+        </div>
+
+        <div class="courses">
+          <article class="course">
+            <span class="label">One</span>
+            <div>
+              <div class="dish">Buttermilk &amp; <em>green walnut,</em> rye crisp</div>
+            </div>
+            <span class="source">Dairy from Bartlett Farm, 6 mi north</span>
+          </article>
+          <article class="course">
+            <span class="label">Two</span>
+            <div>
+              <div class="dish">Trout cured in sea salt &amp; juniper</div>
+            </div>
+            <span class="source">Lostine River, line-caught Tuesday</span>
+          </article>
+          <article class="course">
+            <span class="label">Three</span>
+            <div>
+              <div class="dish">Burnt squash, hazelnut, <em>sage cream</em></div>
+            </div>
+            <span class="source">Field 4, harvested Wednesday</span>
+          </article>
+          <article class="course">
+            <span class="label">Four</span>
+            <div>
+              <div class="dish">Bread &amp; the week's butter</div>
+            </div>
+            <span class="source">Wood-fired sourdough, our wheat</span>
+          </article>
+          <article class="course">
+            <span class="label">Five</span>
+            <div>
+              <div class="dish">Lamb shoulder over coals, <em>plum</em> &amp; black mustard</div>
+            </div>
+            <span class="source">Born here, March 2024</span>
+          </article>
+          <article class="course">
+            <span class="label">Six</span>
+            <div>
+              <div class="dish">Chicories, anchovy, lardo crouton</div>
+            </div>
+            <span class="source">Cold frame, picked at five</span>
+          </article>
+          <article class="course">
+            <span class="label">Seven</span>
+            <div>
+              <div class="dish">Honey ice cream &amp; <em>quince</em> in its syrup</div>
+            </div>
+            <span class="source">Hive 3, the meadow</span>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHOTO MOSAIC -->
+  <section class="section-tight">
+    <div class="wrap-wide">
+      <div class="photo-mosaic">
+        <div class="tile t1"><img src="photo-product-1.jpg" alt="Hands trimming herbs at the pass"></div>
+        <div class="tile t2"><img src="photo-landscape-1.jpg" alt="The kitchen garden in late afternoon"></div>
+        <div class="tile t3"><img src="photo-portrait-1.jpg" alt="A guest room window onto the orchard"></div>
+        <div class="tile t4"><img src="photo-product-2.jpg" alt="Bread cooling on a linen cloth"></div>
+        <div class="tile t5"><img src="photo-landscape-1.jpg" alt="The dining room with candles lit"></div>
+        <div class="tile t6"><img src="photo-portrait-1.jpg" alt="Sheep grazing the south pasture"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DUAL: ROOMS / FARM -->
+  <section>
+    <div class="dual" style="border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)">
+      <div class="panel left">
+        <div>
+          <div class="photo-frame"><img src="photo-portrait-1.jpg" alt="Guest room with linen bedding and a writing desk"></div>
+          <span class="eyebrow"><span class="dot"></span>Seven Rooms</span>
+          <h3 class="display">Stay above the granary.</h3>
+          <p>Seven rooms with cast-iron tubs, wool blankets, and views of the orchard or the river. Breakfast is included; dinner is a short walk across the yard. From $295 a night, two-night minimum on weekends.</p>
+        </div>
+        <a class="arrow-link" href="rooms.html">View the rooms →</a>
+      </div>
+      <div class="panel">
+        <div>
+          <div class="photo-frame"><img src="photo-landscape-1.jpg" alt="Beekeeper walking through wildflower meadow"></div>
+          <span class="eyebrow"><span class="dot"></span>On the Farm</span>
+          <h3 class="display">Walks, harvests &amp; the <em class="display-italic">honey house.</em></h3>
+          <p>Saturday mornings, our farm manager Cal leads a two-hour walk through the gardens, pastures and orchards — finishing with coffee and a slice of something warm in the honey house. Free for house guests, $30 for the public.</p>
+        </div>
+        <a class="arrow-link" href="experiences.html">See farm experiences →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="notes">
+        <div class="note">
+          <div class="k">40</div>
+          <div class="l">Seats</div>
+          <p>Two seatings: 5:30 and 8:00. One menu for the room.</p>
+        </div>
+        <div class="note">
+          <div class="k">80<em>ac</em></div>
+          <div class="l">Acres</div>
+          <p>Pasture, orchard, market garden and a slow stretch of the Lostine River.</p>
+        </div>
+        <div class="note">
+          <div class="k">7</div>
+          <div class="l">Rooms</div>
+          <p>Above the granary, restored from a 1912 timber frame.</p>
+        </div>
+        <div class="note">
+          <div class="k">Thu—<em>Sun</em></div>
+          <div class="l">Open</div>
+          <p>Closed Monday through Wednesday for harvest, prep and rest.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRESS -->
+  <section class="section">
+    <div class="wrap">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;gap:32px;flex-wrap:wrap">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Selected Press</span>
+          <h2 class="display" style="margin-top:18px">What's been <em class="display-italic">written.</em></h2>
+        </div>
+        <a class="arrow-link" href="press.html">All press &amp; awards →</a>
+      </div>
+      <div class="press-row">
+        <article class="press-item">
+          <span class="pub">The New York Times</span>
+          <p class="quote">"A meal here doesn't feel performed — it feels harvested, then handed across the table."</p>
+          <span class="date">Sept 2024</span>
+        </article>
+        <article class="press-item">
+          <span class="pub">Cherry Bombe</span>
+          <p class="quote">"The most quietly confident restaurant we visited all year — and the lamb is genuinely unforgettable."</p>
+          <span class="date">May 2024</span>
+        </article>
+        <article class="press-item">
+          <span class="pub">Condé Nast Traveler</span>
+          <p class="quote">"Worth the four-hour drive from Portland, the six from Seattle, and the night in the granary loft afterward."</p>
+          <span class="date">Jan 2024</span>
+        </article>
+        <article class="press-item">
+          <span class="pub">James Beard Foundation</span>
+          <p class="quote">Semifinalist, Best New Restaurant — Outstanding Hospitality, Pacific Northwest.</p>
+          <span class="date">2023</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- UPCOMING SEATINGS -->
+  <section class="section-roomy calendar-section">
+    <div class="wrap">
+      <div class="calendar-grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Upcoming Seatings</span>
+          <h2 class="display">Tables open this <em class="display-italic">month.</em></h2>
+          <p>We release reservations on the first of each month, ninety days out. A small number of seats are held back for walk-ins from house guests and for the bar.</p>
+          <a class="btn" href="reservations.html">Book a table</a>
+        </div>
+        <div class="seatings">
+          <div class="seating"><span class="d">Thu, Oct 24</span><span class="t">5:30 &amp; 8:00 PM</span><span class="s">4 seats</span></div>
+          <div class="seating"><span class="d">Fri, Oct 25</span><span class="t">5:30 &amp; 8:00 PM</span><span class="s full">Full</span></div>
+          <div class="seating"><span class="d">Sat, Oct 26</span><span class="t">5:30 &amp; 8:00 PM</span><span class="s full">Full</span></div>
+          <div class="seating"><span class="d">Sun, Oct 27</span><span class="t">5:30 PM only</span><span class="s">9 seats</span></div>
+          <div class="seating"><span class="d">Thu, Oct 31</span><span class="t">5:30 &amp; 8:00 PM</span><span class="s">12 seats</span></div>
+          <div class="seating"><span class="d">Fri, Nov 1</span><span class="t">5:30 &amp; 8:00 PM</span><span class="s">6 seats</span></div>
+          <div class="seating"><span class="d">Sat, Nov 2</span><span class="t">5:30 &amp; 8:00 PM</span><span class="s">2 seats</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="mark">Salt <em>&amp;</em> Field</div>
+        <p>A forty-seat restaurant and seven guest rooms on a regenerative farm in the Wallowa Valley. Tasting menus, Thursday through Sunday.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Visit</h5>
+        <ul>
+          <li><a href="reservations.html">Reservations</a></li>
+          <li><a href="restaurant.html">The Restaurant</a></li>
+          <li><a href="rooms.html">Stay With Us</a></li>
+          <li><a href="experiences.html">On the Farm</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>House</h5>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="press.html">Press &amp; Awards</a></li>
+          <li><a href="about.html#team">The Team</a></li>
+          <li><a href="about.html#cards">Gift Cards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Find Us</h5>
+        <address>
+          4180 Lostine River Road<br>
+          Lostine, Oregon 97857<br>
+          <a href="tel:+15415559082">541&nbsp;555&nbsp;9082</a><br>
+          <a href="mailto:hello@saltandfield.com">hello@saltandfield.com</a>
+        </address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 Salt &amp; Field Farm Co. — Open Thursday through Sunday, by reservation.</div>
+      <div class="legal">
+        <a href="#">Instagram</a>
+        <a href="#">Newsletter</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
