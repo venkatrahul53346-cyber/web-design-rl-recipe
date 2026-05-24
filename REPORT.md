@@ -95,17 +95,19 @@ weights sum to 1.0, output ∈ [0, 1].
 
 | Signal | Weight | What it measures | Failure mode it catches |
 |---|---:|---|---|
-| **bm_position** | 0.15 | viewport-normalised centroid distance per matched pair | "Right element, wrong place" |
-| **bm_text** | 0.10 | char-bigram Dice on matched pair text | "Wrong copy in matched element" |
-| **bm_color** | 0.15 | 0.6 × text colour CIEDE2000 + 0.4 × effective bg CIEDE2000 | "Wrong palette per element AND wrong page background regime" |
-| **bm_font** | 0.10 | 0.4 × family (tiered) + 0.4 × size (ratio) + 0.2 × weight (ratio) | "Wrong typography" |
-| **bm_border** | 0.05 | 0.4 × radius + 0.3 × style + 0.3 × shadow | "Wrong border treatment" |
-| **bm_size** | 0.05 | min(area)/max(area) per pair | "Wrong physical size" |
-| **bm_recall** | 0.10 | matched_area / total_GT_area | "Sparse output, big GT regions unmatched" |
+| **bm_position** | 0.20 | viewport-normalised centroid distance per matched pair | "Right element, wrong place" |
 | **tree_bleu** | 0.20 | DOM 1-height subtree multiset recall | "Wrong nesting (skeletal divs, missing semantic tags)" |
-| **visual_ssim** | 0.10 | grayscale SSIM | "Pages don't look alike at the pixel level" |
+| **bm_color** | 0.15 | 0.6 × text colour CIEDE2000 + 0.4 × effective bg CIEDE2000 | "Wrong palette per element AND wrong page background regime" |
+| **bm_recall** | 0.15 | matched_area / total_GT_area | "Sparse output, big GT regions unmatched" |
+| **bm_text** | 0.10 | char-bigram Dice on matched pair text | "Wrong copy in matched element" |
+| **bm_font** | 0.10 | 0.4 × family (tiered) + 0.4 × size (ratio) + 0.2 × weight (ratio) | "Wrong typography" |
+| **bm_size** | 0.05 | min(area)/max(area) per pair | "Wrong physical size" |
+| **visual_ssim** | 0.05 | grayscale SSIM | "Pixel-level adversarial mode (right DOM, bizarre imagery)" |
 
-Sum = 1.000. Combined ∈ [0, 1] by construction.
+Sum = 1.000. Combined ∈ [0, 1] by construction. Weights were
+empirically rebalanced from a uniform v3-era baseline using the
+variance/discrimination analysis in §4.3 — see that section for the
+data behind every weight.
 
 ### 1.3 The matching step — Hungarian + Sørensen-Dice
 
@@ -374,19 +376,19 @@ no salvageable trajectory). Of the 110:
 
 | Task | n | Mean | Std | Min | Max | Spread |
 |---|---:|---:|---:|---:|---:|---:|
-| `auth_glassy-001` | 10 | **0.819** | 0.028 | 0.779 | 0.868 | 0.089 |
-| `docs_mono-001` | 10 | **0.726** | 0.076 | 0.567 | 0.795 | 0.228 |
-| `dashboard_dense-001` | 10 | **0.717** | 0.036 | 0.668 | 0.771 | 0.103 |
-| `pricing_dark-001` | 9 | **0.669** | 0.016 | 0.639 | 0.690 | 0.051 |
-| `healthcare_clinic__glassy_pastel-001` | 10 | **0.640** | 0.032 | 0.597 | 0.698 | 0.101 |
-| `government__dark_native_clean-001` | 9 | **0.635** | 0.065 | 0.579 | 0.780 | 0.201 |
-| `product_splash__crypto_neon-001` | 9 | **0.632** | 0.045 | 0.574 | 0.710 | 0.136 |
-| `hotel_booking__photo_warm_display-001` | 10 | **0.618** | 0.054 | 0.547 | 0.689 | 0.141 |
-| `saas_minimal-001` | 10 | **0.605** | 0.210 | **0.000** | 0.795 | 0.795 |
-| `portfolio_neobrut-001` | 10 | **0.585** | 0.086 | 0.472 | 0.706 | 0.234 |
-| `news_portal__editorial_dark-001` | 9 | **0.559** | 0.050 | 0.511 | 0.656 | 0.146 |
+| `auth_glassy-001` | 10 | **0.826** | 0.029 | 0.791 | 0.878 | 0.087 |
+| `docs_mono-001` | 10 | **0.726** | 0.094 | 0.528 | 0.804 | 0.276 |
+| `dashboard_dense-001` | 10 | **0.721** | 0.042 | 0.668 | 0.783 | 0.115 |
+| `pricing_dark-001` | 9 | **0.648** | 0.016 | 0.621 | 0.672 | 0.051 |
+| `healthcare_clinic__glassy_pastel-001` | 10 | **0.625** | 0.038 | 0.576 | 0.693 | 0.118 |
+| `government__dark_native_clean-001` | 9 | **0.614** | 0.080 | 0.552 | 0.793 | 0.241 |
+| `product_splash__crypto_neon-001` | 9 | **0.612** | 0.053 | 0.545 | 0.705 | 0.160 |
+| `hotel_booking__photo_warm_display-001` | 10 | **0.602** | 0.064 | 0.518 | 0.683 | 0.165 |
+| `saas_minimal-001` | 10 | **0.588** | 0.209 | **0.000** | 0.804 | 0.804 |
+| `portfolio_neobrut-001` | 10 | **0.583** | 0.097 | 0.458 | 0.724 | 0.266 |
+| `news_portal__editorial_dark-001` | 9 | **0.537** | 0.061 | 0.481 | 0.654 | 0.173 |
 
-**Overall (n=106):** mean = 0.656, std = 0.109, range = [0.000, 0.868].
+**Overall (n=106):** mean = 0.645, std = 0.119, range = [0.000, 0.878].
 
 The distribution is clean:
 
@@ -432,27 +434,106 @@ inspection. **No reversed pairs** were found.
 
 ### 4.3 Per-signal discrimination
 
-Across 106 trials, the per-signal mean and standard deviation tell
-which signals discriminate runs and which are nearly uniform:
+Across 124 trials (106 final-eval Opus + 18 cross-model), the
+per-signal mean, std, Spearman correlation with composite, and share
+of composite variance attributable to each signal:
 
-| Signal | Mean | Std | Discrimination |
-|---|---:|---:|---|
-| **bm_position** | 0.482 | **0.235** | **highest std — biggest discriminator** |
-| **bm_recall** | 0.731 | 0.190 | high |
-| **visual_ssim** | 0.474 | 0.140 | high |
-| **bm_font** | 0.831 | 0.119 | moderate |
-| **bm_color** | 0.823 | 0.108 | moderate |
-| **bm_size** | 0.688 | 0.108 | moderate |
-| **bm_text** | 0.916 | 0.106 | low — agents nail copy |
-| **tree_bleu** | 0.415 | 0.103 | low (mean is low — strict signal) |
-| **bm_border** | 0.954 | 0.096 | almost uniform — default treatments converge |
+| Signal | Weight | Mean | Std | Spearman ρ vs composite | Variance share |
+|---|---:|---:|---:|---:|---:|
+| **`bm_position`** | 0.20 | 0.49 | **0.24** | **+0.88** | **57 %** |
+| **`tree_bleu`** | 0.20 | 0.41 | 0.11 | +0.80 | 12 % |
+| **`bm_recall`** | 0.15 | 0.71 | 0.20 | +0.76 | 22 % |
+| `bm_color` | 0.15 | 0.81 | 0.12 | +0.58 | 7 % |
+| `bm_text` | 0.10 | 0.91 | 0.10 | +0.90 | 2 % |
+| `bm_font` | 0.10 | 0.82 | 0.12 | +0.64 | 3 % |
+| `bm_size` | 0.05 | 0.68 | 0.11 | +0.86 | 1 % |
+| `visual_ssim` | 0.05 | 0.48 | 0.16 | +0.77 | 1 % |
 
-`bm_position` does the heaviest discriminative work — Opus
-consistently produces the right elements but places them slightly off.
-`bm_recall` catches "agent matched a smaller share of GT than
-expected" (sparse agents on dense pages). `bm_text` and `bm_border`
-are near-saturated — every Opus run reproduces text faithfully and
-defaults to similar border treatments.
+(Variance share = (w·std)² normalised; assumes signal independence so
+slightly overstates contributions. Earlier `bm_border` was dropped
+to 0.00 weight after this same analysis showed Spearman ρ = −0.02
+across 124 trials — flat near 0.95 on every run, contributing nothing
+to ranking.)
+
+**One signal does the majority of the work.** `bm_position` carries
+≈57 % of composite variance — agents reliably produce the right
+elements but place them slightly off, and that gap is what
+discriminates a faithful replica from an approximate one.
+
+`bm_recall` is the second-biggest mover (≈22 %): "the agent matched
+a smaller share of GT than it should have" catches sparse-output
+agents on dense pages.
+
+`bm_text` and `bm_size` show the highest Spearman with composite
+(+0.90, +0.86) — they correlate strongly with quality — but their low
+weight × low std means they don't *separate* runs much. Every Opus
+trial reproduces text faithfully (mean 0.91). They're useful as
+quality *indicators* and anti-gaming guards rather than primary
+discriminators.
+
+`bm_color` correlates more weakly with composite (+0.58) than other
+signals — palettes are shared across the same template family, so
+most agents land in the right colour neighbourhood regardless of
+overall faithfulness.
+
+`visual_ssim` is the smallest contributor (≈1 %): it's redundant
+with `bm_position` (r=+0.73) and saturates low (max ≈ 0.74 even on
+oracle-faithful renders due to anti-aliasing noise). It earns its
+5 % weight as the only pure-pixel sanity check — defends against the
+"right DOM, weird imagery" adversarial mode that the structural
+signals would otherwise miss.
+
+### 4.4 External validity — perturbation curve and model rank ordering
+
+Two checks were run to confirm the score is a meaningful number, not
+just an internally-consistent ranking.
+
+**(a) Perturbation monotonicity.** For three diverse tasks
+(`auth_glassy-001`, `dashboard_dense-001`, `portfolio_neobrut-001`)
+we synthesised five GT-derived agent submissions per task at
+increasing severity:
+
+| sev | what we feed the grader | expected behaviour |
+|---:|---|---|
+| 0 | random ASCII gibberish, no CSS | floor (≈0) |
+| 1 | GT structure, no CSS, all text shuffled | low |
+| 2 | GT structure + GT CSS, all text shuffled | mid |
+| 3 | GT, 25 % of text leaves shuffled | high |
+| 4 | byte-for-byte GT (oracle) | 1.000 |
+
+Result on all 3 tasks (full curve in
+`report_figures/perturbation_curve.png`):
+
+| task | sev 0 | sev 1 | sev 2 | sev 3 | sev 4 |
+|---|---:|---:|---:|---:|---:|
+| `auth_glassy-001` | 0.032 | 0.678 | 0.979 | 0.995 | **1.000** |
+| `dashboard_dense-001` | 0.001 | 0.574 | 0.968 | 0.991 | **1.000** |
+| `portfolio_neobrut-001` | 0.005 | 0.638 | 0.949 | 0.983 | **1.000** |
+
+Strict monotonicity holds at every step on every task; sev 0 hits the
+floor; sev 4 hits exactly 1.000. The largest single jump is sev 1 →
+sev 2 (≈+0.30) where CSS comes back — this is the layout/visual
+signals firing. The remaining gap to oracle is small (≈0.02–0.05)
+because sev 2 and sev 3 already match GT structure and styling
+pixel-for-pixel, and only the text content differs. That matches the
+weights: text-only signals are ≤ 10 % of the composite.
+
+**(b) Cross-model rank ordering.** A 3-model × 3-task × 2-attempt run
+(`configs/cross_model_calibration.yaml`, all 18 trials graded) checks
+that a stronger Claude variant scores higher on average:
+
+| model | overall | `auth_glassy` | `dashboard_dense` | `portfolio_neobrut` |
+|---|---:|---:|---:|---:|
+| `claude-haiku-4-5` | 0.514 | 0.619 | 0.540 | 0.383 |
+| `claude-sonnet-4-6` | 0.623 | 0.749 | 0.654 | 0.466 |
+| `claude-opus-4-7` | **0.685** | **0.848** | **0.727** | **0.479** |
+
+Strict haiku < sonnet < opus ordering holds **overall and on every
+task individually**. Bar plot in `report_figures/cross_model_scores.png`,
+raw rows in `report_figures/cross_model_results.csv`. Same pages, same
+prompt, only the model differs — so the score difference is
+attributable to model output quality, not noise. This is the
+calibration anchor the grader was missing in v3.x.
 
 ---
 
@@ -493,7 +574,8 @@ machine type, or (c) profile and remove the stall.
 ### 5.4 No human-rated calibration anchor
 
 We validated correlation by visual inspection of best-vs-worst pairs
-(§4.2). We did not collect ≥30 human-rated triplets to anchor the
+(§4.2), perturbation monotonicity, and cross-model rank ordering
+(§4.4). We did not collect ≥30 human-rated triplets to anchor the
 grader against ground-truth visual-similarity ranking. Spearman ρ
 between the v5.1 grader and the predecessor v3.4 baseline was 0.733
 (n=59, on the 6 tasks where we had paired data) — meaningful but not
@@ -662,8 +744,11 @@ trial/
 │   └── compatibility.py       # 56 valid (vertical × style) pairs
 ├── tests/
 │   └── test_templates.py      # invariants, runs in 0.15s
+├── scripts/
+│   └── perturb_test.py        # 5-severity GT→gibberish perturbation runner (§4.4 a)
 ├── configs/
-│   └── final_eval_opus.yaml   # the eval config used in §4
+│   ├── final_eval_opus.yaml   # the eval config used in §4
+│   └── cross_model_calibration.yaml # haiku/sonnet/opus rank-ordering check (§4.4)
 ├── datasets/final/            # the 11 deliverable Harbor tasks
 ├── report_figures/
 │   ├── v51_results.csv        # 106-row trial output (the data behind §4)
@@ -673,7 +758,11 @@ trial/
 │   ├── v51_signals.png
 │   ├── v51_best_worst.png
 │   ├── grader_correlation.png # v5.1 vs v3.4 baseline scatter
-│   └── pairs_v51/             # 22 best+worst stitched PNGs
+│   ├── pairs_v51/             # 22 best+worst stitched PNGs
+│   ├── perturbation_results.csv  # 5-severity × 3-task curve (§4.4 a)
+│   ├── perturbation_curve.png
+│   ├── cross_model_results.csv   # 18-trial 3-model rank ordering (§4.4 b)
+│   └── cross_model_scores.png
 ├── PIPELINE.md                # deeper pipeline reference
 ├── GRADER.md                  # grader's reasoning trail
 ├── TAXONOMY.md                # design space (12 archetypes × 5 axes)

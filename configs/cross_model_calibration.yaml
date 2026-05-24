@@ -1,0 +1,33 @@
+# Cross-model grader calibration: do haiku < sonnet < opus rank correctly?
+#
+# 3 representative tasks × 3 models × 2 attempts = 18 trials.
+# Run with the Vertex-env-isolation idiom (CLAUDE.md).
+
+job_name: cross-model-calib-v51
+jobs_dir: jobs
+n_attempts: 2
+timeout_multiplier: 1.0
+
+orchestrator:
+  type: local
+  n_concurrent_trials: 18
+  quiet: false
+
+environment:
+  type: modal
+  delete: true
+
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-haiku-4-5
+  - name: claude-code
+    model_name: anthropic/claude-sonnet-4-6
+  - name: claude-code
+    model_name: anthropic/claude-opus-4-7
+
+datasets:
+  - path: datasets/final
+    task_names:
+      - auth_glassy-001
+      - dashboard_dense-001
+      - portfolio_neobrut-001

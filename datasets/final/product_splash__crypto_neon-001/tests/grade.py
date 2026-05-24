@@ -76,15 +76,15 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 WEIGHTS = {
-    "bm_position":  0.15,
+    "bm_position":  0.20,
     "bm_text":      0.10,
     "bm_color":     0.15,
     "bm_font":      0.10,
-    "bm_border":    0.05,
+    "bm_border":    0.00,
     "bm_size":      0.05,
-    "bm_recall":    0.10,
+    "bm_recall":    0.15,
     "tree_bleu":    0.20,
-    "visual_ssim":  0.10,
+    "visual_ssim":  0.05,
 }
 assert abs(sum(WEIGHTS.values()) - 1.0) < 1e-9, sum(WEIGHTS.values())
 
