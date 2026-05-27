@@ -735,14 +735,142 @@ env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
 
 ## 8. Out of scope (Parts 2 and 3 of the brief)
 
-- **Animations** (Part 2). The grader operates on static screenshots;
-  it doesn't see CSS keyframes or transitions. A natural extension is
-  temporal SSIM frame-by-frame from `page.video()` recordings, plus
-  CSS animation declaration comparison.
-- **React / Tailwind / Solid** (Part 3). The pipeline currently emits
-  HTML+CSS files; the spec → compiler split is framework-agnostic and
-  could swap the compiler stage without changing the grader (which
-  operates on the rendered DOM).
+Both Parts 2 and 3 were deferred per the brief's "high-taste Part 1
+beats rushed all-three" guidance. This section documents the proposed
+approach for each so reviewers can see the design taste even where we
+chose not to implement.
+
+### 8.1 Part 2 — animations
+
+**Spec design.** Animations belong on a third orthogonal axis alongside
+vertical × style, because their compatibility is real but cross-cutting
+(`pulse_neon_glow` works on `crypto_neon` but not `mono_everywhere`;
+`marquee_logos` works on `saas_landing` but not `docs_mono`).
+
+```python
+@dataclass(frozen=True)
+class AnimationMeta:
+    name: str                                # e.g., "entrance_fade_stagger"
+    category: Literal["entrance", "loop", "scroll", "decoration"]
+    target_role: str                         # which spec slot
+    duration_ms: int
+    delay_ms: int = 0
+    easing: str = "ease-out"
+    motion_descriptor: dict                  # canonical {translate_y, opacity, ...}
+    css_keyframes: str                       # the literal @keyframes the compiler emits
+    intensity: Literal["subtle", "moderate", "prominent"]
+    visibility_window: tuple[float, float]   # observable in canonical recording
+```
+
+Each `VerticalMeta` declares animation slots; the sampler picks 0–N
+animations subject to `compatibility(style, animation)`.
+
+**Visibility constraint (the load-bearing decision).** If an animation
+isn't observable from the agent's input, grading it is unfair noise.
+Three constraints fall out:
+
+1. *Excluded categories:* hover, click, focus, state-driven (modal
+   open, validation shake), canvas/WebGL/Lottie, autoplay video,
+   stochastic. The agent has no cursor, no input device, no way to
+   trigger state, and the grader is blind to canvas pixels.
+2. *Canonical recording protocol:* `t=0..3s` page load (catches
+   entrance + first loop cycle), `t=3..6s` smooth scroll top→bottom
+   (catches scroll-triggered), `t=6..8s` settle. Every declared
+   animation must have its `visibility_window` covered by this
+   recording.
+3. *Pre-flight visibility check:* run the recording with animations
+   disabled (`.no-anim` class) vs enabled. Any declared animation that
+   produces no visible diff is too subtle and rejected.
+
+**Grading — stack four DOM-based signals on top of v5.1.** Because we
+control the renderer, we can pause and seek the animation timeline
+deterministically (`element.getAnimations().forEach(a => a.pause())`,
+`a.currentTime = t`) and read DOM at any timestamp. **No video pixel
+diff required.**
+
+| Signal | What it measures | Implementation |
+|---|---|---|
+| `anim_declaration` | "Does agent animate the right elements?" | Per matched pair: read `getComputedStyle().animationName` + `animationDuration`. Set-overlap, normalised. |
+| `anim_motion` | "Is the *type* of motion right?" | Parse `@keyframes` from CSSOM into canonical descriptor `{fade, slide_dir, scale, rotate, ...}` per element. Descriptor overlap. |
+| `anim_trajectory` | "Does the element actually move similarly over time?" | Sample bbox at `t = 0.0, 0.15, 0.3, 0.6, 1.0, 2.0 s` per declared animation. DTW distance on centroid trajectories. |
+| `anim_temporal_v51` | "Right page state at right time?" | Run v5.1 grader on (GT_at_t, agent_at_t) for *mid-flight* timestamps per declared animation. Mean. |
+
+The animation composite folds in at ~0.10–0.15 weight; v5.1's static
+signals stay dominant. Static-only pages get `anim_*` = 1.0 for free
+(no animations declared, none expected, perfect match).
+
+**Why not temporal SSIM frame-by-frame.** That was the §8 stub in the
+v5.1 report and is *the wrong primary primitive*. Pixel-aligned
+frame-diff is sensitive to ±50ms timing offsets, FPS jitter, and
+encoding noise; it rewards lookalike pixels at frame `t` rather than
+"right element doing right motion." The trajectory primitive is
+inherently semantic (bbox of a matched element over time), inherits
+v5.1's anti-gaming guarantees (works on the matched anchor pool), and
+runs in milliseconds rather than seconds.
+
+**Agent input.** 5–8 keyframe screenshots plus one short MP4 (≤ 5s)
+per animated page. Opus 4.7's video understanding is uneven but
+real; multi-frame redundancy is the safety net.
+
+### 8.2 Part 3 — multi-framework support
+
+**The grader is framework-agnostic by construction.** It operates on
+rendered DOM, not source code: render in headless Chromium, walk the
+element tree, read computed styles, screenshot. Two HTML files that
+produce identical DOMs score 1.0. Four framework variants that produce
+identical DOMs are indistinguishable to v5.1.
+
+This is the strongest single design decision in v5.1 and pays its
+biggest dividend on Part 3.
+
+**What changes per framework:**
+
+| Layer | HTML + CSS | React + CSS | React + Tailwind | Solid + Tailwind |
+|---|---|---|---|---|
+| Spec | unchanged | unchanged | unchanged | unchanged |
+| Compiler stage | current per-page LLM compile | per-page LLM compile with React/JSX prompt | + Tailwind utility classes | + Solid syntax (close to React) |
+| Dockerfile | playwright base | + Node 20 | + Node 20 | + Node 20 |
+| Build step | none (file://) | `npm ci && vite build` | same | same |
+| Render | open `file://*.html` | spin Vite dev server, Playwright connects to `localhost:5173/<route>` | same | same |
+| Grader | unchanged | **unchanged** | **unchanged** | **unchanged** |
+| Instruction.md | "produce HTML+CSS" | "produce React app, scaffold provided" | "+ Tailwind" | "+ Solid+Tailwind" |
+
+Concrete additions: ~30 LOC to compiler (per-framework prompt
+templates), ~50 LOC to Dockerfile (Node + Vite stub), ~40 LOC to
+render step (start/stop dev server). No grader change.
+
+**The cross-framework benchmark falls out for free.** Same
+`WebsiteSpec`, four compiler invocations → four task variants → ten
+Opus runs each = 4 × 10 × 11 = 440 trials. The composite score is
+directly comparable across frameworks because the grader is identical.
+
+**Predicted findings (educated guess for the proposal — not measured):**
+
+| Framework | Expected behaviour |
+|---|---|
+| HTML + CSS | baseline (already measured: mean 0.65) |
+| React + CSS | ≈ baseline. JSX is essentially syntactic sugar over HTML at the DOM level. |
+| React + Tailwind | `bm_color`/`bm_font` *up* (utility classes pin design tokens to a fixed palette/scale). `tree_bleu` *down* (utility-soup flattens semantic class names; many `<div className="flex gap-4 ...">` instead of `<section class="hero">`). |
+| Solid + Tailwind | small drop from React+Tailwind (Opus's training distribution skews more React). |
+
+**Patterns Opus likely struggles with per framework:**
+
+- *React+CSS*: hook closures and stale state, but those are functional
+  not visual — out of scope for our grader. The visual fidelity should
+  match HTML+CSS closely.
+- *Tailwind variants*: Opus tends to over-use arbitrary-value
+  utilities (`text-[14px]`) instead of the design-system scale.
+  Visually similar; structurally noisy.
+- *Solid+Tailwind*: `createSignal`/`createEffect` reactivity model
+  differs from React; Opus may hallucinate React patterns. Again,
+  functional more than visual.
+
+Implementation effort: ~2–3 days of careful work (compiler prompts,
+Dockerfile/Vite plumbing, render adapter), then a 2-hour eval run on
+Modal to produce the 4-framework benchmark.
+
+### 8.3 Other deferred work
+
 - **Pattern coverage on every vertical.** Pattern axes (see §2's
   within-pair diversity subsection) are populated for `saas_landing`
   as proof. Extending each remaining vertical takes ~2 hours of
@@ -753,10 +881,7 @@ env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
   the 56 valid pairs; some pairs (`saas_clean` covers 11 verticals)
   get over-sampled at large batch sizes. A `sample_batch(N)` that
   enforces coverage across the (regime × typography × density) grid
-  is needed for production batches >50.
-
-Both Parts 2 and 3 were deferred per the brief's "high-taste Part 1
-beats rushed all-three" guidance.
+  is needed for production batches > 50.
 
 ---
 

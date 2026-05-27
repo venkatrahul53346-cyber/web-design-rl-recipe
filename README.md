@@ -14,18 +14,30 @@ This repo is a deliverable for Anthropic's recipe-design trial.
 
 The report covers, in order:
 
-1. **The grader** — Block-Match architecture, 9 signals, weights,
-   anti-gaming.
-2. **The pipeline** — spec-driven LLM compile, decoupled vertical/style
-   architecture.
+1. **The grader** — Block-Match architecture, 9 signals, weights, anti-gaming.
+2. **The pipeline** — spec-driven LLM compile, decoupled vertical/style architecture.
 3. **The 11 final tasks** — distribution across (vertical × style).
-4. **Empirical results** — 106 of 110 trials, per-task / per-signal
-   distributions.
-5. **Grader shortcomings** — what we know we can't catch.
+4. **Empirical results** — 106 of 110 trials, per-task / per-signal distributions.
+5. **Grader shortcomings** — what we know we can't catch, including §5.7 sparse / image-heavy pages.
 6. **What we learned about Opus 4.7** — observed failure patterns.
+7. **Reproducing the results.**
+8. **Out of scope (Parts 2 and 3)** — proposed approach for animations and multi-framework support.
+9. **Grader evolution: v5.2 candidate** — area-weighted aggregation + 39-trial empirical comparison.
 
-Open `report_figures/v51_pairs.html` in a browser for the visual
-GT-vs-agent gallery that anchors the correlation evidence in §4.2.
+## Visual deliverables (open in a browser)
+
+| File | What it shows |
+|---|---|
+| **`report_figures/slides/index.html`** | **9-slide deck** with keyboard nav, lightbox, narration alongside each panel. The headline visual report. |
+| `report_figures/v51_pairs.html` | GT-vs-agent gallery (22 best/worst pairs across 11 tasks) — anchors §4.2's correlation evidence. |
+| `report_figures/slides/A_per_task_spread.png` … `F_v51_vs_v52.png` | The 6 individual slide panels as standalone PNGs. |
+
+```bash
+# from the repo root
+open report_figures/slides/index.html        # the slide deck
+open report_figures/v51_pairs.html           # the GT-vs-agent gallery
+ls datasets/final/                           # the 11 deliverable Harbor tasks
+```
 
 ## Other docs
 
@@ -67,7 +79,7 @@ env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
 ```
 src/
   synthesize.py              per-page LLM compiler (the recipe)
-  _blockmatch_grade.py       v5.1 Block-Match grader (primary)
+  _blockmatch_grade.py       v5.1 grader; v5.2 mode via weighting="sqrt_area" (§9)
   _container_grade.py        helpers (CIE-Lab + tree-BLEU); shipped beside grade.py
   render.py                  host-side playwright screenshotter
   generate.py                Harbor task layout (bakes the grader)
@@ -88,11 +100,13 @@ report_figures/
   v51_pairs.html             GT-vs-agent visual gallery
   v51_contact_sheet.png      single-image overview of all best/worst pairs
   pairs_v51/                 22 individual best/worst stitched PNGs
+  v52_compare.csv            39-trial v5.1 vs v5.2 comparison (§9)
+  adversarial_results.csv    empty + screenshot-embed cheat anchors (§1.5)
+  slides/                    9-slide deck (index.html + 6 panel PNGs)
 ```
 
 ## What's deliberately out of scope
 
 - **Crawling existing sites.** Forbidden by the brief.
-- **Animations** (Part 2 of the brief). Architecture supports it later.
-- **React / Tailwind / Solid** (Part 3). The pipeline is framework-
-  agnostic at the spec level.
+- **Animations** (Part 2). Proposed approach + DOM-based grader extension in [REPORT §8](REPORT.md).
+- **React / Tailwind / Solid** (Part 3). Proposed approach in [REPORT §8](REPORT.md); v5.1 grader is framework-agnostic by construction.
