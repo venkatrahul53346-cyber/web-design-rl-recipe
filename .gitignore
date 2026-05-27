@@ -41,11 +41,9 @@ jobs/
 # Local-only diversity demos (proof artifacts, regenerable)
 demos/
 
-# Local-only one-off helper scripts (kept around, not part of the deliverable)
-scripts/demo_patterns.py
-scripts/rerender_demo.py
-scripts/perturb_render.py
+# Local-only plumbing & one-off helper scripts — not part of the deliverable
+scripts/
 
-# Local-only rendered perturbation panels (regenerable from scripts/perturb_render.py)
+# Local-only rendered perturbation panels (regenerable)
 report_figures/perturb_panels/
 report_figures/perturb_panels.html

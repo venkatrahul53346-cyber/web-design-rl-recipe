@@ -715,10 +715,11 @@ what visual fidelity benchmarks should reward.
 ## 7. Reproducing the results
 
 ```bash
-# Generate all 11 tasks (~30-50 min, ~$30-50 in Anthropic credits)
+# Generate one task from the spec → compiler → render → Harbor packaging pipeline
 env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
   ANTHROPIC_API_KEY="$(tr -d '\n\r' < ~/.trial-anthropic-key)" \
-  bash scripts/synth-all.sh
+  .venv/bin/python -m src.synthesize \
+  --vertical saas_landing --style saas_clean --seed 0 --out datasets/final/
 
 # Run Opus 4.7 × 10 attempts on all 11 tasks (~30-90 min, ~$50-200)
 env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
@@ -726,14 +727,8 @@ env -i HOME=$HOME PATH=$PATH SHELL=$SHELL USER=$USER LANG=en_US.UTF-8 \
   harbor run -c configs/final_eval_opus.yaml -y \
   --ae ANTHROPIC_API_KEY="$(tr -d '\n\r' < ~/.trial-anthropic-key)"
 
-# Aggregate v5.1 scores from jobs/<run_name>/*/verifier/reward.json
-.venv/bin/python /tmp/aggregate_v51.py
-```
-
-Stuck Modal verifier sandboxes can be recovered locally:
-
-```bash
-.venv/bin/python /tmp/recover_stuck.py     # re-grade from agent/trajectory.json
+# Each trial's reward.json is at jobs/<run_name>/<trial>/verifier/reward.json;
+# aggregated outputs in this report come from report_figures/v51_results.csv.
 ```
 
 ---
@@ -843,9 +838,10 @@ per-pair signals. Every conclusion in §4 and §6 survives the change —
 we'd ship it as a future grader cycle but don't treat it as urgent.
 v5.1 isn't broken; v5.2 is more principled.
 
-Reproduce: `.venv/bin/python scripts/regrade_v52.py` (regrades a
-configured subset of `jobs/final-eval-opus-v51/` trials) →
-`.venv/bin/python scripts/render_v52_panel.py` (renders Panel F).
+The v5.2 implementation is part of `src/_blockmatch_grade.py`
+(`grade_page(..., weighting="sqrt_area")`). The empirical impact data
+in this section comes from `report_figures/v52_compare.csv`, with the
+visual comparison rendered as Panel F in `report_figures/slides/`.
 
 ---
 
@@ -866,12 +862,6 @@ trial/
 │   └── compatibility.py       # 56 valid (vertical × style) pairs
 ├── tests/
 │   └── test_templates.py      # invariants, runs in 0.15s
-├── scripts/
-│   ├── perturb_test.py        # 5-severity GT→gibberish perturbation runner (§4.4 a)
-│   ├── adversarial_test.py    # screenshot-embed cheat measurement (§1.5)
-│   ├── regrade_v52.py         # re-grade trials with v5.2 sqrt-area weighting (§9)
-│   ├── render_v52_panel.py    # v5.1-vs-v5.2 comparison panel (§9.2)
-│   └── render_slides.py       # 5-panel slide-deck renderer
 ├── configs/
 │   ├── final_eval_opus.yaml   # the eval config used in §4
 │   └── cross_model_calibration.yaml # haiku/sonnet/opus rank-ordering check (§4.4)
