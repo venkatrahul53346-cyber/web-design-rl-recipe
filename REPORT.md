@@ -594,6 +594,44 @@ The architecture is designed to make trivial cheats score near 0
 (§1.5). We didn't actually run an adversarial agent that tries each
 cheat — the proofs are by construction (signal weights), not by test.
 
+### 5.7 Sparse pages and image-heavy sites
+
+The grader is calibrated and validated on tasks with **40+ matched
+text anchors per page** (the lowest in our 11-task set is auth_glassy
+at ~55). Six of nine signals are per-pair and aggregated as a mean
+over `n_matched` pairs, so the standard error of those signals scales
+like `1/√n_matched`. Sparser pages produce wider per-trial
+distributions because individual anchor mismatches contribute
+disproportionately to the per-pair means.
+
+| Regime | Per-pair signal behaviour |
+|---|---|
+| `n_matched` ≥ 30 | Stable. Each pair contributes ≤ 3% to means. All 11 of our tasks live here. |
+| 5 ≤ `n_matched` < 30 | High-variance. One bad pair shifts means by 5–20%. Single-trial scores need to be interpreted as means over ≥ 5 attempts. |
+| `n_matched` < 5 | Near-binary. Page-level signals (`bm_recall`, `tree_bleu`, `visual_ssim`, combined weight 0.40) carry most of the discriminative work. |
+| GT has 0 text anchors | `bm_recall` returns 1.0 by special case; per-pair signals all return 0; composite caps at ~0.40 even for an oracle reproduction. Wrong direction; needs a fix. |
+
+A separate weakness applies to **image-heavy pages**. Text-anchored
+matching is blind to `<img>` content, so a portfolio gallery with 12
+thumbnails and 2 text anchors is graded almost entirely by `tree_bleu`
+(DOM structure) and `visual_ssim` (pixel fidelity) — combined weight
+0.25. The other 0.75 of the composite is per-pair signals computed on
+2 anchors, which is noise. Tasks of this type weren't in our 11-task
+slate, so the limitation is theoretical, not yet measured — but it
+would surface immediately on a portfolio-with-image-grid task.
+
+Three mitigations worth considering for v5.3:
+
+1. **Confidence-aware aggregation.** Below some `K` (e.g. 10), shrink
+   per-pair signal contributions toward neutral and shift weight to
+   page-level signals.
+2. **Image-content scoring.** For matched `<img>` elements, compute
+   per-region SSIM or CLIP/DINO embedding cosine. Adds a real signal
+   for image-heavy pages without changing the text-matching primitive.
+3. **Fix `bm_recall = 1.0` for empty GT.** Fall through to
+   `tree_bleu × visual_ssim` rather than auto-granting recall when the
+   page has no text leaves at all.
+
 ---
 
 ## 6. What we learned about Opus 4.7
@@ -727,7 +765,91 @@ beats rushed all-three" guidance.
 
 ---
 
-## 9. Repo map
+## 9. Grader evolution: v5.2 candidate
+
+A natural follow-up to v5.1 aligns the per-pair signal aggregation
+with `bm_recall`'s area-weighting. v5.1 has an internal inconsistency:
+`bm_recall` is area-weighted by construction
+(`matched_area / total_GT_area`), but the six per-pair signals are
+flat means — every matched pair contributes equally regardless of bbox
+size. A heading mismatch counts the same as a footer-link mismatch.
+
+### 9.1 The change
+
+```python
+# v5.1 (current):
+bm_text = float(np.mean([sim for _, _, sim in pairs]))
+
+# v5.2 (candidate):
+gt_areas = np.array([gt_anchors[i]["w"] * gt_anchors[i]["h"]
+                     for i, _, _ in pairs])
+w = np.sqrt(np.maximum(gt_areas, 1.0))
+w = w / w.sum()
+bm_text = float(np.average([sim for _, _, sim in pairs], weights=w))
+```
+
+Applied uniformly to all six per-pair signals
+(`bm_position`, `bm_text`, `bm_color`, `bm_font`, `bm_border`,
+`bm_size`). Page-level signals are untouched.
+
+**Why sqrt-area, not pure area:** a hero with 100× the bbox area of a
+footer link gets ~10× the weight under sqrt, not 100×. Avoids
+single-element dominance while still rewarding visual prominence.
+
+**Why GT area, not agent or min/max:** we're measuring fidelity to GT.
+Agent-side area is already represented inside `bm_size`.
+
+The `w` and `h` fields are already captured per anchor by `_RICH_JS`
+via `getBoundingClientRect()` — they were just unused outside
+`bm_recall`. Implementation: ~10 LoC in `grade_page`, gated by
+`weighting="sqrt_area"` parameter. v5.1 mode preserved as
+`weighting="flat"` (default).
+
+### 9.2 Empirical impact (39 trials regraded)
+
+We re-graded the 4 most informative tasks with both modes in a single
+render pass each (3 highest-spread tasks: docs_mono, portfolio_neobrut,
+government_dark; plus 1 saturated control: auth_glassy). Raw data:
+`report_figures/v52_compare.csv`. Comparison panel:
+`report_figures/slides/F_v51_vs_v52.png`.
+
+| Property | Result |
+|---|---|
+| Spearman ρ between v5.1 and v5.2 composites | **0.9984** |
+| Kendall τ | **0.9838** |
+| Composite delta (mean) | +0.003 |
+| Composite delta (range) | [−0.004, +0.017] |
+| Within-task best-run preserved | 4 / 4 tasks |
+| Within-task worst-run preserved | 3 / 4 (auth_glassy swap between trials whose v5.1 scores differed by 0.002) |
+
+#### Per-signal effects (mean Δ across 39 trials)
+
+| Signal | Mean Δ (v5.2 − v5.1) | Direction |
+|---|---:|---|
+| `bm_color` | +0.0154 | up — bigger anchors have palette-correct colours more often |
+| `bm_position` | +0.0142 | up — Opus places larger anchors more accurately than smaller ones |
+| `bm_border` | +0.0052 | up — heroes/cards get rounded-corner styling consistently right |
+| `bm_size` | −0.0140 | down — bigger anchors have larger absolute size mismatches |
+| `bm_text` | −0.0108 | down — longer text strings have more bigram drift than short labels |
+| `bm_font` | −0.0049 | down (small) |
+| `bm_recall`, `tree_bleu`, `visual_ssim` | 0.0000 | unchanged — page-level signals not affected by per-pair weighting |
+
+### 9.3 Verdict
+
+v5.2 is a **safe upgrade**: ranking preserved, no pathological cases,
+signal effects are interpretable in the predicted direction. It
+addresses the architectural inconsistency between `bm_recall` and the
+per-pair signals. Every conclusion in §4 and §6 survives the change —
+we'd ship it as a future grader cycle but don't treat it as urgent.
+v5.1 isn't broken; v5.2 is more principled.
+
+Reproduce: `.venv/bin/python scripts/regrade_v52.py` (regrades a
+configured subset of `jobs/final-eval-opus-v51/` trials) →
+`.venv/bin/python scripts/render_v52_panel.py` (renders Panel F).
+
+---
+
+## 10. Repo map
 
 ```
 trial/
@@ -745,7 +867,11 @@ trial/
 ├── tests/
 │   └── test_templates.py      # invariants, runs in 0.15s
 ├── scripts/
-│   └── perturb_test.py        # 5-severity GT→gibberish perturbation runner (§4.4 a)
+│   ├── perturb_test.py        # 5-severity GT→gibberish perturbation runner (§4.4 a)
+│   ├── adversarial_test.py    # screenshot-embed cheat measurement (§1.5)
+│   ├── regrade_v52.py         # re-grade trials with v5.2 sqrt-area weighting (§9)
+│   ├── render_v52_panel.py    # v5.1-vs-v5.2 comparison panel (§9.2)
+│   └── render_slides.py       # 5-panel slide-deck renderer
 ├── configs/
 │   ├── final_eval_opus.yaml   # the eval config used in §4
 │   └── cross_model_calibration.yaml # haiku/sonnet/opus rank-ordering check (§4.4)
@@ -762,7 +888,10 @@ trial/
 │   ├── perturbation_results.csv  # 5-severity × 3-task curve (§4.4 a)
 │   ├── perturbation_curve.png
 │   ├── cross_model_results.csv   # 18-trial 3-model rank ordering (§4.4 b)
-│   └── cross_model_scores.png
+│   ├── cross_model_scores.png
+│   ├── adversarial_results.csv   # empty + screenshot-embed cheat anchors (§1.5)
+│   ├── v52_compare.csv        # 39 trials × 2 modes for v5.1/v5.2 comparison (§9)
+│   └── slides/                # slide-deck panels A–F + index.html
 ├── PIPELINE.md                # deeper pipeline reference
 ├── GRADER.md                  # grader's reasoning trail
 ├── TAXONOMY.md                # design space (12 archetypes × 5 axes)

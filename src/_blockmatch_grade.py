@@ -501,8 +501,15 @@ class V5PageScore:
 
 def grade_page(gt_render: RichRendered, ag_render: Optional[RichRendered],
                gt_html: str, ag_html: str,
-               vw: float = 1280, vh: float = 800) -> V5PageScore:
-    """Score a single (gt, agent) page pair under v5."""
+               vw: float = 1280, vh: float = 800,
+               weighting: str = "flat") -> V5PageScore:
+    """Score a single (gt, agent) page pair under v5.
+
+    weighting: "flat" (v5.1, np.mean) or "sqrt_area" (v5.2, np.average with
+    weights = sqrt(GT bbox area), normalised). Sqrt-area weighting makes
+    bigger anchors contribute more to bm_position/text/color/font/border/size,
+    consistent with how bm_recall is already area-weighted.
+    """
     if ag_render is None:
         return V5PageScore(
             name=gt_render.name, n_gt_anchors=0, n_ag_anchors=0, n_matched=0,
@@ -515,22 +522,20 @@ def grade_page(gt_render: RichRendered, ag_render: Optional[RichRendered],
     pairs, _ = block_match_pairs(gt_anchors, ag_anchors)
 
     if pairs:
-        bm_pos = float(np.mean([
-            position_score(gt_anchors[i], ag_anchors[j], vw, vh) for i, j, _ in pairs
-        ]))
-        bm_text = float(np.mean([sim for _, _, sim in pairs]))
-        bm_color = float(np.mean([
-            color_score(gt_anchors[i], ag_anchors[j]) for i, j, _ in pairs
-        ]))
-        bm_font = float(np.mean([
-            font_score(gt_anchors[i], ag_anchors[j]) for i, j, _ in pairs
-        ]))
-        bm_border = float(np.mean([
-            border_score(gt_anchors[i], ag_anchors[j]) for i, j, _ in pairs
-        ]))
-        bm_size = float(np.mean([
-            size_score(gt_anchors[i], ag_anchors[j]) for i, j, _ in pairs
-        ]))
+        if weighting == "sqrt_area":
+            areas = np.array([gt_anchors[i]["w"] * gt_anchors[i]["h"] for i, _, _ in pairs])
+            w = np.sqrt(np.maximum(areas, 1.0))
+            w = w / w.sum()
+            agg = lambda vals: float(np.average(vals, weights=w))
+        else:
+            agg = lambda vals: float(np.mean(vals))
+
+        bm_pos    = agg([position_score(gt_anchors[i], ag_anchors[j], vw, vh) for i, j, _ in pairs])
+        bm_text   = agg([sim for _, _, sim in pairs])
+        bm_color  = agg([color_score(gt_anchors[i], ag_anchors[j])  for i, j, _ in pairs])
+        bm_font   = agg([font_score(gt_anchors[i], ag_anchors[j])   for i, j, _ in pairs])
+        bm_border = agg([border_score(gt_anchors[i], ag_anchors[j]) for i, j, _ in pairs])
+        bm_size   = agg([size_score(gt_anchors[i], ag_anchors[j])   for i, j, _ in pairs])
     else:
         bm_pos = bm_text = bm_color = bm_font = bm_border = bm_size = 0.0
 

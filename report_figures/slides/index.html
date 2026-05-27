@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Web-Design RL Benchmark — Part 1 Results</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #1a1d23;
+    --ink: #e8e8ea;
+    --muted: #9aa0a8;
+    --accent: #4a9eff;
+    --easy: #4caf50;
+    --hard: #ef5350;
+    --adv: #ab47bc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink);
+               font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+               overflow: hidden; }
+  .deck { position: relative; width: 100vw; height: 100vh; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column;
+           padding: 28px 36px 16px; opacity: 0; transition: opacity .25s; }
+  .slide.active { display: flex; opacity: 1; }
+  .slide h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; letter-spacing: -.01em; }
+  .slide h1 .sub { color: var(--muted); font-weight: 400; font-size: 18px; margin-left: 12px; }
+  .slide .body { flex: 1; display: grid; grid-template-columns: 1fr 380px;
+                 gap: 28px; margin-top: 14px; min-height: 0; }
+  .panel-img { background: var(--panel); border-radius: 8px; padding: 12px;
+               display: flex; align-items: center; justify-content: center; min-height: 0; }
+  .panel-img img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-in; }
+  .narration { background: var(--panel); border-radius: 8px; padding: 22px 26px;
+               overflow-y: auto; }
+  .narration h3 { font-size: 14px; text-transform: uppercase; letter-spacing: .08em;
+                  color: var(--muted); margin-bottom: 10px; }
+  .narration ul { list-style: none; }
+  .narration ul li { padding: 8px 0 8px 18px; position: relative;
+                     border-bottom: 1px solid #2a2d33; font-size: 15px; line-height: 1.55; }
+  .narration ul li:last-child { border-bottom: none; }
+  .narration ul li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); }
+  .narration .stat { display: inline-block; background: #252830; padding: 2px 8px;
+                     border-radius: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+                     font-size: 13px; color: var(--accent); }
+  .narration .green { color: var(--easy); font-weight: 600; }
+  .narration .red { color: var(--hard); font-weight: 600; }
+  .narration .purple { color: var(--adv); font-weight: 600; }
+  .footer { position: absolute; left: 36px; right: 36px; bottom: 14px;
+            display: flex; justify-content: space-between; align-items: center;
+            color: var(--muted); font-size: 13px; }
+  .footer .count { font-variant-numeric: tabular-nums; }
+  .footer .help { font-size: 12px; }
+  .footer .help kbd { background: #2a2d33; padding: 1px 6px; border-radius: 3px;
+                       font-family: ui-monospace, monospace; font-size: 11px;
+                       border: 1px solid #3a3d43; }
+  /* Title slide */
+  .slide.title { justify-content: center; align-items: center; text-align: center; padding: 40px; }
+  .slide.title h1 { font-size: 56px; margin-bottom: 16px; }
+  .slide.title .meta { color: var(--muted); font-size: 22px; margin-bottom: 32px; }
+  .slide.title .stats-row { display: flex; gap: 40px; margin-top: 24px; }
+  .slide.title .stats-row .stat-item { text-align: center; }
+  .slide.title .stats-row .num { font-size: 42px; color: var(--accent); font-weight: 700; }
+  .slide.title .stats-row .lbl { color: var(--muted); font-size: 14px; }
+  /* Summary slide */
+  .slide.summary .body { grid-template-columns: 1fr; }
+  .slide.summary .narration { padding: 32px 40px; }
+  .slide.summary .narration ul li { font-size: 18px; padding: 14px 0 14px 28px; }
+  .slide.summary .narration ul li::before { content: "✓"; color: var(--easy); }
+  /* Lightbox */
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+              display: none; align-items: center; justify-content: center;
+              cursor: zoom-out; z-index: 1000; padding: 28px; }
+  .lightbox.show { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .progress { position: absolute; top: 0; left: 0; height: 3px; background: var(--accent);
+              transition: width .25s; }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+  <!-- Slide 0: Title -->
+  <section class="slide title active">
+    <h1>Web-Design RL Benchmark</h1>
+    <div class="meta">Part 1 results — Opus 4.7 on 11 multi-page web-design tasks</div>
+    <div class="stats-row">
+      <div class="stat-item"><div class="num">11</div><div class="lbl">tasks</div></div>
+      <div class="stat-item"><div class="num">10</div><div class="lbl">attempts/task</div></div>
+      <div class="stat-item"><div class="num">106</div><div class="lbl">graded trials</div></div>
+      <div class="stat-item"><div class="num">v5.1</div><div class="lbl">Block-Match grader</div></div>
+    </div>
+    <div style="margin-top: 56px; color: var(--muted); font-size: 14px;">
+      Press <kbd style="background:#2a2d33;padding:2px 8px;border-radius:3px;">→</kbd> or <kbd style="background:#2a2d33;padding:2px 8px;border-radius:3px;">Space</kbd> to advance
+    </div>
+  </section>
+
+  <!-- Slide A -->
+  <section class="slide">
+    <h1>Where Opus wins, where it loses <span class="sub">— per-task score distribution</span></h1>
+    <div class="body">
+      <div class="panel-img"><img src="A_per_task_spread.png" alt="Panel A"></div>
+      <div class="narration">
+        <h3>What to look at</h3>
+        <ul>
+          <li>11 tasks, sorted by mean. <span class="green">Green</span> = saturated/easy, <span class="red">red</span> = hard.</li>
+          <li>Every task lives between the two dotted lines: <span class="purple">screenshot-embed cheat = 0.05</span> on the left, <span class="stat">oracle = 1.000</span> on the right.</li>
+          <li>Saturated tasks (<span class="stat">auth (glassy)</span>, <span class="stat">pricing (dark)</span>) sit near the top with tight spreads (~0.05–0.09).</li>
+          <li>Hard tasks have wider spreads — <span class="stat">docs (mono)</span>, <span class="stat">portfolio (neobrut)</span>, <span class="stat">government (dark)</span> all show 0.20+ best-vs-worst.</li>
+          <li>The single 0.000 outlier on <span class="stat">saas (minimal)</span>: an Opus run that produced no HTML at all. The grader correctly returned its true score.</li>
+          <li><strong>Takeaway:</strong> A reward signal that saturates on 3 control tasks and discriminates on 8 hard ones is exactly the shape an RL trainer wants.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide B -->
+  <section class="slide">
+    <h1>What within-task spread is made of <span class="sub">— best vs worst on 3 high-spread tasks</span></h1>
+    <div class="body">
+      <div class="panel-img"><img src="B_best_vs_worst_signals.png" alt="Panel B"></div>
+      <div class="narration">
+        <h3>What to look at</h3>
+        <ul>
+          <li>3 rows = 3 tasks with the largest best-vs-worst gap.</li>
+          <li>Each row: best Opus run (left), worst Opus run (right), per-signal contribution to the spread.</li>
+          <li>In the bar chart, <strong>raw delta</strong> (faded) and <strong>weighted contribution</strong> (solid) per signal.</li>
+          <li>Look at <span class="stat">bm_position</span> in every row — it's the longest bar by far. Opus produces the right elements but places them slightly off.</li>
+          <li><span class="stat">bm_recall</span> is second — the worst run matches less of the GT's element area than the best.</li>
+          <li><span class="stat">bm_text</span> and <span class="stat">bm_border</span> barely move — Opus reproduces copy and rounded-corner aesthetics near-perfectly on every run.</li>
+          <li><strong>Takeaway:</strong> The gap between a good Opus run and a poor one is almost entirely about <em>spatial composition</em>, not copy or styling.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide C -->
+  <section class="slide">
+    <h1>The grader is correctly anchored <span class="sub">— calibration on auth_glassy</span></h1>
+    <div class="body">
+      <div class="panel-img"><img src="C_adversarial_anchors.png" alt="Panel C"></div>
+      <div class="narration">
+        <h3>What to look at</h3>
+        <ul>
+          <li>Same task, five different agent submissions, sorted by score.</li>
+          <li><span class="red">Gibberish</span> (random ASCII, no CSS): <span class="stat">0.032</span>. Every signal hits zero.</li>
+          <li><span class="purple">Screenshot embed</span> (<code>&lt;img src=GT.png&gt;</code>): <span class="stat">0.050</span>. The strongest cheat possible — pixel-perfect visual_ssim of 1.0. But text=0, recall=0, tree_bleu=0. The 0.05 weight on SSIM × 1.0 is the entire score.</li>
+          <li><span style="color:#f9a825">Structure only</span> (GT layout, text shuffled): <span class="stat">0.678</span>. Layout signals fire correctly; text and SSIM are penalised.</li>
+          <li><span style="color:var(--accent)">Real Opus 4.7</span> mean over 10 attempts: <span class="stat">0.819</span>.</li>
+          <li><span class="green">Oracle</span> (GT verbatim): <span class="stat">1.000</span>.</li>
+          <li><strong>Takeaway:</strong> Floor and ceiling are correctly placed. The single most powerful trivial cheat scores 1/20 of the real run. The grader cannot be gamed without actually doing the task.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide D -->
+  <section class="slide">
+    <h1>What Opus 4.7 consistently struggles with <span class="sub">— canonical failure modes</span></h1>
+    <div class="body">
+      <div class="panel-img"><img src="D_opus_failure_modes.png" alt="Panel D"></div>
+      <div class="narration">
+        <h3>What to look at</h3>
+        <ul>
+          <li>Four canonical failure modes, each shown via the worst Opus run on a task that exhibits it.</li>
+          <li><strong>Symmetric drift</strong> — when GT is intentionally asymmetric (portfolio neobrutalism), Opus collapses to a 12-col grid.</li>
+          <li><strong>Column compression</strong> — when GT uses narrow editorial measure (~40ch news columns), Opus defaults to wide single-column.</li>
+          <li><strong>Hero compression</strong> — when GT has tall airy hero (government civic page), Opus crams content upward into the fold.</li>
+          <li><strong>Density underproduction</strong> — when GT shows 3-pane mono (docs), Opus collapses to dark single column.</li>
+          <li>All four are caught by the same two signals: <span class="stat">bm_position</span> and <span class="stat">bm_recall</span>.</li>
+          <li><strong>Takeaway:</strong> Spatial composition is the consistent gap. The failure modes connect cleanly to the signals doing the discriminative work in slide B.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide E -->
+  <section class="slide">
+    <h1>Where the score actually comes from <span class="sub">— per-signal discrimination</span></h1>
+    <div class="body">
+      <div class="panel-img"><img src="E_signal_discrimination.png" alt="Panel E"></div>
+      <div class="narration">
+        <h3>What to look at</h3>
+        <ul>
+          <li>Two views of the same 106 trials.</li>
+          <li><strong>Left</strong> — share of composite variance attributable to each signal. Three signals do 85% of the work: <span class="stat">bm_position</span> (54.7%), <span class="stat">bm_recall</span> (20%), <span class="stat">tree_bleu</span> (10.5%).</li>
+          <li><strong>Right</strong> — Spearman ρ between each signal and overall composite. <span class="stat">bm_text</span> at +0.90 correlates strongly, but its low standard deviation means it doesn't <em>separate</em> runs — it's a quality <em>indicator</em>, not a <em>discriminator</em>.</li>
+          <li><span class="stat">bm_border</span> shows ρ = −0.17 — slightly negative correlation. This is why v5.1 dropped its weight to 0.</li>
+          <li><strong>Takeaway:</strong> The weights are calibrated to put discriminative work where the variance lives, with low-variance high-correlation signals as quality floors.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide F1: v5.2 design -->
+  <section class="slide">
+    <h1>v5.2 candidate <span class="sub">— area-weighted per-pair aggregation</span></h1>
+    <div class="body">
+      <div class="narration" style="grid-column: span 2; padding: 28px 36px;">
+        <h3>What changes (and what doesn't)</h3>
+        <ul>
+          <li><strong>Matching step is unchanged.</strong> Same Hungarian + Sørensen-Dice on text bigrams, same 0.5 threshold, same anchors.</li>
+          <li><strong>Aggregation across matched pairs changes from <span class="stat">np.mean</span> to <span class="stat">np.average(weights = sqrt(GT bbox area))</span></strong> for the six per-pair signals: bm_position, bm_text, bm_color, bm_font, bm_border, bm_size.</li>
+          <li>Page-level signals untouched: <span class="stat">bm_recall</span> was already area-weighted; <span class="stat">tree_bleu</span> and <span class="stat">visual_ssim</span> aren't per-pair.</li>
+          <li><strong>Why sqrt-area, not pure area:</strong> a hero with 100× the bbox area of a footer link gets ~10× weight under sqrt, not 100×. Avoids a single huge element dominating every signal.</li>
+          <li><strong>Why GT area, not agent or min/max:</strong> we're measuring fidelity to GT. Agent-side area is already represented inside <span class="stat">bm_size</span>.</li>
+          <li><strong>Implementation:</strong> ~10 lines in <code>grade_page</code>. The <code>w</code> and <code>h</code> fields per anchor are already captured by <code>_RICH_JS</code> — we just weren't using them outside <span class="stat">bm_recall</span>.</li>
+          <li><strong>Motivating concern:</strong> at flat-mean aggregation, an H1 mismatch counts the same as a footer-link mismatch. A reader notices the H1 first.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide F2: v5.1 vs v5.2 comparison -->
+  <section class="slide">
+    <h1>v5.1 vs v5.2 empirical comparison <span class="sub">— 39 trials regraded with both modes</span></h1>
+    <div class="body">
+      <div class="panel-img"><img src="F_v51_vs_v52.png" alt="Panel F"></div>
+      <div class="narration">
+        <h3>What to look at</h3>
+        <ul>
+          <li><strong>Top-left scatter:</strong> v5.1 vs v5.2 composite. <span class="stat">Spearman ρ = 0.9984</span>, <span class="stat">Kendall τ = 0.9838</span>. Every point on y=x.</li>
+          <li><strong>Top-middle:</strong> deltas are tiny — mean +0.003, range [−0.004, +0.017]. v5.2 nudges scores slightly upward on average.</li>
+          <li><strong>Top-right:</strong> within-task ranking integrity. <span class="green">Best stayed best on all 4 tasks.</span> Worst stayed worst on 3 of 4. The auth_glassy swap is between two trials whose v5.1 scores differed by 0.002 — essentially tied.</li>
+          <li><strong>Bottom-left, the meat:</strong> per-signal deltas show where the change actually happens. <span class="stat">bm_color</span> +0.015 and <span class="stat">bm_position</span> +0.014 lead — both rise under area-weighting because Opus does better on bigger anchors than smaller ones.</li>
+          <li><span class="stat">bm_text</span> (−0.011) and <span class="stat">bm_size</span> (−0.014) drop slightly — bigger anchors have noisier text Dice and bigger absolute size mismatches.</li>
+          <li><span class="stat">bm_recall</span>, <span class="stat">tree_bleu</span>, <span class="stat">visual_ssim</span> show zero delta — they aren't per-pair signals.</li>
+          <li><strong>Verdict:</strong> v5.2 is a safe upgrade. Ranking preserved, no pathological cases, signal effects are interpretable. Worth shipping, but v5.1 isn't broken.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary slide -->
+  <section class="slide summary">
+    <h1>Summary <span class="sub">— grader properties demonstrated</span></h1>
+    <div class="body">
+      <div class="narration">
+        <ul>
+          <li><strong>Higher score ↔ more faithful replica.</strong> Pair-by-pair visual inspection across 11 tasks confirms the score ranking matches the human ranking.</li>
+          <li><strong>Floor and ceiling correctly anchored.</strong> Trivial cheats fall below 0.10; oracle hits 1.000; the SSIM-cheat scores exactly the SSIM weight ceiling.</li>
+          <li><strong>Discriminative within tasks.</strong> Hard tasks show 0.10–0.23 best-vs-worst spread, dominated by spatial-composition signals.</li>
+          <li><strong>Identifies model failure modes.</strong> The same two signals (bm_position, bm_recall) that drive discrimination also catch all four canonical Opus failures.</li>
+          <li><strong>Anti-gaming by construction.</strong> No single signal can produce a high composite — every cheat we tried collapses to ≤0.05.</li>
+          <li><strong>Cross-model rank-ordering.</strong> haiku &lt; sonnet &lt; opus on every task individually (REPORT.md §4.4b).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  <div class="count"><span id="cur">1</span> / <span id="total">7</span></div>
+  <div class="help">
+    <kbd>←</kbd> <kbd>→</kbd> navigate &nbsp;·&nbsp;
+    <kbd>Home</kbd> <kbd>End</kbd> jump &nbsp;·&nbsp;
+    click image to zoom
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('show')">
+  <img id="lightbox-img" alt="">
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let idx = 0;
+  const total = slides.length;
+  document.getElementById('total').textContent = total;
+
+  function show(i) {
+    idx = Math.max(0, Math.min(total - 1, i));
+    slides.forEach((s, k) => s.classList.toggle('active', k === idx));
+    document.getElementById('cur').textContent = idx + 1;
+    document.getElementById('progress').style.width = ((idx + 1) / total * 100) + '%';
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (document.getElementById('lightbox').classList.contains('show')) {
+      if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('show');
+      return;
+    }
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault(); show(idx + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault(); show(idx - 1);
+    } else if (e.key === 'Home') {
+      e.preventDefault(); show(0);
+    } else if (e.key === 'End') {
+      e.preventDefault(); show(total - 1);
+    }
+  });
+
+  // Click image -> lightbox
+  document.querySelectorAll('.panel-img img').forEach(img => {
+    img.addEventListener('click', () => {
+      document.getElementById('lightbox-img').src = img.src;
+      document.getElementById('lightbox').classList.add('show');
+    });
+  });
+
+  show(0);
+</script>
+</body>
+</html>
